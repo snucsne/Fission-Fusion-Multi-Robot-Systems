@@ -1,0 +1,225 @@
+name : Goal seek behavior
+fuzzy-rules :
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : BACK_LEFT
+    - type : antecedent
+      input-value : goal-arrival-time
+      linguistic-variable : ArrivalTime
+      linguistic-value : NOW
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : LEFT
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : SAME
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : BACK_LEFT
+    - type : antecedent
+      input-value : goal-arrival-time
+      hedge :
+        id : NOT
+        linguistic-variable : ArrivalTime
+        linguistic-value : NOW
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : LEFT
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : FASTER
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : BACK_RIGHT
+    - type : antecedent
+      input-value : goal-arrival-time
+      linguistic-variable : ArrivalTime
+      linguistic-value : NOW
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : RIGHT
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : SAME
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : BACK_RIGHT
+    - type : antecedent
+      input-value : goal-arrival-time
+      hedge :
+        id : NOT
+        linguistic-variable : ArrivalTime
+        linguistic-value : NOW
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : RIGHT
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : FASTER
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_LEFT
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_RIGHT
+    - type : antecedent
+      input-value : goal-arrival-time
+      linguistic-variable : ArrivalTime
+      linguistic-value : DISTANT
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : MUCH_FASTER
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_LEFT
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_RIGHT
+    - type : antecedent
+      input-value : goal-arrival-time
+      linguistic-variable : ArrivalTime
+      linguistic-value : LONG_TIME
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : FASTER
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_LEFT
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_RIGHT
+    - type : antecedent
+      input-value : goal-arrival-time
+      linguistic-variable : ArrivalTime
+      linguistic-value : SOON
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : SAME
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_LEFT
+    - type : antecedent
+      input-value : goal-dir-theta
+      hedge :
+        id : NOT
+        linguistic-variable : GoalSeekDirTheta
+        linguistic-value : BACK_RIGHT
+    - type : antecedent
+      input-value : goal-arrival-time
+      linguistic-variable : ArrivalTime
+      linguistic-value : REAL_SOON
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : SLOWER
+
+  - rule :
+    - type : antecedent
+      input-value : goal-arrival-time
+      linguistic-variable : ArrivalTime
+      linguistic-value : NOW
+    - type : consequent
+      output-value : steer-speed-relative-output
+      linguistic-variable : SteerSpeedRelative
+      linguistic-value : MUCH_SLOWER
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : LEFT
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : LEFT
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : SMALL_LEFT
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : SMALL_LEFT
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : CENTER
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : CENTER
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : SMALL_RIGHT
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : SMALL_RIGHT
+
+  - rule :
+    - type : antecedent
+      input-value : goal-dir-theta
+      linguistic-variable : GoalSeekDirTheta
+      linguistic-value : RIGHT
+    - type : consequent
+      output-value : steer-yaw-output
+      linguistic-variable : SteerYaw
+      linguistic-value : RIGHT
