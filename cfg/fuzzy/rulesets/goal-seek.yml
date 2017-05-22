@@ -35,105 +35,105 @@ fuzzy-rules :
       linguistic-variable   : SteerSpeedRelative same
 
   - rule :
-    - input-value : goal-dir-theta
-      linguistic-variable : GoalSeekDirTheta back-right
-    - input-value : goal-arrival-time
+    - input-value           : goal-dir-theta
+      linguistic-variable   : GoalSeekDirTheta back-right
+    - input-value           : goal-arrival-time
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : ArrivalTime now
-    - output-value : steer-yaw-output
-      linguistic-variable : SteerYaw right
-    - output-value : steer-speed-relative-output
-      linguistic-variable : SteerSpeedRelative faster
+    - output-value          : steer-yaw-output
+      linguistic-variable   : SteerYaw right
+    - output-value          : steer-speed-relative-output
+      linguistic-variable   : SteerSpeedRelative faster
 
   - rule :
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-left
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-right
-    - input-value : goal-arrival-time
-      linguistic-variable : ArrivalTime distant
-    - output-value : steer-speed-relative-output
-      linguistic-variable : SteerSpeedRelative much-faster
+    - input-value           : goal-arrival-time
+      linguistic-variable   : ArrivalTime distant
+    - output-value          : steer-speed-relative-output
+      linguistic-variable   : SteerSpeedRelative much-faster
 
   - rule :
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-left
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-right
-    - input-value : goal-arrival-time
-      linguistic-variable : ArrivalTime long-time
-    - output-value : steer-speed-relative-output
-      linguistic-variable : SteerSpeedRelative faster
+    - input-value           : goal-arrival-time
+      linguistic-variable   : ArrivalTime long-time
+    - output-value          : steer-speed-relative-output
+      linguistic-variable   : SteerSpeedRelative faster
 
   - rule :
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-left
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-right
-    - input-value : goal-arrival-time
-      linguistic-variable : ArrivalTime soon
-    - output-value : steer-speed-relative-output
-      linguistic-variable : SteerSpeedRelative same
+    - input-value           : goal-arrival-time
+      linguistic-variable   : ArrivalTime soon
+    - output-value          : steer-speed-relative-output
+      linguistic-variable   : SteerSpeedRelative same
 
   - rule :
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-left
-    - input-value : goal-dir-theta
+    - input-value           : goal-dir-theta
       hedge :
-        id : not
+        id                  : not
         linguistic-variable : GoalSeekDirTheta back-right
-    - input-value : goal-arrival-time
-      linguistic-variable : ArrivalTime real-soon
-    - output-value : steer-speed-relative-output
-      linguistic-variable : SteerSpeedRelative slower
+    - input-value           : goal-arrival-time
+      linguistic-variable   : ArrivalTime real-soon
+    - output-value          : steer-speed-relative-output
+      linguistic-variable   : SteerSpeedRelative slower
 
   - rule :
-    - input-value : goal-arrival-time
-      linguistic-variable : ArrivalTime now
-    - output-value : steer-speed-relative-output
-      linguistic-variable : SteerSpeedRelative much-slower
+    - input-value           : goal-arrival-time
+      linguistic-variable   : ArrivalTime now
+    - output-value          : steer-speed-relative-output
+      linguistic-variable   : SteerSpeedRelative much-slower
 
   - rule :
-    - input-value : goal-dir-theta
-      linguistic-variable : GoalSeekDirTheta left
-    - output-value : steer-yaw-output
-      linguistic-variable : SteerYaw left
+    - input-value           : goal-dir-theta
+      linguistic-variable   : GoalSeekDirTheta left
+    - output-value          : steer-yaw-output
+      linguistic-variable   : SteerYaw left
 
   - rule :
-    - input-value : goal-dir-theta
-      linguistic-variable : GoalSeekDirTheta small-left
-    - output-value : steer-yaw-output
-      linguistic-variable : SteerYaw small-left
+    - input-value           : goal-dir-theta
+      linguistic-variable   : GoalSeekDirTheta small-left
+    - output-value          : steer-yaw-output
+      linguistic-variable   : SteerYaw small-left
 
   - rule :
-    - input-value : goal-dir-theta
-      linguistic-variable : GoalSeekDirTheta center
-    - output-value : steer-yaw-output
-      linguistic-variable : SteerYaw center
+    - input-value           : goal-dir-theta
+      linguistic-variable   : GoalSeekDirTheta center
+    - output-value          : steer-yaw-output
+      linguistic-variable   : SteerYaw center
 
   - rule :
-    - input-value : goal-dir-theta
-      linguistic-variable : GoalSeekDirTheta small-right
-    - output-value : steer-yaw-output
-      linguistic-variable : SteerYaw small-right
+    - input-value           : goal-dir-theta
+      linguistic-variable   : GoalSeekDirTheta small-right
+    - output-value          : steer-yaw-output
+      linguistic-variable   : SteerYaw small-right
 
   - rule :
-    - input-value : goal-dir-theta
-      linguistic-variable : GoalSeekDirTheta right
-    - output-value : steer-yaw-output
-      linguistic-variable : SteerYaw right
+    - input-value           : goal-dir-theta
+      linguistic-variable   : GoalSeekDirTheta right
+    - output-value          : steer-yaw-output
+      linguistic-variable   : SteerYaw right
