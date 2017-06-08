@@ -1,0 +1,30 @@
+# Unique ID
+id: agent-collision-avoidance-goal-seek
+
+# Implementing class
+class: edu.snu.csne.mates.agent.DefaultAgent
+
+# All fuzzy variables
+fuzzy-variables:
+- 
+  
+# All float variables
+float-variables:
+- input-variable: float-speed
+  type: fuzzy-input
+  value: speed
+- output-variable: steer-speed-relative-output-command
+  type: fuzzy-output
+  value: steer-speed-relative-output
+
+# All modules
+modules:
+
+# Relative motor output command module
+- rank: 4
+  type: relative-motor-output-command-module
+  steer-speed-relative-var-id: steer-speed-relative-output-command
+  steer-yaw-var-id: steer-yaw-output-command
+  steer-pitch-var-id: steer-pitch-output-command
+  steer-roll-var-id: steer-roll-output-command
+  attention-dir-yaw-var-id: 

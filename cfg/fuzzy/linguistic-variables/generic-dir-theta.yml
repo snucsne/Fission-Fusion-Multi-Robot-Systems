@@ -1,6 +1,6 @@
 name : DirTheta
-uod : (-1,1)
-linguistic-values :
+uod : "[-1,1]"
+values :
   - name : back-left
     membership : (-1,1) (-0.55,1) (-0.45,0)
   - name : left
