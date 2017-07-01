@@ -19,6 +19,10 @@
  */
 package edu.snu.csne.mates.agent;
 
+// Imports
+import edu.snu.csne.mates.agent.module.AgentModule;
+import edu.snu.csne.mates.sim.SimulationState;
+
 
 /**
  * TODO Class description
@@ -27,13 +31,77 @@ package edu.snu.csne.mates.agent;
  */
 public interface Agent extends Comparable<Agent>
 {
+    /**
+     * Adds a module to this agent
+     *
+     * @param module The agent module to add
+     * @param rank The rank of the module with respect to the other modules
+     */
+    public void addModule( AgentModule module, int rank );
+    
+    /**
+     * Returns the unique ID of this agent
+     *
+     * @return The unique ID
+     */
     public Object getID();
     
+    /**
+     * Returns the name of this agent
+     *
+     * @return The name
+     */
     public String getName();
     
+    /**
+     * Returns the full name of this agent
+     * 
+     * @return The full name
+     */
+    public String getFullName();
+
+    /**
+     * Returns the team of this agent
+     *
+     * @return The team
+     */
+    public AgentTeam getTeam();
+    
+    /**
+     * Returns the blackboard for this agent
+     *
+     * @return The blackboard
+     */
+    public AgentBlackboard getBlackboard();
+    
+    /**
+     * Initializes this agent
+     */
+    public void initialize( SimulationState simState );
+    
+    /**
+     * Executes this agent
+     */
     public void execute();
     
+    /**
+     * Destroys this agent
+     */
+    public void destroy();
+    
+    /**
+     * Indicates whether or not the agent is active
+     *
+     * @return <code>true</code> if the agent is active, otherwise,
+     * <code>false</code>
+     */
     public boolean isActive();
     
+    /**
+     * Indicates whether or not the agent has been initialized
+     *
+     * @return <code>true</code> if the agent has been initialized, otherwise,
+     * <code>false</code>
+     */
     public boolean isInitialized();
 }

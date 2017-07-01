@@ -1,5 +1,5 @@
 name : Goal seek behavior
-fuzzy-rules :
+rules :
   - rule :
     # IF (goal-dir-theta IS back-left) AND (goal-arrival-time IS now)
     # THEN (steer-yaw-output IS left) AND (steer-speed-relative-output IS same)
