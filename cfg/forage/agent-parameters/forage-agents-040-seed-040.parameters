@@ -1,0 +1,49 @@
+# =========================================================
+# generated on: Sun Jul 09 22:50:02 CDT 2017
+# position count [40]
+# minimum neighbor separation [1.0]
+# maximum position radius [4.472136]
+# random seed [40]
+# =========================================================
+
+agent-count = 40
+agent.000.position = +00.000,+00.000,+00.000
+agent.001.position = -03.002,+01.967,+00.000
+agent.002.position = +01.408,+00.511,+00.000
+agent.003.position = +00.900,-03.646,+00.000
+agent.004.position = -00.396,+01.657,+00.000
+agent.005.position = -01.826,-00.306,+00.000
+agent.006.position = -03.042,-02.997,+00.000
+agent.007.position = +00.239,-01.408,+00.000
+agent.008.position = -01.233,-02.912,+00.000
+agent.009.position = +03.214,-00.387,+00.000
+agent.010.position = +01.121,-02.636,+00.000
+agent.011.position = +02.337,-01.604,+00.000
+agent.012.position = -04.148,+01.350,+00.000
+agent.013.position = +03.048,+02.824,+00.000
+agent.014.position = +02.060,-03.468,+00.000
+agent.015.position = +00.861,+02.782,+00.000
+agent.016.position = +01.980,-00.543,+00.000
+agent.017.position = -03.506,-00.183,+00.000
+agent.018.position = -01.257,-01.339,+00.000
+agent.019.position = -02.530,+02.970,+00.000
+agent.020.position = +04.270,+00.392,+00.000
+agent.021.position = -01.688,+03.698,+00.000
+agent.022.position = -01.807,+01.331,+00.000
+agent.023.position = +00.236,+03.761,+00.000
+agent.024.position = -03.074,-01.412,+00.000
+agent.025.position = +03.555,-01.875,+00.000
+agent.026.position = +01.446,+03.977,+00.000
+agent.027.position = +03.202,+01.498,+00.000
+agent.028.position = +00.021,-02.480,+00.000
+agent.029.position = +02.463,+00.789,+00.000
+agent.030.position = -00.753,+00.690,+00.000
+agent.031.position = -00.406,-03.971,+00.000
+agent.032.position = +01.279,+01.585,+00.000
+agent.033.position = -00.810,+03.039,+00.000
+agent.034.position = -02.183,-01.986,+00.000
+agent.035.position = -03.258,+00.821,+00.000
+agent.036.position = -04.253,-00.939,+00.000
+agent.037.position = -01.940,-03.921,+00.000
+agent.038.position = -03.843,-02.251,+00.000
+agent.039.position = +04.390,-00.832,+00.000

@@ -1,0 +1,8 @@
+patch-count = 2
+patch.00.position = 50,0,0
+patch.00.resources = 50
+patch.00.radius = 5
+patch.01.position = 100,20,0
+patch.01.resources = 50
+patch.01.radius = 8
+

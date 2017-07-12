@@ -1,0 +1,32 @@
+# Simulation parameters
+random-seed = 42
+simulation-count = 1
+simulation-step-count = 10000
+agent-properties-file = cfg/forage/forage-agents-example.parameters
+patch-properties-file = cfg/forage/forage-patch-example.parameters
+event-listener-count = 2
+event-listener.00.class = edu.snu.csne.forage.event.PositionEventListener
+position-history-file = test-position-history.data
+event-listener.01.class = edu.snu.csne.forage.event.DecisionEventListener
+decision-history-file = test-decision-history.data
+
+
+# Sensing parameters
+agent-sensor-class = edu.snu.csne.forage.sensor.MetricAgentSensor
+agent-sensing-distance = 30
+patch-sensor-class = edu.snu.csne.forage.sensor.MetricPatchSensor
+patch-sensing-distance = 50
+
+
+# Decision-maker parameters
+decision-maker-class = edu.snu.csne.forage.decision.FlockingDecisionMaker
+
+
+# Agent parameters
+max-speed = 2.0
+max-force = 1.0
+resource-consumption-rate = 1
+resource-consumption-max = 1000
+arrival-scale-distance = 10
+
+

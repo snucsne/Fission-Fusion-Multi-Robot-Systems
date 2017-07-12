@@ -1,0 +1,22 @@
+agent-count = 10
+agent.000.position = 0,0,0
+agent.000.team = FlockingTeam
+agent.001.position = 0,1,0
+agent.001.team = FlockingTeam
+agent.002.position = 1,0,0
+agent.002.team = FlockingTeam
+agent.003.position = 1,1,0
+agent.003.team = FlockingTeam
+agent.004.position = 0,-1,0
+agent.004.team = FlockingTeam
+agent.005.position = -1,0,0
+agent.005.team = FlockingTeam
+agent.006.position = -1.5,1.5,0
+agent.006.team = FlockingTeam
+agent.007.position = -1,-1,0
+agent.007.team = FlockingTeam
+agent.008.position = 1,-1,0
+agent.008.team = FlockingTeam
+agent.009.position = -1,1,0
+agent.009.team = FlockingTeam
+

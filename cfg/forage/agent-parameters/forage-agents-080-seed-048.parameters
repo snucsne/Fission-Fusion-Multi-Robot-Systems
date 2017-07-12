@@ -1,0 +1,89 @@
+# =========================================================
+# generated on: Sun Jul 09 22:51:01 CDT 2017
+# position count [80]
+# minimum neighbor separation [1.0]
+# maximum position radius [6.3245554]
+# random seed [48]
+# =========================================================
+
+agent-count = 80
+agent.000.position = +00.000,+00.000,+00.000
+agent.001.position = +04.105,+00.453,+00.000
+agent.002.position = +02.536,-02.056,+00.000
+agent.003.position = -01.145,+05.142,+00.000
+agent.004.position = -00.630,+01.983,+00.000
+agent.005.position = +01.620,-05.992,+00.000
+agent.006.position = -01.796,+03.554,+00.000
+agent.007.position = +02.890,-03.291,+00.000
+agent.008.position = -05.172,+01.770,+00.000
+agent.009.position = -04.058,-01.269,+00.000
+agent.010.position = -03.183,+03.990,+00.000
+agent.011.position = +04.504,+03.838,+00.000
+agent.012.position = +03.402,+04.214,+00.000
+agent.013.position = -03.414,+01.230,+00.000
+agent.014.position = -00.625,-05.498,+00.000
+agent.015.position = -04.890,-03.223,+00.000
+agent.016.position = -03.162,+05.217,+00.000
+agent.017.position = +01.747,+04.189,+00.000
+agent.018.position = -03.575,+02.306,+00.000
+agent.019.position = +02.482,+00.589,+00.000
+agent.020.position = +03.334,+01.888,+00.000
+agent.021.position = +00.787,+03.364,+00.000
+agent.022.position = -03.495,-05.148,+00.000
+agent.023.position = -03.102,-01.935,+00.000
+agent.024.position = -01.146,+01.068,+00.000
+agent.025.position = -02.003,-04.211,+00.000
+agent.026.position = +00.924,+01.209,+00.000
+agent.027.position = +01.242,-04.995,+00.000
+agent.028.position = +00.288,-02.072,+00.000
+agent.029.position = +02.551,-00.819,+00.000
+agent.030.position = +03.788,-02.130,+00.000
+agent.031.position = +03.072,+05.179,+00.000
+agent.032.position = -02.000,-05.326,+00.000
+agent.033.position = -01.162,-02.466,+00.000
+agent.034.position = +05.538,-01.317,+00.000
+agent.035.position = +00.989,-00.823,+00.000
+agent.036.position = -05.428,-00.606,+00.000
+agent.037.position = -00.565,-04.079,+00.000
+agent.038.position = +05.897,-00.306,+00.000
+agent.039.position = -04.564,+03.650,+00.000
+agent.040.position = +04.858,-02.421,+00.000
+agent.041.position = +05.177,+02.842,+00.000
+agent.042.position = -01.289,-01.158,+00.000
+agent.043.position = +02.573,-04.613,+00.000
+agent.044.position = -04.545,-02.277,+00.000
+agent.045.position = -00.735,+03.883,+00.000
+agent.046.position = -02.255,+01.787,+00.000
+agent.047.position = +02.011,+05.560,+00.000
+agent.048.position = +00.322,+05.297,+00.000
+agent.049.position = +03.176,+03.233,+00.000
+agent.050.position = +01.994,+01.603,+00.000
+agent.051.position = +01.419,-03.832,+00.000
+agent.052.position = -02.426,-03.147,+00.000
+agent.053.position = -03.752,-03.459,+00.000
+agent.054.position = +03.601,-00.609,+00.000
+agent.055.position = -04.378,+00.083,+00.000
+agent.056.position = +04.360,-04.473,+00.000
+agent.057.position = -02.094,+00.031,+00.000
+agent.058.position = -06.222,+00.444,+00.000
+agent.059.position = +03.588,-05.128,+00.000
+agent.060.position = +04.496,-03.357,+00.000
+agent.061.position = +05.124,+01.360,+00.000
+agent.062.position = -02.601,-00.932,+00.000
+agent.063.position = +01.739,+02.590,+00.000
+agent.064.position = +00.391,-03.415,+00.000
+agent.065.position = +00.512,-06.073,+00.000
+agent.066.position = -00.064,+01.053,+00.000
+agent.067.position = -05.737,-01.790,+00.000
+agent.068.position = +01.567,-02.533,+00.000
+agent.069.position = -02.626,+02.865,+00.000
+agent.070.position = -01.438,+06.149,+00.000
+agent.071.position = +06.162,+00.997,+00.000
+agent.072.position = +01.111,+06.004,+00.000
+agent.073.position = +04.351,+02.084,+00.000
+agent.074.position = +04.893,-00.193,+00.000
+agent.075.position = -00.294,+06.140,+00.000
+agent.076.position = +00.400,+02.172,+00.000
+agent.077.position = -04.473,-04.435,+00.000
+agent.078.position = -05.191,+00.731,+00.000
+agent.079.position = -01.071,+00.002,+00.000
