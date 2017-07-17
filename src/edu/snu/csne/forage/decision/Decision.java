@@ -19,9 +19,8 @@
  */
 package edu.snu.csne.forage.decision;
 
+//Imports
 import org.apache.commons.lang3.Validate;
-
-// Imports
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.AgentTeam;
 

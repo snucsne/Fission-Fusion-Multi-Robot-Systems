@@ -104,6 +104,9 @@ public class SimulationState
     /** Key postfix for a position */
     private static final String _POSITION_KEY = "position";
     
+    /** Key postfix for a velocity */
+    private static final String _VELOCITY_KEY = "velocity";
+
     /** Key postfix for a radius value */
     private static final String _RADIUS_KEY = "radius";
 
@@ -665,6 +668,11 @@ public class SimulationState
                     prefix + _POSITION_KEY,
                     "Agent [" + formattedIdx + "] position " );
             
+            // Get the velocity
+            Vector3f velocity = MiscUtils.loadNonEmptyVector3fProperty( agentProps,
+                    prefix + _VELOCITY_KEY,
+                    "Agent [" + formattedIdx + "] velocity " );
+
             // Get the team
             String teamID = agentProps.getProperty( prefix + _TEAM_KEY );
             Validate.notEmpty( teamID, "Team id may not be null or empty" );
@@ -675,7 +683,7 @@ public class SimulationState
             // Create the agent
             Agent agent = new Agent( id,
                     position,
-                    Vector3f.ZERO.clone(),
+                    velocity,
                     team,
                     resourceConsumptionRate,
                     resourceConsumptionMax,

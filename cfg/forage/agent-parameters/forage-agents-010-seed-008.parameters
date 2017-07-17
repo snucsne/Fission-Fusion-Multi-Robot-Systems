@@ -1,5 +1,5 @@
 # =========================================================
-# generated on: Sun Jul 09 22:49:12 CDT 2017
+# generated on: Sun Jul 16 20:47:33 CDT 2017
 # position count [10]
 # minimum neighbor separation [1.0]
 # maximum position radius [2.236068]
@@ -8,12 +8,22 @@
 
 agent-count = 10
 agent.000.position = +00.000,+00.000,+00.000
+agent.000.team = Team000
 agent.001.position = +01.073,-00.215,+00.000
+agent.001.team = Team000
 agent.002.position = -01.983,-00.389,+00.000
+agent.002.team = Team000
 agent.003.position = +00.157,+01.445,+00.000
+agent.003.team = Team000
 agent.004.position = -01.773,+00.828,+00.000
+agent.004.team = Team000
 agent.005.position = +00.097,-01.416,+00.000
+agent.005.team = Team000
 agent.006.position = -01.036,+01.515,+00.000
+agent.006.team = Team000
 agent.007.position = -01.000,-01.182,+00.000
+agent.007.team = Team000
 agent.008.position = +01.636,+00.753,+00.000
+agent.008.team = Team000
 agent.009.position = +01.199,+01.671,+00.000
+agent.009.team = Team000

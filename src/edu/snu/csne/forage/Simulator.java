@@ -155,22 +155,26 @@ public class Simulator
         Iterator<Agent> agentIter = agents.iterator();
         while( agentIter.hasNext() )
         {
-            agentIter.next().sense();
+            Agent current = agentIter.next();
+            current.sense();
+            current.plan();
+            current.act();
+//            agentIter.next().sense();
         }
         
-        // Execute the planning
-        agentIter = agents.iterator();
-        while( agentIter.hasNext() )
-        {
-            agentIter.next().plan();
-        }
-        
-        // Execute the acting
-        agentIter = agents.iterator();
-        while( agentIter.hasNext() )
-        {
-            agentIter.next().act();
-        }
+//        // Execute the planning
+//        agentIter = agents.iterator();
+//        while( agentIter.hasNext() )
+//        {
+//            agentIter.next().plan();
+//        }
+//        
+//        // Execute the acting
+//        agentIter = agents.iterator();
+//        while( agentIter.hasNext() )
+//        {
+//            agentIter.next().act();
+//        }
         
         _LOG.trace( "Leaving runSimStep()" );
     }

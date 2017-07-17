@@ -68,7 +68,7 @@ public class FlockingDecisionMaker extends AbstractAgentDecisionMaker
     @Override
     public Decision decide( Agent agent )
     {
-        _LOG.trace( "Entering decide( agent )" );
+//        _LOG.trace( "Entering decide( agent )" );
 
         // There should be only one team
         Map<String,AgentTeam> allTeams = _simState.getAllTeams();
@@ -78,13 +78,13 @@ public class FlockingDecisionMaker extends AbstractAgentDecisionMaker
         Decision decision = new Decision( DecisionType.NO_CHANGE,
                 team,
                 null,
-                1.0f,
+                1.5f,
                 1.0f,
                 1.0f,
                 0.0f );
         
         
-        _LOG.trace( "Leaving decide( agent )" );
+//        _LOG.trace( "Leaving decide( agent )" );
         
         return decision;
     }

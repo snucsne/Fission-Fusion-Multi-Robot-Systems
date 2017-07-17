@@ -1,5 +1,5 @@
 # =========================================================
-# generated on: Sun Jul 09 22:49:57 CDT 2017
+# generated on: Sun Jul 16 20:48:19 CDT 2017
 # position count [40]
 # minimum neighbor separation [1.0]
 # maximum position radius [4.472136]
@@ -8,42 +8,82 @@
 
 agent-count = 40
 agent.000.position = +00.000,+00.000,+00.000
+agent.000.team = Team000
 agent.001.position = +02.350,-00.603,+00.000
+agent.001.team = Team000
 agent.002.position = -00.321,-00.977,+00.000
+agent.002.team = Team000
 agent.003.position = +00.829,+04.358,+00.000
+agent.003.team = Team000
 agent.004.position = -02.050,+02.445,+00.000
+agent.004.team = Team000
 agent.005.position = -00.253,-03.960,+00.000
+agent.005.team = Team000
 agent.006.position = +01.533,+01.773,+00.000
+agent.006.team = Team000
 agent.007.position = -00.711,-02.746,+00.000
+agent.007.team = Team000
 agent.008.position = +03.437,-02.492,+00.000
+agent.008.team = Team000
 agent.009.position = -03.756,-00.818,+00.000
+agent.009.team = Team000
 agent.010.position = +00.040,+02.344,+00.000
+agent.010.team = Team000
 agent.011.position = +02.365,-01.872,+00.000
+agent.011.team = Team000
 agent.012.position = -01.156,+03.148,+00.000
+agent.012.team = Team000
 agent.013.position = -02.174,-02.349,+00.000
+agent.013.team = Team000
 agent.014.position = +04.013,-01.518,+00.000
+agent.014.team = Team000
 agent.015.position = -02.736,-03.403,+00.000
+agent.015.team = Team000
 agent.016.position = -01.933,+00.170,+00.000
+agent.016.team = Team000
 agent.017.position = +00.946,-02.518,+00.000
+agent.017.team = Team000
 agent.018.position = +02.416,-03.593,+00.000
+agent.018.team = Team000
 agent.019.position = -01.591,-01.488,+00.000
+agent.019.team = Team000
 agent.020.position = -03.196,+02.254,+00.000
+agent.020.team = Team000
 agent.021.position = +02.303,+02.895,+00.000
+agent.021.team = Team000
 agent.022.position = +04.120,-00.118,+00.000
+agent.022.team = Team000
 agent.023.position = +01.007,+00.013,+00.000
+agent.023.team = Team000
 agent.024.position = -00.347,+01.396,+00.000
+agent.024.team = Team000
 agent.025.position = -03.257,+01.244,+00.000
+agent.025.team = Team000
 agent.026.position = +01.224,-04.036,+00.000
+agent.026.team = Team000
 agent.027.position = +03.682,+02.268,+00.000
+agent.027.team = Team000
 agent.028.position = -02.415,+03.610,+00.000
+agent.028.team = Team000
 agent.029.position = +01.753,+00.766,+00.000
+agent.029.team = Team000
 agent.030.position = -04.242,+00.839,+00.000
+agent.030.team = Team000
 agent.031.position = -01.545,-03.402,+00.000
+agent.031.team = Team000
 agent.032.position = -03.930,-02.120,+00.000
+agent.032.team = Team000
 agent.033.position = -02.460,-00.830,+00.000
+agent.033.team = Team000
 agent.034.position = +03.505,+01.268,+00.000
+agent.034.team = Team000
 agent.035.position = +00.641,+00.975,+00.000
+agent.035.team = Team000
 agent.036.position = +00.916,+03.210,+00.000
+agent.036.team = Team000
 agent.037.position = -01.600,+01.482,+00.000
+agent.037.team = Team000
 agent.038.position = +01.265,-01.009,+00.000
+agent.038.team = Team000
 agent.039.position = +03.135,+00.147,+00.000
+agent.039.team = Team000

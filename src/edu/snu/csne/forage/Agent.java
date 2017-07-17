@@ -89,6 +89,9 @@ public class Agent
     /** The distance at which the velocity is scaled to arrive at a destination */
     private float _arrivalScaleDistance = 0.0f;
     
+    /** The desired separation distance */
+    private float _desiredSeparation = 2.0f;
+    
     /** Flag indicating whether or not this agent is active */
     private boolean _active = true;
     
@@ -158,7 +161,7 @@ public class Agent
      */
     public void sense()
     {
-        _LOG.trace( "Entering sense()" );
+//        _LOG.trace( "Entering sense()" );
 
         // Clear out all the previously sensed objects
         _sensedAgents.clear();
@@ -187,7 +190,7 @@ public class Agent
         // Sense the patches
         _sensedPatches = _patchSensor.sense( this );
         
-        _LOG.trace( "Leaving sense()" );
+//        _LOG.trace( "Leaving sense()" );
     }
 
     /**
@@ -195,11 +198,11 @@ public class Agent
      */
     public void plan()
     {
-        _LOG.trace( "Entering plan()" );
+//        _LOG.trace( "Entering plan()" );
 
         _decision = _decisionMaker.decide( this );
         
-        _LOG.trace( "Leaving plan()" );
+//        _LOG.trace( "Leaving plan()" );
     }
 
     /**
@@ -209,10 +212,6 @@ public class Agent
     {
         _LOG.trace( "Entering act()" );
 
-        _LOG.debug( "Agent ["
-                + getID()
-                + "] is acting" );
-        
         // Reset the acceleration
         _acceleration = new Vector3f();
 
@@ -227,7 +226,7 @@ public class Agent
         {
             Vector3f separation = calculateSeparation();
             separation.multLocal( separationWeight );
-            _LOG.debug( "separation=[" + separation + "]" );
+            _LOG.debug( getID() + " separation=[" + separation + "]" );
             _acceleration.addLocal( separation );
         }
         float cohesionWeight = _decision.getCohesionWeight();
@@ -235,7 +234,7 @@ public class Agent
         {
             Vector3f cohesion = calculateCohesion();
             cohesion.multLocal( cohesionWeight );
-            _LOG.debug( "cohesion=[" + cohesion + "]" );
+            _LOG.debug( getID() + " cohesion=[" + cohesion + "]" );
             _acceleration.addLocal( cohesion );
         }
         float alignmentWeight = _decision.getAlignmentWeight();
@@ -243,7 +242,7 @@ public class Agent
         {
             Vector3f alignment = calculateAlignment();
             alignment.multLocal( alignmentWeight );
-            _LOG.debug( "alignment=[" + alignment + "]" );
+            _LOG.debug( getID() + " alignment=[" + alignment + "]" );
             _acceleration.addLocal( alignment );
         }
         float goalSeekWeight = _decision.getGoalSeekWeight();
@@ -251,16 +250,34 @@ public class Agent
         {
             Vector3f goalSeek = calculateGoalSeek();
             goalSeek.multLocal( goalSeekWeight );
-            _LOG.debug( "goalSeek=[" + goalSeek + "]" );
+            _LOG.debug( getID() + "goalSeek=[" + goalSeek + "]" );
             _acceleration.addLocal( goalSeek );
         }
-        _LOG.debug( "_acceleration=[" + _acceleration + "]" );
+        _LOG.debug( getID() + " _acceleration=[" + _acceleration + "]" );
+        
+//        ForageUtils.limitMagnitude( _acceleration, 0.25f );
 
+        // Sanity check the acceleration
+        float diff = _acceleration.subtract( _velocity ).length();
+        if( diff > 1.0f )
+        {
+            _LOG.warn( "LARGE ACCELERATION ["
+                    + getID()
+                    + "]: acc=["
+                    + _acceleration
+                    + "]  vel=["
+                    + _velocity
+                    + "]  diff=["
+                    + diff
+                    + "]" );
+        }
+        
         // Apply the acceleration to the velocity and move the agent
         _velocity.addLocal( _acceleration );
+        ForageUtils.limitMagnitude( _velocity, _maxSpeed );
         _position.addLocal( _velocity );
-        _LOG.debug( "_velocity=[" + _velocity + "]" );
-        _LOG.debug( "_position=[" + _position + "]" );
+        _LOG.debug( getID() + " _velocity=[" + _velocity + "]" );
+        _LOG.debug( getID() + " _position=[" + _position + "]" );
 
         _LOG.trace( "Leaving act()" );
     }
@@ -346,7 +363,7 @@ public class Agent
 //        _LOG.debug( "alignment=[" + alignment + "]" );
         
         // Limit it by the max force
-        alignment.subtractLocal( _velocity );
+//        alignment.subtractLocal( _velocity );
         ForageUtils.limitMagnitude( alignment, _maxForce );
 //        _LOG.debug( "alignment=[" + alignment + "] (relative & limited)" );
 
@@ -363,43 +380,73 @@ public class Agent
         Vector3f separation = new Vector3f();
 
         // Average all the relative positions from our sensed teammates
+        int separationAgentCount = 0;
         Iterator<Agent> agentIter = _sensedTeammates.iterator();
         while( agentIter.hasNext() )
         {
             Agent current = agentIter.next();
-//            _LOG.debug( "Sensed agent ["
-//                    + current.getID()
-//                    + "] position=["
-//                    + current.getPosition()
-//                    + "]" );
+            _LOG.debug( getID() + " Sensed agent ["
+                    + current.getID()
+                    + "] position=["
+                    + current.getPosition()
+                    + "] from position ["
+                    + _position
+                    + "]" );
             
             // Calculate the vector to us 
             Vector3f fromCurrent = _position.subtract( current.getPosition() );
-//            _LOG.debug( "fromCurrent=["
-//                    + fromCurrent
-//                    + "]" );
+            _LOG.debug( "fromCurrent=["
+                    + fromCurrent
+                    + "]" );
             float distance = fromCurrent.length();
-            fromCurrent.normalizeLocal();
-            fromCurrent.divideLocal( distance );
-//            _LOG.debug( "fromCurrent=["
-//                    + fromCurrent
-//                    + "] distance=["
-//                    + distance
-//                    + "]" );
             
-            // Add it to the total separation
-            separation.addLocal( fromCurrent );
-        }
-        separation.divideLocal( _sensedTeammates.size() );
-        
-        // Normalize it and scale it to the maximum speed
-        separation.normalizeLocal();
-        separation.multLocal( _maxSpeed );
+            // Is the distance within the desired separation?
+            if( _desiredSeparation > distance )
+            {
+                fromCurrent.normalizeLocal();
+                fromCurrent.divideLocal( distance );
 
-        // Limit it by the max force
-        separation.subtractLocal( _velocity );
-        ForageUtils.limitMagnitude( separation, _maxForce );
-//        _LOG.debug( "separation=[" + separation + "] (relative & limited)" );
+                // Add it to the total separation
+                separation.addLocal( fromCurrent );
+                separationAgentCount++;
+                
+                _LOG.debug( getID()
+                        + " final separation: fromCurrent=["
+                        + fromCurrent
+                        + "] distance=["
+                        + distance
+                        + "] currentSep=["
+                        + separation
+                        + "] count=["
+                        + separationAgentCount
+                        + "]" );
+            }
+        }
+        
+        // Did we separate from anyone?
+        if( 0 < separationAgentCount )
+        {
+//            separation.normalizeLocal();
+            //Yup, scale it
+            separation.divideLocal( _sensedTeammates.size() );
+            
+            // Normalize it and scale it to the maximum speed
+//            separation.multLocal( _maxSpeed );
+//            ForageUtils.limitMagnitude( separation, _maxSpeed );
+
+            // Limit it by the max force
+//            separation.subtractLocal( _velocity );
+//            ForageUtils.limitMagnitude( separation, _maxForce );
+//            _LOG.debug( getID() + " separation=["
+//                    + separation
+//                    + "] count=["
+//                    + separationAgentCount
+//                    + "] (relative & limited)" );
+        }
+        else
+        {
+            separation = new Vector3f();
+        }
 
         return separation;
     }
@@ -421,14 +468,15 @@ public class Agent
             cohesion.addLocal( current.getPosition().subtract( _position ) );
         }
         cohesion.divideLocal( _sensedTeammates.size() );
-        cohesion.normalize();
-        cohesion.multLocal( _maxSpeed );
+//        cohesion.normalize();
+//        cohesion.multLocal( _maxSpeed );
         
         // Limit it by the max force
-        cohesion.subtractLocal( _velocity );
-        ForageUtils.limitMagnitude( cohesion, _maxForce );
+//        cohesion.subtractLocal( _velocity );
+//        ForageUtils.limitMagnitude( cohesion, _maxForce );
 
-        return cohesion;
+//        return cohesion;
+        return seek( cohesion, false );
     }
 
     /**
@@ -447,32 +495,43 @@ public class Agent
      * Calculates vector to seek to a location
      *
      * @param location The location to which the agent will navigate
+     * @param slowDown Flag indicating whether or not the agent should slow down
+     * when the destination is close
      * @return The vector to navigate to a location
      */
-    private Vector3f seek( Vector3f location )
+    private Vector3f seek( Vector3f location, boolean slowDown )
     {
         // Is it within the minimum distance to not go full speed?
         float distance = location.length();
         Vector3f desired = location.normalize();
-//        _LOG.debug( "desired=[" + desired + "]" );
-//        if( _arrivalScaleDistance > distance )
-//        {
-//            // Yup, scale based on distance
-//            desired.divideLocal( distance );
-//        }
-//        else
-//        {
-            // Nope, use the max speed
-            desired.multLocal( _maxSpeed );
-//        }
+        Vector3f steer = null;
+        if( 0.0f < distance )
+        {
+//            _LOG.debug( "desired=[" + desired + "]" );
+            if( slowDown && (_arrivalScaleDistance > distance) )
+            {
+                // Yup, scale based on distance
+                desired.multLocal( distance / _arrivalScaleDistance );
+            }
+            else
+            {
+                // Nope, use the max speed
+                desired.multLocal( _maxSpeed );
+            }
+            
+            // Calculate steering change
+            steer = desired.subtract( _velocity );
+        }
+        else
+        {
+            steer = new Vector3f();
+        }
 //        _LOG.debug( "desired=[" + desired + "] (scaled)" );
 
-        // Calculate steering change
-        Vector3f steer = desired.subtract( _velocity );
 //        _LOG.debug( "steer=[" + steer + "]" );
 
         // Limit it to our max force
-        ForageUtils.limitMagnitude( steer, _maxForce );
+//        ForageUtils.limitMagnitude( steer, _maxForce );
 //        _LOG.debug( "steer=[" + steer + "] (limited)" );
 
         return steer;
