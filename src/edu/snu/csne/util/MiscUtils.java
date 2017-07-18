@@ -19,6 +19,7 @@
  */
 package edu.snu.csne.util;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,6 +30,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 
 
@@ -292,6 +294,78 @@ public class MiscUtils
         }
         
         return new Vector3f( x, y, z );
+    }
+
+    /**
+     * Parses a color object from a comma-separated string
+     * 
+     * @param colorDef The color definition
+     * @return The color
+     */
+    public static ColorRGBA parseJMEColor( String colorDef )
+    {
+        // Get the individual components
+        String[] components = colorDef.split( "," );
+        if( components.length != 4 )
+        {
+            throw new IllegalArgumentException( "Invalid color definition ["
+                    + colorDef
+                    + "]" );
+        }
+        
+        // Get the components as floats
+        float red, green, blue, alpha;
+        try
+        {
+            red = Float.parseFloat( components[0] );
+            green = Float.parseFloat( components[1] );
+            blue = Float.parseFloat( components[2] );
+            alpha = Float.parseFloat( components[3] );
+        }
+        catch( NumberFormatException nfe )
+        {
+            throw new IllegalArgumentException( "Invalid color definition ["
+                    + colorDef
+                    + "]" );
+        }
+        
+        return new ColorRGBA( red, green, blue, alpha );
+    }
+
+    /**
+     * Parses a color object from a comma-separated string
+     * 
+     * @param colorDef The color definition
+     * @return The color
+     */
+    public static Color parseAWTColor( String colorDef )
+    {
+        // Get the individual components
+        String[] components = colorDef.split( "," );
+        if( components.length != 4 )
+        {
+            throw new IllegalArgumentException( "Invalid color definition ["
+                    + colorDef
+                    + "]" );
+        }
+        
+        // Get the components as floats
+        float red, green, blue, alpha;
+        try
+        {
+            red = Float.parseFloat( components[0] );
+            green = Float.parseFloat( components[1] );
+            blue = Float.parseFloat( components[2] );
+            alpha = Float.parseFloat( components[3] );
+        }
+        catch( NumberFormatException nfe )
+        {
+            throw new IllegalArgumentException( "Invalid color definition ["
+                    + colorDef
+                    + "]" );
+        }
+        
+        return new Color( red, green, blue, alpha );
     }
 
 }

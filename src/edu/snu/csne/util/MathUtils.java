@@ -38,4 +38,15 @@ public class MathUtils
         return (int) ((Math.round( value / (float) step )) * step);
     }
 
+    /**
+     * Round a float value using the specified step size
+     *
+     * @param value The value to round
+     * @param step The step size to which the value will be rounded
+     * @return The rounded value
+     */
+    public static float round(float input, float step) 
+    {
+        return (float) ((Math.round(input / step)) * step);
+    }
 }

@@ -24,22 +24,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.JPanel;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.jme3.math.Vector3f;
-
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.mates.math.SphericalVector;
 import edu.snu.csne.util.MathUtils;
 
 /**
@@ -56,26 +55,14 @@ public class GraphicalPositionPanel extends JPanel
     private static final Logger _LOG = LogManager.getLogger(
             GraphicalPositionPanel.class.getName() );
 
-    /** The height of the panel */
-    private int _width = 0;
-    
-    /** The width of the panel */
-    private int _height = 0;
-    
     /** Center of mass of all agents */
     private Vector3f _agentCenterOfMass = new Vector3f();
-    
-    /** The offset from the origin in the X dimension */
-    private int _xOffset = 0;
-    
-    /** The offset from the origin in the Y dimension */
-    private int _yOffset = 0;
     
     /** The step size of the grid lines */
     private int _gridStep = 0;
     
     /** The display scale */
-    private float _displayScale = 40.0f;
+    private float _displayScale = 0.0f;
     
     /** Background color */
     private Color _bgColor = null;
@@ -83,27 +70,51 @@ public class GraphicalPositionPanel extends JPanel
     /** Grid color */
     private Color _gridColor = null;
     
+    /** Agent color */
+    private Color _agentColor = null;
+    
     /** All the agents */
     private List<Agent> _agents = new LinkedList<Agent>();
     
     /** Agent draw size */
-    private float _agentDrawSize = 3.0f;
+    private float _agentDrawSize = 0.0f;
     
+    /** Polygon for an agent */
+    private Polygon _agentPoly = null;
+
     
     public GraphicalPositionPanel( int width,
             int height,
             int gridStep,
             Color bgColor,
             Color gridColor,
+            Color agentColor,
+            float displayScale,
+            float agentDrawSize,
             SimulationState simState )
     {
         // Set the preferred size
         setPreferredSize( new Dimension( width, height ) );
-        _width = width;
-        _height = height;
         _gridStep = gridStep;
         _bgColor = bgColor;
         _gridColor = gridColor;
+        _agentColor = agentColor;
+        _displayScale = displayScale;
+        _agentDrawSize = agentDrawSize;
+        
+        int[] xPoints = { 0,
+                (int) (0.707f * _agentDrawSize),
+                0,
+                (int) (-0.707f * _agentDrawSize)};
+        int[] yPoints = { (int) (_agentDrawSize),
+                (int) (-0.707f * _agentDrawSize),
+                (int) (-1.0f * _agentDrawSize),
+                (int) (-0.707f * _agentDrawSize)};
+        _agentPoly = new Polygon( xPoints, yPoints, xPoints.length );
+
+        _LOG.debug( "xPoints: " + Arrays.toString( xPoints ) );
+        _LOG.debug( "yPoints: " + Arrays.toString( yPoints ) );
+        
         simUpdate( simState );
     }
 
@@ -119,18 +130,11 @@ public class GraphicalPositionPanel extends JPanel
         // Call the superclass implementation
         super.paintComponent( g );
 
-        // Get the current panel size
-        Dimension panelSize = getSize();
-        _width = panelSize.width;
-        _height = panelSize.height;
-        
-        // Adjust the offset so it is in the center of the panel
-//        _xOffset = (int) (_agentCenterOfMass.x * _displayScale + _width / 2);
-//        _yOffset = (int) (_agentCenterOfMass.y * _displayScale + _height / 2);
-        _LOG.debug( "Scaled and centered: xOffset=[" + _xOffset + "] yOffset=[" + _yOffset + "]" );
-
         // Cast it to a 2d object for easier drawing
         Graphics2D g2d = (Graphics2D) g.create();
+        
+        // Set the background color
+        g2d.setBackground( _bgColor );
         
         // Turn on anti-aliasing
         g2d.setRenderingHint( RenderingHints.KEY_RENDERING,
@@ -138,25 +142,11 @@ public class GraphicalPositionPanel extends JPanel
         g2d.setRenderingHint( RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON );
 
-//        // Flip the coordinate system
-//        g2d.scale(1, -1);
-////        g2d.setTransform( AffineTransform.getTranslateInstance( 0, getHeight() ) );
-//        
-//        // Center the view on the center of mass of the agents
-//        g2d.translate( _xOffset, _yOffset );
-//        
-//        // Draw a red circle at the center for TESTING
-//        g2d.setColor( Color.GREEN ); 
-//        g2d.fill( new Rectangle2D.Double( -5, convertY(10), 10, 20 ) );
-//        g2d.setColor( Color.RED ); 
-////        g2d.fillOval( _xOffset + _width / 2 - 5, _yOffset + _height / 2 - 5, 10, 10 );
-//        g2d.fillOval( _width / 2 - 5, convertY(_height / 2 - 5), 10, 10 );
-//        
         // Draw the grid
         drawGrid( g2d );
         
         // Draw the patches
-//        drawPatches( g2d );
+        drawPatches( g2d );
         
         // Draw the agents
         drawAgents( g2d );
@@ -182,10 +172,8 @@ public class GraphicalPositionPanel extends JPanel
         while( agentIter.hasNext() )
         {
             centerOfMass.addLocal( agentIter.next().getPosition() );
-//            _LOG.debug( "centerOfMass=[" + centerOfMass + "]" );
         }
         _agentCenterOfMass = centerOfMass.divide( (float) _agents.size() );
-        _LOG.debug( "Agent center of mass [" + _agentCenterOfMass + "]" );
         
         // Repaint the view
         if( isVisible() )
@@ -212,18 +200,14 @@ public class GraphicalPositionPanel extends JPanel
     private void drawGrid( Graphics2D g2d )
     {
         // Round the center of mass to the nearest grid step
-        float xGridCenter = round( _agentCenterOfMass.x, _gridStep );
-        float yGridCenter = round( _agentCenterOfMass.y, _gridStep );
-//        System.out.println( "Grid center [" + xGridCenter + ","
-//                + yGridCenter + "]" );
+        float xGridCenter = MathUtils.round( _agentCenterOfMass.x, _gridStep );
+        float yGridCenter = MathUtils.round( _agentCenterOfMass.y, _gridStep );
 
         // Calculate the screen coordinates of the center of the grid
         int xGridCenterScreen = getWidth() / 2
                 + (int) Math.round( (xGridCenter - _agentCenterOfMass.x) * _displayScale );
         int yGridCenterScreen = getHeight() - (getHeight() / 2
                 + (int) Math.round( (yGridCenter - _agentCenterOfMass.y) * _displayScale ));
-//        System.out.println( "Grid center screen [" + xGridCenterScreen + ","
-//                + yGridCenterScreen + "]" );
 
         // How many lines can fit on the screen?
         float gridStepPixels = _gridStep * _displayScale;
@@ -231,17 +215,10 @@ public class GraphicalPositionPanel extends JPanel
                 + 2;
         int yLineCount = (int) Math.ceil( ((float) getHeight()) / gridStepPixels )
                 + 2;
-//        System.out.println( "Line count ["
-//                + xLineCount
-//                + ","
-//                + yLineCount
-//                + "]" );
 
         // Calculate the starting values of the first grid line
         int xGridStart = (int) (xGridCenterScreen - (-1 + xLineCount / 2) * gridStepPixels);
         int yGridStart = (int) (yGridCenterScreen - (-1 + yLineCount / 2) * gridStepPixels);
-//        System.out.println( "Grid start [" + xGridStart + ","
-//                + xGridStart + "]" );
 
         // Draw the vertical lines
         g2d.setColor( _gridColor );
@@ -250,7 +227,6 @@ public class GraphicalPositionPanel extends JPanel
             // Calculate the x value and draw the line
             int x = (int) Math.round( xGridStart + i * gridStepPixels );
             g2d.drawLine( x, -1, x, getHeight() + 1 );
-//            System.out.println( "x=[" + x + "]" );
         }
         
         // Draw the horizontal lines
@@ -259,7 +235,6 @@ public class GraphicalPositionPanel extends JPanel
             // Calculate the y value and draw the line
             int y = (int) Math.round( yGridStart + i * gridStepPixels );
             g2d.drawLine( -1, y, getWidth() + 1, y );
-//            System.out.println( "y=[" + y + "]" );
         }
     }
     
@@ -280,42 +255,61 @@ public class GraphicalPositionPanel extends JPanel
      */
     private void drawAgents( Graphics2D g2d )
     {
-        // TEMP
-        g2d.setColor( Color.BLUE );
-        
         // At the moment, just draw a circle for each agent
         Iterator<Agent> agentIter = _agents.iterator();
         while( agentIter.hasNext() )
         {
+            g2d.setColor( _agentColor );
             Agent current = agentIter.next();
-            _LOG.debug( "Converting position of agent ["
-                    + current.getID()
-                    + "]" );
             Vector3f converted = convert( current.getPosition() );
-            drawAgent( g2d, converted, current.getVelocity(), 10 );
+            drawAgent( g2d, converted, current.getVelocity() );
         }
     }
     
+    /**
+     * Draws a single agent
+     *
+     * @param g2d
+     * @param position
+     * @param velocity
+     * @param size
+     */
     private void drawAgent( Graphics2D g2d,
             Vector3f position,
-            Vector3f velocity,
-            float size )
+            Vector3f velocity )
     {
-        // Simply draw a circle
-        int diameter = (int) size;
-        int halfDiameter = diameter / 2;
+        // Get the original transformation
+        AffineTransform original = g2d.getTransform();
         
-        g2d.fillOval( (int) position.x - halfDiameter,
-                (int) position.y - halfDiameter,
-                diameter,
-                diameter );
+        // Calculate the rotation angle
+        AffineTransform agentTransform = new AffineTransform();
+        SphericalVector spherical = new SphericalVector( velocity );
+        agentTransform.translate( position.x, position.y );
+        agentTransform.rotate( Math.PI / -2.0f - spherical.theta );
+        g2d.transform( agentTransform );
+        g2d.fill( _agentPoly );
+        
+        // Restore the original
+        g2d.setTransform( original );
     }
-    
+
+    /**
+     * Convert regular y coordinate into display coordinate 
+     *
+     * @param y
+     * @return
+     */
     private int convertY( int y )
     {
         return getHeight() - y;
     }
 
+    /**
+     * Convert a simulation coordinate into a display coordinate
+     *
+     * @param original The original simulation coordinate
+     * @return The display coordinate
+     */
     private Vector3f convert( Vector3f original )
     {
         Vector3f converted = original.clone();
@@ -333,14 +327,9 @@ public class GraphicalPositionPanel extends JPanel
         // Reverse the y coordinate
         converted.y = getHeight() - converted.y;
         
-        _LOG.debug( "Original=[" + original + "]  converted=[" + converted + "]" );
+//        _LOG.debug( "Original=[" + original + "]  converted=[" + converted + "]" );
         
         return converted;
-    }
-
-    public static float round(float input, float step) 
-    {
-        return (float) ((Math.round(input / step)) * step);
     }
 
 }

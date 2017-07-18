@@ -24,9 +24,12 @@ import java.awt.Color;
 import java.util.Properties;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.util.MiscUtils;
 
 /**
  * TODO Class description
@@ -39,6 +42,33 @@ public class GraphicalPositionEventListener
     /** Our logger */
     private static final Logger _LOG = LogManager.getLogger(
             GraphicalPositionEventListener.class.getName() );
+    
+    /** Key prefix for the display */
+    private static final String _DISPLAY_PREFIX_KEY = "display";
+    
+    /** Key for the display height */
+    private static final String _HEIGHT_KEY = "height";
+    
+    /** Key for the display width */
+    private static final String _WIDTH_KEY = "width";
+    
+    /** Key for the background color */
+    private static final String _BG_COLOR_KEY = "bg-color";
+    
+    /** Key for the grid color */
+    private static final String _GRID_COLOR_KEY = "grid-color";
+    
+    /** Key for the agent color */
+    private static final String _AGENT_COLOR_KEY = "agent-color";
+    
+    /** Key for the grid step size */
+    private static final String _GRID_STEP_KEY = "grid-step";
+    
+    /** Key for the display scale */
+    private static final String _SCALE_KEY = "scale";
+    
+    /** Key for the agent drawing size */
+    private static final String _AGENT_SIZE = "agent-size";
     
     
     /** The panel displaying all the agents */
@@ -61,12 +91,49 @@ public class GraphicalPositionEventListener
         // Grab the properties
         Properties props = simState.getProps();
         
+        // Get the display configuration
+        int width = MiscUtils.loadNonEmptyIntegerProperty( props,
+                _DISPLAY_PREFIX_KEY + "." + _WIDTH_KEY,
+                "Display width " );
+        int height = MiscUtils.loadNonEmptyIntegerProperty( props,
+                _DISPLAY_PREFIX_KEY + "." + _HEIGHT_KEY,
+                "Display height " );
+        int gridStep = MiscUtils.loadNonEmptyIntegerProperty( props,
+                _DISPLAY_PREFIX_KEY + "." + _GRID_STEP_KEY,
+                "Display grid step " );
+        float displayScale = MiscUtils.loadNonEmptyFloatProperty( props,
+                _DISPLAY_PREFIX_KEY + "." + _SCALE_KEY,
+                "Display scale " );
+        float agentDrawSize = MiscUtils.loadNonEmptyFloatProperty( props,
+                _DISPLAY_PREFIX_KEY + "." + _AGENT_SIZE,
+                "Agent display size " );
+
+        // Get the colors
+        String bgColorStr = props.getProperty( _DISPLAY_PREFIX_KEY
+                + "."
+                + _BG_COLOR_KEY );
+        Validate.notEmpty( bgColorStr, "Background color may not be blank" );
+        Color bgColor = MiscUtils.parseAWTColor( bgColorStr );
+        String gridColorStr = props.getProperty( _DISPLAY_PREFIX_KEY
+                + "."
+                + _GRID_COLOR_KEY );
+        Validate.notEmpty( gridColorStr, "Grid color may not be blank" );
+        Color gridColor = MiscUtils.parseAWTColor( gridColorStr );;
+        String agentColorStr = props.getProperty( _DISPLAY_PREFIX_KEY
+                + "."
+                + _AGENT_COLOR_KEY );
+        Validate.notEmpty( agentColorStr, "Agent color may not be blank" );
+        Color agentColor = MiscUtils.parseAWTColor( agentColorStr );;
+        
         // Create the graphics panel
-        _panel = new GraphicalPositionPanel( 800,
-                600,
-                5,
-                Color.WHITE,
-                Color.DARK_GRAY,
+        _panel = new GraphicalPositionPanel( width,
+                height,
+                gridStep,
+                bgColor,
+                gridColor,
+                agentColor,
+                displayScale,
+                agentDrawSize,
                 simState );
         
         // Create our display

@@ -87,6 +87,12 @@ public class SimulationState
     /** Key for the agent's maximum force */
     private static final String _MAX_FORCE_KEY = "max-force";
     
+    /** Key for the agent's arrival scale distance */
+    private static final String _ARRIVAL_SCALE_DISTANCE_KEY = "arrival-scale-distance";
+    
+    /** Key for the agent's desired separation */
+    private static final String _DESIRED_SEPARATION_KEY = "desired-separation";
+    
     /** Key for the number of patches */
     private static final String _PATCH_COUNT_KEY = "patch-count";
     
@@ -598,6 +604,18 @@ public class SimulationState
                 "Maximum force is required " );
         _LOG.debug( "maxForce=[" + maxForce + "]" );
 
+        // Get the arrival scale distance
+        float arrivalScaleDistance = MiscUtils.loadNonEmptyFloatProperty( _props,
+                _ARRIVAL_SCALE_DISTANCE_KEY,
+                "Arrival scale distance is required " );
+        _LOG.debug( "arrivalScaleDistance=[" + arrivalScaleDistance + "]" );
+
+        // Get the desired separation
+        float desiredSeparation = MiscUtils.loadNonEmptyFloatProperty( _props,
+                _DESIRED_SEPARATION_KEY,
+                "Desired separation is required " );
+        _LOG.debug( "desiredSeparation=[" + desiredSeparation + "]" );
+
         // Get the resource consumption rate
         float resourceConsumptionRate = MiscUtils.loadNonEmptyFloatProperty( _props,
                 _RESOURCE_CONSUMPTION_RATE_KEY,
@@ -689,6 +707,8 @@ public class SimulationState
                     resourceConsumptionMax,
                     maxSpeed,
                     maxForce,
+                    arrivalScaleDistance,
+                    desiredSeparation,
                     agentSensor,
                     patchSensor,
                     decisionMaker );
