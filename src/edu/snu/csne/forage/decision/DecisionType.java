@@ -26,9 +26,10 @@ package edu.snu.csne.forage.decision;
  */
 public enum DecisionType
 {
-    INITIATE,
+    NAVIGATE_TO_PATCH,
+    EXPLORE,
     FOLLOW,
     FORAGE,
-    NO_CHANGE;
+    REST;
 
 }

@@ -3,14 +3,13 @@
  */
 package edu.snu.csne.forage.decision;
 
+// Imports
 import java.util.Properties;
-
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.SimulationState;
+
 
 /**
  * TODO Class description
@@ -25,6 +24,7 @@ public abstract class AbstractAgentDecisionMaker implements AgentDecisionMaker
     
     /** The current simulation state */
     protected SimulationState _simState = null;
+    
     
     /**
      * Initialize this agent decision-maker

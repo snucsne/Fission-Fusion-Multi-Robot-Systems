@@ -23,19 +23,14 @@ package edu.snu.csne.forage;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.math3.geometry.euclidean.threed.SphericalCoordinates;
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
-
 import edu.snu.csne.forage.decision.AgentDecisionMaker;
 import edu.snu.csne.forage.decision.Decision;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
-import edu.snu.csne.mates.math.NavigationalVector;
 
 
 /**
@@ -95,6 +90,9 @@ public class Agent
     /** The desired separation distance */
     private float _desiredSeparation = 0.0f;
     
+    /** The max foraging area */
+    private float _maxForagingArea = 0.0f;
+    
     /** Flag indicating whether or not this agent is active */
     private boolean _active = true;
     
@@ -103,6 +101,9 @@ public class Agent
     
     /** The other teammates currently sensed */
     private List<Agent> _sensedTeammates = new LinkedList<Agent>();
+    
+    /** The non-teammates currently sensed */
+    private List<Agent> _sensedNonTeammates = new LinkedList<Agent>();
     
     /** The patches currently sensed */
     private List<Patch> _sensedPatches = new LinkedList<Patch>();
@@ -132,6 +133,7 @@ public class Agent
             float maxForce,
             float arrivalScaleDistance,
             float desiredSeparation,
+            float maxForagingArea,
             AgentSensor agentSensor,
             PatchSensor patchSensor,
             AgentDecisionMaker decisionMaker )
@@ -147,6 +149,7 @@ public class Agent
         Validate.isTrue( 0.0f < maxForce, "Max force must be positive" );
         Validate.isTrue( 0.0f < arrivalScaleDistance, "Arrival scale distance must be positive" );
         Validate.isTrue( 0.0f < desiredSeparation, "Desired separation must be positive" );
+        Validate.isTrue( 0.0f < maxForagingArea, "Max foraging area must be positive" );
         Validate.notNull( agentSensor, "Agent sensor may not be null" );
         Validate.notNull( patchSensor, "Patch sensor may not be null" );
         Validate.notNull( decisionMaker, "Decision maker may not be null" );
@@ -160,9 +163,12 @@ public class Agent
         _maxForce = maxForce;
         _arrivalScaleDistance = arrivalScaleDistance;
         _desiredSeparation = desiredSeparation;
+        _maxForagingArea = maxForagingArea;
         _agentSensor = agentSensor;
         _patchSensor = patchSensor;
         _decisionMaker = decisionMaker;
+        
+        _decision = Decision.buildRestDecision( 0, this );
     }
     
     /**
@@ -175,6 +181,7 @@ public class Agent
         // Clear out all the previously sensed objects
         _sensedAgents.clear();
         _sensedTeammates.clear();
+        _sensedNonTeammates.clear();
         _sensedPatches.clear();
         
         // Sense the agents
@@ -191,6 +198,10 @@ public class Agent
             {
                 // Yup
                 _sensedTeammates.add( current );
+            }
+            else
+            {
+                _sensedNonTeammates.add( current );
             }
         }
         
@@ -346,6 +357,46 @@ public class Agent
     {
         return _active;
     }
+
+    /**
+     * Returns this agent's current decision
+     *
+     * @return The decision
+     */
+    public Decision getDecision()
+    {
+        return _decision;
+    }
+    
+    /**
+     * Returns all the teammate agents that are sensed by this agent
+     *
+     * @return The sensed teammates
+     */
+    public List<Agent> getSensedTeammates()
+    {
+        return _sensedTeammates;
+    }
+    
+    /**
+     * Returns all the non-teammate agents that are sensed by this agent
+     *
+     * @return The sensed non-teammates
+     */
+    public List<Agent> getSensedNonTeammates()
+    {
+        return _sensedNonTeammates;
+    }
+
+    /**
+     * Returns all the patches sensed by this agent
+     *
+     * @return The sensed patches
+     */
+    public List<Patch> getSensedPatches()
+    {
+        return _sensedPatches;
+    }
     
     /**
      * Calculates the alignment vector
@@ -449,9 +500,10 @@ public class Agent
      */
     private Vector3f calculateGoalSeek()
     {
-        Vector3f goalSeek = new Vector3f();
+        // Get the destination from the decision
+        Vector3f goal = _decision.getDestination();
         
-        return goalSeek;
+        return seek( goal, true );
     }
     
     /**

@@ -19,6 +19,7 @@
  */
 package edu.snu.csne.forage;
 
+// Imports
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,8 +52,29 @@ public class Patch
     /** The amount of resources at this patch */
     private float _remainingResources = 0.0f;
     
+    /** The probability of predation at this patch */
+    private float _predationProbability = 0.0f;
     
-    public Patch( String id, Vector3f position, float radius, float initialResources )
+    /** The minimum number of agents required for foraging to succeed */
+    private int _minAgentForageCount = 0;
+    
+    
+    /**
+     * Builds this Patch object
+     *
+     * @param id
+     * @param position
+     * @param radius
+     * @param initialResources
+     * @param predationProbability
+     * @param minAgentForageCount
+     */
+    public Patch( String id,
+            Vector3f position,
+            float radius,
+            float initialResources,
+            float predationProbability,
+            int minAgentForageCount )
     {
         // Validate and store
         Validate.notEmpty( id, "Patch ID may not be null or empty" );
@@ -61,11 +83,19 @@ public class Patch
                 "Patch radius must be positive" );
         Validate.isTrue( 0.0f < initialResources,
                 "Patch initial resources must be positive" );
+        Validate.inclusiveBetween( 0.0f, 1.0f, predationProbability,
+                "Predation probability must lie in [0,1]: value=["
+                + predationProbability
+                + "]" );
+        Validate.isTrue( 0 <= minAgentForageCount,
+                "Minimum agent foraging count must be non-negative" );
         _id = id;
         _position = position;
         _radius = radius;
         _initialResources = initialResources;
         _remainingResources = initialResources;
+        _predationProbability = predationProbability;
+        _minAgentForageCount = minAgentForageCount;
     }
     
     /**

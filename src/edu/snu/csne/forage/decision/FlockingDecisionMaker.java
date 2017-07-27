@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.AgentTeam;
 import edu.snu.csne.forage.SimulationState;
@@ -75,19 +76,17 @@ public class FlockingDecisionMaker extends AbstractAgentDecisionMaker
         AgentTeam team = allTeams.values().iterator().next();
         
         // Always do the same thing and simply flock
-        Decision decision = new Decision( DecisionType.NO_CHANGE,
+        Decision decision = Decision.buildExploreDecision( 0,
                 team,
-                null,
+                Vector3f.ZERO,
                 1.5f,
                 1.0f,
                 1.0f,
+                0.0f,
                 0.0f );
-        
         
 //        _LOG.trace( "Leaving decide( agent )" );
         
         return decision;
     }
-
-
 }

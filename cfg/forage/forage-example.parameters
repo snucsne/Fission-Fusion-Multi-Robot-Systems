@@ -41,6 +41,7 @@ max-force = 0.03
 desired-separation = 2
 resource-consumption-rate = 1
 resource-consumption-max = 1000
+max-foraging-area = 3
 arrival-scale-distance = 10
 
 

@@ -93,6 +93,9 @@ public class SimulationState
     /** Key for the agent's desired separation */
     private static final String _DESIRED_SEPARATION_KEY = "desired-separation";
     
+    /** Key for the agent's max foraging area */
+    private static final String _MAX_FORAGING_AREA_KEY = "max-foraging-area";
+    
     /** Key for the number of patches */
     private static final String _PATCH_COUNT_KEY = "patch-count";
     
@@ -118,6 +121,12 @@ public class SimulationState
 
     /** Key postfix for a resources value */
     private static final String _RESOURCES_KEY = "resources";
+    
+    /** Key postfix for a predation probability value */
+    private static final String _PREDATION_PROBABILITY_KEY = "predation-probability";
+    
+    /** Key postfix for a minimum agent forage count value */
+    private static final String _MIN_AGENT_FORAGE_COUNT_KEY = "min-agent-forage-count";
     
     /** Key postfix for a team value */
     private static final String _TEAM_KEY = "team";
@@ -627,6 +636,12 @@ public class SimulationState
                 _RESOURCE_CONSUMPTION_MAX_KEY,
                 "Resource consumption rate is required " );
         _LOG.debug( "resourceConsumptionMax=[" + resourceConsumptionMax + "]" );
+        
+        // Get the max foraging area
+        float maxForagingArea = MiscUtils.loadNonEmptyFloatProperty( _props,
+                _MAX_FORAGING_AREA_KEY,
+                "Resource consumption rate is required " );
+        _LOG.debug( "maxForagingArea=[" + maxForagingArea + "]" );
 
         // Get the agent sensor class
         String agentSensorClassName = _props.getProperty( _AGENT_SENSOR_CLASS_KEY );
@@ -709,6 +724,7 @@ public class SimulationState
                     maxForce,
                     arrivalScaleDistance,
                     desiredSeparation,
+                    maxForagingArea,
                     agentSensor,
                     patchSensor,
                     decisionMaker );
@@ -772,8 +788,23 @@ public class SimulationState
                     prefix + _RESOURCES_KEY,
                     "Patch [" + formattedIdx + "] resources" );
             
+            // Get the radius
+            float predationProbability = MiscUtils.loadNonEmptyFloatProperty( patchProps,
+                    prefix + _PREDATION_PROBABILITY_KEY,
+                    "Patch [" + formattedIdx + "] predation probability " );
+
+            // Get the radius
+            int minAgentForageCount = MiscUtils.loadNonEmptyIntegerProperty( patchProps,
+                    prefix + _MIN_AGENT_FORAGE_COUNT_KEY,
+                    "Patch [" + formattedIdx + "] min agent forage count " );
+
             // Create the patch and store it
-            Patch patch = new Patch( id, position, radius, resources );
+            Patch patch = new Patch( id,
+                    position,
+                    radius,
+                    resources,
+                    predationProbability,
+                    minAgentForageCount );
             _patches.put( id, patch );
         }
 

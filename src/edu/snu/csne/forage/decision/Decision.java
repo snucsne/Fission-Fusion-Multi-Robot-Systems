@@ -21,8 +21,12 @@ package edu.snu.csne.forage.decision;
 
 //Imports
 import org.apache.commons.lang3.Validate;
+
+import com.jme3.math.Vector3f;
+
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.AgentTeam;
+import edu.snu.csne.forage.Patch;
 
 
 /**
@@ -35,11 +39,20 @@ public class Decision
     /** The type of decision */
     private DecisionType _type = null;
 
+    /** The time of this decision */
+    private long _timestep = 0l;
+    
     /** The team associated with this decision */
     private AgentTeam _team = null;
     
     /** The leader (if any) associated with this decision */
     private Agent _leader = null;
+    
+    /** The patch (if any) associated with this decision */
+    private Patch _patch = null;
+    
+    /** The exploration destination (if any) associated with this decision */
+    private Vector3f _destination = null;
     
     /** Weight of the separation behavior */
     protected float _separationWeight = 0.0f;
@@ -52,40 +65,50 @@ public class Decision
     
     /** Weight of the goal seek behavior */
     protected float _goalSeekWeight = 0.0f;
-    
 
-    /**
-     * Builds this Decision object
-     *
-     * @param type The type of decsion
-     * @param team The associated team
-     * @param leader The leader (if any)
-     * @param separationWeight
-     * @param cohesionWeight
-     * @param alignmentWeight
-     * @param goalSeekWeight
-     */
-    public Decision( DecisionType type,
+    /** The probability of making this decision */
+    private float _probability = 0.0f;
+
+    
+    private Decision( DecisionType type,
+            long timestep,
             AgentTeam team,
             Agent leader,
+            Patch patch,
+            Vector3f destination,
             float separationWeight,
             float cohesionWeight,
             float alignmentWeight,
-            float goalSeekWeight )
+            float goalSeekWeight,
+            float probability )
     {
-        // Validate and store
+        // Validate and store the required parameters
         Validate.notNull( type, "Decision type may not be null" );
-        Validate.notNull( type, "Agent team may not be null" );
-        // Leader is optional
-        // Weights can be zero (or negative) to inhibit
         _type = type;
+        Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
+        _timestep = timestep;
+        Validate.notNull( type, "Agent team may not be null" );
         _team = team;
+        
+        // Optional parameters
         _leader = leader;
+        _patch = patch;
+        _destination = destination;
+        
+        // Store the weights
         _separationWeight = separationWeight;
         _cohesionWeight = cohesionWeight;
         _alignmentWeight = alignmentWeight;
         _goalSeekWeight = goalSeekWeight;
         
+        // Validate the probability
+        Validate.inclusiveBetween( 0.0f,
+                1.0f,
+                probability,
+                "Probability must lie in the interval [0,1] - given ["
+                        + probability
+                        + "]" );
+        _probability = probability;
     }
     
     /**
@@ -116,6 +139,36 @@ public class Decision
     public Agent getLeader()
     {
         return _leader;
+    }
+
+    /**
+     * Returns the destination for the goal seek behavior
+     *
+     * @return The destination
+     */
+    public Vector3f getDestination()
+    {
+        // The type of decisions determines the destination
+        Vector3f destination = new Vector3f();
+        
+        if( DecisionType.NAVIGATE_TO_PATCH.equals( _type ) )
+        {
+            destination = _patch.getPosition();
+        }
+        else if( DecisionType.EXPLORE.equals( _type ) )
+        {
+            destination = _destination;
+        }
+        else if( DecisionType.FOLLOW.equals( _type ) )
+        {
+            destination = _leader.getPosition();
+        }
+        if( DecisionType.FORAGE.equals( _type ) )
+        {
+            destination = _patch.getPosition();
+        }
+
+        return destination;
     }
     
     /**
@@ -158,4 +211,169 @@ public class Decision
         return _goalSeekWeight;
     }
     
+    
+    public static Decision buildNavigateDecision(
+            long timestep,
+            AgentTeam team,
+            Patch patch,
+            float separationWeight,
+            float cohesionWeight,
+            float alignmentWeight,
+            float goalSeekWeight,
+            float probability )
+    {
+        Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
+        Validate.notNull( team, "Agent team may not be null" );
+        Validate.notNull( patch, "Patch may not be null" );
+        Validate.inclusiveBetween( 0.0f,
+                1.0f,
+                probability,
+                "Probability must lie in the interval [0,1] - given ["
+                        + probability
+                        + "]" );
+
+        // Create the decision
+        return new Decision(
+                DecisionType.NAVIGATE_TO_PATCH,
+                timestep,
+                team,
+                null,
+                patch,
+                null,
+                separationWeight,
+                cohesionWeight,
+                alignmentWeight,
+                goalSeekWeight,
+                probability );
+    }
+    
+    public static Decision buildExploreDecision(
+            long timestep,
+            AgentTeam team,
+            Vector3f destination,
+            float separationWeight,
+            float cohesionWeight,
+            float alignmentWeight,
+            float goalSeekWeight,
+            float probability )
+    {
+        // Validate the parameters
+        Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
+        Validate.notNull( team, "Agent team may not be null" );
+        Validate.notNull( destination, "Destination may not be null" );
+        Validate.inclusiveBetween( 0.0f,
+                1.0f,
+                probability,
+                "Probability must lie in the interval [0,1] - given ["
+                        + probability
+                        + "]" );
+        
+        // Create the decision
+        return new Decision(
+                DecisionType.EXPLORE,
+                timestep,
+                team,
+                null,
+                null,
+                destination,
+                separationWeight,
+                cohesionWeight,
+                alignmentWeight,
+                goalSeekWeight,
+                probability );
+    }
+    
+    public static Decision buildFollowDecision(
+            long timestep,
+            Agent leader,
+            float separationWeight,
+            float cohesionWeight,
+            float alignmentWeight,
+            float goalSeekWeight,
+            float probability )
+    {
+        Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
+        Validate.notNull( leader, "Agent leader may not be null" );
+        Validate.inclusiveBetween( 0.0f,
+                1.0f,
+                probability,
+                "Probability must lie in the interval [0,1] - given ["
+                        + probability
+                        + "]" );
+        
+        // Create the decision
+        return new Decision(
+                DecisionType.FOLLOW,
+                timestep,
+                leader.getTeam(),
+                leader,
+                null,
+                null,
+                separationWeight,
+                cohesionWeight,
+                alignmentWeight,
+                goalSeekWeight,
+                probability );
+    }
+    
+    public static Decision buildForageDecision(
+            long timestep,
+            AgentTeam team,
+            Agent leader,
+            Patch patch,
+            float separationWeight,
+            float cohesionWeight,
+            float alignmentWeight,
+            float goalSeekWeight,
+            float probability )
+    {
+        Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
+        Validate.notNull( patch, "Patch may not be null" );
+        Validate.inclusiveBetween( 0.0f,
+                1.0f,
+                probability,
+                "Probability must lie in the interval [0,1] - given ["
+                        + probability
+                        + "]" );
+
+        // Leader or team is required
+        Validate.isTrue( (null != team) || (null != leader),
+                "Leader or team is required" );
+        
+        // Create the decision
+        return new Decision(
+                DecisionType.NAVIGATE_TO_PATCH,
+                timestep,
+                team,
+                leader,
+                patch,
+                null,
+                separationWeight,
+                cohesionWeight,
+                alignmentWeight,
+                goalSeekWeight,
+                probability );
+    }
+    
+    public static Decision buildRestDecision(
+            long timestep,
+            Agent agent )
+    {
+        Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
+        Validate.notNull( agent, "Agent may not be null" );
+        
+        // Create the decision
+        return new Decision(
+                DecisionType.REST,
+                timestep,
+                agent.getTeam(),
+                agent,
+                null,
+                agent.getPosition(),
+                0.0f,
+                0.0f,
+                0.0f,
+                0.0f,
+                1.0f );
+    }
 }
