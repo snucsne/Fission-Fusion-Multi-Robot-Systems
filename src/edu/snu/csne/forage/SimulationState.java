@@ -229,12 +229,13 @@ public class SimulationState
                 + _simulationRunStepCount
                 + "]" );
 
+        /* Create the food patches first so agent decision makers can have
+         * access to them if needed */
+        createPatches();
+
         // Create the agents
         createAgents();
-        
-        // Create the food patches
-        createPatches();
-        
+                
         // Load all the event listeners
         int eventListenerCount = MiscUtils.loadNonEmptyIntegerProperty(
                 _props,
@@ -760,6 +761,7 @@ public class SimulationState
         int patchCount = MiscUtils.loadNonEmptyIntegerProperty( patchProps,
                 _PATCH_COUNT_KEY,
                 "Patch count " );
+        _LOG.debug( "Loading [" + patchCount + "] patches" );
 
         for( int i = 0; i < patchCount; i++ )
         {
@@ -806,6 +808,8 @@ public class SimulationState
                     predationProbability,
                     minAgentForageCount );
             _patches.put( id, patch );
+            
+            _LOG.debug( "Created patch [" + id + "]" );
         }
 
         _LOG.trace( "Leaving createPatches()" );

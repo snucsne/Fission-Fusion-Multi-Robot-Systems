@@ -76,6 +76,7 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
         
         // Get all the patches
         _patchIDs = new LinkedList<String>( simState.getAllPatches().keySet() );
+        _LOG.debug( "There are [" + _patchIDs.size() + "] patch IDs" );
         
         _LOG.trace( "Leaving initialize( simState, props )" );
     }
@@ -96,9 +97,10 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
 
         // What is the agent's current decision?
         Decision current = agent.getDecision();
+        _LOG.debug( "Current decision [" + current + "]" );
         
         // Is it the default of rest?
-        if( (null != current) || (DecisionType.REST.equals( current.getType() ) ) )
+        if( (null == current) || (DecisionType.REST.equals( current.getType() ) ) )
         {
             // Yup.  Is there someone to follow?
             List<Agent> nonTeammates = agent.getSensedNonTeammates();
@@ -168,6 +170,8 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
         {
             // Keep doing it
         }
+        
+        _LOG.debug( "Decision is [" + decision + "]" );
         
         _LOG.trace( "Leaving decide( agent )" );
         

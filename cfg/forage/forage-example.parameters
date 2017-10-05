@@ -32,7 +32,8 @@ patch-sensing-distance = 50
 
 
 # Decision-maker parameters
-decision-maker-class = edu.snu.csne.forage.decision.FlockingDecisionMaker
+#decision-maker-class = edu.snu.csne.forage.decision.FlockingDecisionMaker
+decision-maker-class = edu.snu.csne.forage.decision.GoalSeekFlockingDecisionMaker
 
 
 # Agent parameters
