@@ -27,6 +27,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -35,8 +36,11 @@ import java.util.Map;
 import javax.swing.JPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.Agent;
+import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
 import edu.snu.csne.mates.math.SphericalVector;
 import edu.snu.csne.util.MathUtils;
@@ -69,6 +73,9 @@ public class GraphicalPositionPanel extends JPanel
     
     /** Grid color */
     private Color _gridColor = null;
+
+    /** All the patches */
+    private List<Patch> _patches = new LinkedList<Patch>();
     
     /** Agent color */
     private Color _agentColor = null;
@@ -162,6 +169,10 @@ public class GraphicalPositionPanel extends JPanel
      */
     public void simUpdate( SimulationState simState )
     {
+        // Get all the patches
+        Map<String,Patch> patches = simState.getAllPatches();
+        _patches = new LinkedList<Patch>( patches.values() );
+        
         // Get all the agents
         Map<String,Agent> agents = simState.getAllAgents();
         _agents = new LinkedList<Agent>( agents.values() );
@@ -245,7 +256,42 @@ public class GraphicalPositionPanel extends JPanel
      */
     private void drawPatches( Graphics2D g2d )
     {
-        // TODO
+        Iterator<Patch> patchIter = _patches.iterator();
+        while( patchIter.hasNext() )
+        {
+            Patch current = patchIter.next();
+            
+            // For now, just use green for the patch
+            // Later the patch color will depend on the resources
+            g2d.setColor( new Color( 0.0f, 0.8f, 0.0f, 0.5f ) );
+            
+            // Get the converted position
+            Vector3f patchPosition = current.getPosition();
+            Vector3f convertedPosition = convert( patchPosition );
+            _LOG.debug( "Patch: position=[" + patchPosition + "]  converted=[" + convertedPosition + "]" );
+            
+            float radius = _displayScale * current.getRadius();
+            float diameter = radius * 2.0f;
+            Ellipse2D patchShape = new Ellipse2D.Float( -radius,
+                    -radius,
+                    diameter,
+                    diameter );
+            
+            // Get the original transformation
+            AffineTransform original = g2d.getTransform();
+
+            // Calculate the transform
+            AffineTransform patchTransform = new AffineTransform();
+            patchTransform.translate( convertedPosition.x, convertedPosition.y );
+            g2d.transform( patchTransform );
+            
+            // Draw the patch
+            g2d.fill( patchShape );
+            
+            // Restore the original transform
+            g2d.setTransform( original );
+
+        }
     }
     
     /**
@@ -255,7 +301,6 @@ public class GraphicalPositionPanel extends JPanel
      */
     private void drawAgents( Graphics2D g2d )
     {
-        // At the moment, just draw a circle for each agent
         Iterator<Agent> agentIter = _agents.iterator();
         while( agentIter.hasNext() )
         {
@@ -263,6 +308,7 @@ public class GraphicalPositionPanel extends JPanel
             Agent current = agentIter.next();
             Vector3f converted = convert( current.getPosition() );
             drawAgent( g2d, converted, current.getVelocity() );
+            
         }
     }
     

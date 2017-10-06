@@ -97,7 +97,11 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
 
         // What is the agent's current decision?
         Decision current = agent.getDecision();
-        _LOG.debug( "Current decision [" + current + "]" );
+        _LOG.debug( "Current decision [" + current + "] for agent [" + agent.getID() + "]" );
+        if( null != current )
+        {
+            _LOG.debug( "Current type [" + current.getType() + "]" );
+        }
         
         // Is it the default of rest?
         if( (null == current) || (DecisionType.REST.equals( current.getType() ) ) )
@@ -122,9 +126,10 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
                 // Nope, navigate to a patch.
                 String patchID = _patchIDs.remove( 0 );
                 Patch patch = _simState.getPatch( patchID );
+                _LOG.debug( "Navigating to patch [" + patchID + "] at [" + patch.getPosition() + "]" );
                 decision = Decision.buildNavigateDecision(
                         _simState.getCurrentSimulationStep(),
-                        agent.getTeam(),
+                        _simState.createNewTeam(),
                         patch,
                         1.5f,
                         1.0f,
@@ -147,6 +152,7 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
                 // Yup.  Choose a new one
                 String patchID = _patchIDs.remove( 0 );
                 Patch patch = _simState.getPatch( patchID );
+                _LOG.debug( "Navigating to NEW  patch [" + patchID + "] at [" + patch.getPosition() + "]" );
                 decision = Decision.buildNavigateDecision(
                         _simState.getCurrentSimulationStep(),
                         agent.getTeam(),
@@ -154,7 +160,7 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
                         1.5f,
                         1.0f,
                         1.0f,
-                        1.0f,
+                        1.5f,
                         1.0f );
                 
                 // Put the patch at the end of the list
@@ -163,15 +169,16 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
             else
             {
                 // Nope.  Keep going.
+                decision = current;
             }
-                    
         }
         else if( DecisionType.FOLLOW.equals( current.getType() ) )
         {
             // Keep doing it
+            decision = current;
         }
         
-        _LOG.debug( "Decision is [" + decision + "]" );
+        _LOG.debug( "Decision is [" + decision + "] of type [" + decision.getType() + "]" );
         
         _LOG.trace( "Leaving decide( agent )" );
         

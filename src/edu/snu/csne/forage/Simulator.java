@@ -78,6 +78,7 @@ public class Simulator
         catch( Exception e )
         {
             _LOG.error( "Unknown error", e );
+            System.exit(1);
         }
     }
 

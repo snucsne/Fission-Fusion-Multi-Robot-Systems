@@ -373,6 +373,22 @@ public class SimulationState
     }
     
     /**
+     * Creates a new team
+     *
+     * @return The newly created team
+     */
+    public AgentTeam createNewTeam()
+    {
+        // Generate an ID
+        String id = "GeneratedTeam" + String.format( "%05d", _newTeamCount++ );
+        
+        // Build the team
+        AgentTeam team = new AgentTeam( id );
+        
+        return team;
+    }
+    
+    /**
      * Returns all the food patches in the simulation
      *
      * @return All the food patches

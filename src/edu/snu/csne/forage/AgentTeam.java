@@ -56,4 +56,19 @@ public class AgentTeam
     {
         return _id;
     }
+
+    /**
+     * TODO Method description
+     *
+     * @param other
+     * @return
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( AgentTeam other )
+    {
+        // Simply compare the ID's
+        return _id.equals( other._id );
+    }
+    
+    
 }

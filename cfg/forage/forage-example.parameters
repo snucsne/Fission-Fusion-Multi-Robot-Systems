@@ -37,8 +37,8 @@ decision-maker-class = edu.snu.csne.forage.decision.GoalSeekFlockingDecisionMake
 
 
 # Agent parameters
-max-speed = 2.0
-max-force = 0.03
+max-speed = 1
+max-force = 0.05
 desired-separation = 2
 resource-consumption-rate = 1
 resource-consumption-max = 1000

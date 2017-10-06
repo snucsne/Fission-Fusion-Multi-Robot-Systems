@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.decision.AgentDecisionMaker;
 import edu.snu.csne.forage.decision.Decision;
+import edu.snu.csne.forage.decision.DecisionType;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
 
@@ -188,22 +189,7 @@ public class Agent
         _sensedAgents = _agentSensor.sense( this );
         
         // Which ones are teammates?
-        Iterator<Agent> agentIter = _sensedAgents.iterator();
-        while( agentIter.hasNext() )
-        {
-            Agent current = agentIter.next();
-            
-            // Are they on the same team?
-            if( _team.equals( current.getTeam() ) )
-            {
-                // Yup
-                _sensedTeammates.add( current );
-            }
-            else
-            {
-                _sensedNonTeammates.add( current );
-            }
-        }
+        findSensedTeammates();
         
 //        _LOG.debug( "Sensed [" + _sensedTeammates.size() + "] teammates" );
         
@@ -220,7 +206,18 @@ public class Agent
     {
 //        _LOG.trace( "Entering plan()" );
 
+        // Get the new decision
         _decision = _decisionMaker.decide( this );
+
+        // Are we switching teams?
+        if( !_decision.getTeam().equals( _team ) )
+        {
+            // Yup
+            _team = _decision.getTeam();
+            
+            // Search through the sensed agents for the new teammates
+            findSensedTeammates();
+        }
         
 //        _LOG.trace( "Leaving plan()" );
     }
@@ -270,7 +267,7 @@ public class Agent
         {
             Vector3f goalSeek = calculateGoalSeek();
             goalSeek.multLocal( goalSeekWeight );
-            _LOG.debug( getID() + "goalSeek=[" + goalSeek + "]" );
+            _LOG.debug( getID() + " goalSeek=[" + goalSeek + "]" );
             _acceleration.addLocal( goalSeek );
         }
         
@@ -399,6 +396,30 @@ public class Agent
     }
     
     /**
+     * Searches for teammates among the sensed agents
+     */
+    private void findSensedTeammates()
+    {
+        // Which of the sensed agents are teammates?
+        Iterator<Agent> agentIter = _sensedAgents.iterator();
+        while( agentIter.hasNext() )
+        {
+            Agent current = agentIter.next();
+            
+            // Are they on the same team?
+            if( _team.equals( current.getTeam() ) )
+            {
+                // Yup
+                _sensedTeammates.add( current );
+            }
+            else
+            {
+                _sensedNonTeammates.add( current );
+            }
+        }
+    }
+    
+    /**
      * Calculates the alignment vector
      *
      * @return The alignment vector
@@ -503,7 +524,7 @@ public class Agent
         // Get the destination from the decision
         Vector3f goal = _decision.getDestination();
         
-        return seek( goal, true );
+        return seek( goal.subtract( _position ), true );
     }
     
     /**
@@ -516,6 +537,8 @@ public class Agent
      */
     private Vector3f seek( Vector3f location, boolean slowDown )
     {
+        _LOG.debug( "Seeking [" + location + "]" );
+        
         // Is it within the minimum distance to not go full speed?
         float distance = location.length();
         Vector3f desired = location.normalize();
