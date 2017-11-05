@@ -453,9 +453,10 @@ public class Agent
     {
         Vector3f separation = new Vector3f();
 
-        // Average all the relative positions from our sensed teammates
+        // Average all the relative positions from everyone
         int separationAgentCount = 0;
-        Iterator<Agent> agentIter = _sensedTeammates.iterator();
+//        Iterator<Agent> agentIter = _sensedTeammates.iterator();
+        Iterator<Agent> agentIter = _sensedAgents.iterator();
         while( agentIter.hasNext() )
         {
             Agent current = agentIter.next();
