@@ -8,14 +8,15 @@ from bokeh.models import ColumnDataSource, HoverTool, Div
 from bokeh.models.widgets import Slider, Select, TextInput
 from bokeh.io import curdoc
 
-##desc = Div( text="Patch depletion", width=800 )
-##resourcesSlider = Slider(title="Initial resources", value=100, start=10, end=200, step=10)
-##areaPatchSlider = Slider(title="Patch area", value=30, start=10, end=50, step=5)
-##agentCountSlider = Slider(title="Agent count", value=5, start=1, end=20, step=1)
-##consuptionRateMaxSlider = Slider(title="", value=25, start=10, end=50, step=5)
-##areaForagingSlider = Slider(title="Agent foraging area", value=1, start=1, end=10, step=1)
-##travelTimeSlider = Slider(title="Travel time", value=0, start=0, end=100, step=5)
-##timeStepsMaxSlider = Slider(title="Time steps max", value=200, start=10, end[=400, step=10)
+desc = Div( text="Patch depletion", width=800 )
+resourcesSlider = Slider(title="Initial resources", value=100, start=10, end=200, step=10)
+areaPatchSlider = Slider(title="Patch area", value=30, start=10, end=50, step=5)
+agentCountSlider = Slider(title="Agent count", value=5, start=1, end=20, step=1)
+consumptionRateMaxSlider = Slider(title="", value=25, start=10, end=50, step=5)
+areaForagingSlider = Slider(title="Agent foraging area", value=1, start=1, end=10, step=1)
+travelTimeSlider = Slider(title="Travel time", value=0, start=0, end=100, step=5)
+timeStepsMaxSlider = Slider(title="Time steps max", value=200, start=10, end=400, step=10)
+
 
 
 def calcDepletion( resourcesInitial,
@@ -25,6 +26,8 @@ def calcDepletion( resourcesInitial,
                    areaForaging,
                    travelTime,
                    timeStepsMax ):
+
+    print( "****************************************************" )
 
     # Define some initial variables
     foragingHistory = list()
@@ -68,6 +71,8 @@ def calcDepletion( resourcesInitial,
             resourcesForagedPerAgent = min( resourcesForagedPerAgentMax,
                                             resourcesForagedPerAgentPreferred )
 
+            print( resourcesForagedPerAgentMax, consumptionRateMax, (areaForagingEffective * resourceDensity), resourcesForagedPerAgentPreferred, resourcesForagedPerAgent )
+
             # Calculate the total amount of resources foraged
             resourcesForaged = resourcesForagedPerAgent * agentCount
 
@@ -81,7 +86,9 @@ def calcDepletion( resourcesInitial,
             percentageOfResourcesForaged = resourcesForagedTotal / resourcesInitial
 
             # Calculate the current slope
-            foragingSlope = percentageOfResourcesForaged / time
+            foragingSlope = 0
+            if( time > 0 ):
+                foragingSlope = percentageOfResourcesForaged / time
 
             # Update the data
             foragingData = { 'resourceDensity': resourceDensity,
@@ -116,36 +123,66 @@ def buildPlotData( rawData ):
         resourcePercentages.append( foragingData['percentageOfResourcesForaged'] )
 #        print( foragingData['time'], foragingData['percentageOfResourcesForaged'] )
 
-    return {'times': times, 'resourcePercentages': resourcePercentages }
-
-##def update():
-##    # Get the slider values
-##    resources = resourcesSlider.value
-##    areaPatch = areaPatchSlider.value
-##    agentCount = agentCountSlider.value
-##    consumptionRateMax = consumptionRateMaxSlider.value
-##    areaForaging = areaForagingSlider.value
-##    travelTime = travelTimeSlider.value
-##    timeStepsMax = timeStepsMaxSlider.value
-##
-##    rawData = calcDepletion( resources,
-##                                     areaPatch,
-##                                     agentCount,
-##                                     consumptionRateMax,
-##                                     areaForaging,
-##                                     travelTime,
-##                                     timeStepsMax )
-##
-##    plotData = buildPlotData( rawData )
+    return {'x': times, 'y': resourcePercentages }
 
 rawData = calcDepletion( 100, 30, 5, 25, 1, 20, 200 )
-plotData = buildPlotData( rawData )
+plotSource = ColumnDataSource( data=buildPlotData( rawData ) )
+slopeSource = ColumnDataSource( data={'x': [0, 1/(rawData['slope']['slope'])], 'y': [0,1] } )
 
 
-output_file( "patch_depletion.html" )
 plot = figure(plot_height=600, plot_width=700, x_range=[0,200], y_range=[0,1] )
-plot.line( plotData['times'], plotData['resourcePercentages'] )
-plot.line( [0, 1/(rawData['slope']['slope'])], [0,1], line_color="#FF6666" )
+plot.line( 'x', 'y', source=plotSource )
+plot.line( 'x', 'y', source=slopeSource, line_color="#FF6666" )
 
-show(plot)
+
+def update():
+    # Get the slider values
+    resources = resourcesSlider.value
+    areaPatch = areaPatchSlider.value
+    agentCount = agentCountSlider.value
+    consumptionRateMax = consumptionRateMaxSlider.value
+    areaForaging = areaForagingSlider.value
+    travelTime = travelTimeSlider.value
+    timeStepsMax = timeStepsMaxSlider.value
+
+    rawData = calcDepletion( resources,
+                             areaPatch,
+                             agentCount,
+                             consumptionRateMax,
+                             areaForaging,
+                             travelTime,
+                             timeStepsMax )
+
+    #plot.x_range = [0, timeStepsMax]
+    plotSource.data = buildPlotData( rawData )
+    slopeSource.data = {'x': [0, 1/(rawData['slope']['slope'])], 'y': [0,1] }
+
+
+controls = [ resourcesSlider, areaPatchSlider, agentCountSlider,
+             consumptionRateMaxSlider, areaForagingSlider,
+             travelTimeSlider, timeStepsMaxSlider ]
+for control in controls:
+    control.on_change('value', lambda attr, old, new: update())
+
+
+##rawData = calcDepletion( 100, 30, 5, 25, 1, 20, 200 )
+##plotData = buildPlotData( rawData )
+
+inputs = widgetbox(*controls)
+plotLayout = layout([
+    [desc],
+    [inputs, plot],
+])
+
+##output_file( "patch_depletion.html" )
+##plot = figure(plot_height=600, plot_width=700, x_range=[0,200], y_range=[0,1] )
+##plot.line( plotData['times'], plotData['resourcePercentages'] )
+##plot.line( [0, 1/(rawData['slope']['slope'])], [0,1], line_color="#FF6666" )
+##
+##show(plot)
+
+update()
+
+curdoc().add_root(plotLayout)
+curdoc().title = "Patch Depletion"
 
