@@ -4,7 +4,7 @@ from os.path import dirname, join
 import numpy as np
 from bokeh.plotting import figure, output_file, show
 from bokeh.layouts import layout, widgetbox
-from bokeh.models import ColumnDataSource, HoverTool, Div
+from bokeh.models import ColumnDataSource, HoverTool, Div, LabelSet
 from bokeh.models.widgets import Slider, Select, TextInput
 from bokeh.io import curdoc
 
@@ -14,7 +14,7 @@ areaPatchSlider = Slider(title="Patch area", value=30, start=10, end=100, step=5
 agentCountSlider = Slider(title="Agent count", value=1, start=1, end=20, step=1)
 consumptionRateMaxSlider = Slider(title="Consumption rate maximum", value=10, start=1, end=20, step=1)
 areaForagingSlider = Slider(title="Agent foraging area", value=1, start=1, end=10, step=1)
-travelTimeSlider = Slider(title="Travel time", value=0, start=0, end=100, step=5)
+travelTimeSlider = Slider(title="Travel time", value=0, start=0, end=100, step=1)
 timeStepsMax = 400
 
 
@@ -124,11 +124,19 @@ rawData = calcDepletion( 100, 30, 5, 25, 1, 20, timeStepsMax )
 plotSource = ColumnDataSource( data=buildPlotData( rawData ) )
 print( "slope", rawData['slope']['slope'] )
 slopeSource = ColumnDataSource( data={'x': [0, 200/(rawData['slope']['slope'])], 'y': [0,200] } )
+labelSource = ColumnDataSource( data={'x': [rawData['slope']['time']],
+                                      'y': [rawData['slope']['resources']],
+                                      'slope': ['Slope = ['+str(rawData['slope']['slope'])+']'] } )
+
 
 
 plot = figure(plot_height=600, plot_width=700, x_range=[0,timeStepsMax], y_range=[0,200] )
 plot.line( 'x', 'y', source=plotSource )
 plot.line( 'x', 'y', source=slopeSource, line_color="#FF6666" )
+labels = LabelSet( x='x', y='y', text='slope', x_offset=10, y_offset=-10, source=labelSource, render_mode='canvas' )
+plot.add_layout( labels )
+plot.xaxis.axis_label = "Time"
+plot.yaxis.axis_label = "Resources gathered"
 
 
 def update():
@@ -151,6 +159,9 @@ def update():
     #plot.x_range = [0, timeStepsMax]
     plotSource.data = buildPlotData( rawData )
     slopeSource.data = {'x': [0, 200/(rawData['slope']['slope'])], 'y': [0,200] }
+    labelSource.data = {'x': [rawData['slope']['time']],
+                                      'y': [rawData['slope']['resources']],
+                                      'slope': ['Slope = ['+str(rawData['slope']['slope'])+']'] }
 
 
 controls = [ resourcesSlider, areaPatchSlider, agentCountSlider,
