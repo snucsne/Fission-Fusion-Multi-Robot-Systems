@@ -10,13 +10,12 @@ from bokeh.io import curdoc
 
 desc = Div( text="Patch depletion", width=800 )
 resourcesSlider = Slider(title="Initial resources", value=100, start=10, end=200, step=10)
-areaPatchSlider = Slider(title="Patch area", value=30, start=10, end=50, step=5)
-agentCountSlider = Slider(title="Agent count", value=5, start=1, end=20, step=1)
-consumptionRateMaxSlider = Slider(title="", value=25, start=10, end=50, step=5)
+areaPatchSlider = Slider(title="Patch area", value=30, start=10, end=100, step=5)
+agentCountSlider = Slider(title="Agent count", value=1, start=1, end=20, step=1)
+consumptionRateMaxSlider = Slider(title="Consumption rate maximum", value=10, start=1, end=20, step=1)
 areaForagingSlider = Slider(title="Agent foraging area", value=1, start=1, end=10, step=1)
 travelTimeSlider = Slider(title="Travel time", value=0, start=0, end=100, step=5)
-timeStepsMaxSlider = Slider(title="Time steps max", value=200, start=10, end=400, step=10)
-
+timeStepsMax = 400
 
 
 def calcDepletion( resourcesInitial,
@@ -27,13 +26,14 @@ def calcDepletion( resourcesInitial,
                    travelTime,
                    timeStepsMax ):
 
-    print( "****************************************************" )
 
     # Define some initial variables
     foragingHistory = list()
     resourcesRemaining = resourcesInitial
     resourcesForagedTotal = 0
     foragingSlopeMax = { 'slope': 0, 'time': 0, 'resources': 0 }
+
+#    print( "agentCount", agentCount )
 
     # Iterate through each timestep
     for time in range(timeStepsMax + 1):
@@ -45,11 +45,11 @@ def calcDepletion( resourcesInitial,
         areaForagingEffective = min( areaForaging,
                                          areaPatch / agentCount )
 
+#        print( "a_eff", areaForagingEffective, "  areaForaging", areaForaging )
+
         # Save the current data
         foragingData = { 'resourceDensity': resourceDensity,
                          'areaForagingEffective': areaForagingEffective,
-                         'resourcesForagedPerAgentMax': 0,
-                         'resourcesForagedPerAgentPreferred': 0,
                          'resourcesForagedPerAgent': 0,
                          'resourcesForaged': 0,
                          'resourcesRemaining': resourcesRemaining,
@@ -62,19 +62,14 @@ def calcDepletion( resourcesInitial,
         if( travelTime <= time ):
             # Yes, they can start foraging
 
-            # Calculate the max possible resources foraged per agent
-            resourcesForagedPerAgentMax = resourceDensity / agentCount
-            
             # Calculate the amount of resources foraged per agent
-            resourcesForagedPerAgentPreferred = min( consumptionRateMax,
+            resourcesForagedPerAgent = min( consumptionRateMax,
                     areaForagingEffective * resourceDensity )
-            resourcesForagedPerAgent = min( resourcesForagedPerAgentMax,
-                                            resourcesForagedPerAgentPreferred )
-
-            print( resourcesForagedPerAgentMax, consumptionRateMax, (areaForagingEffective * resourceDensity), resourcesForagedPerAgentPreferred, resourcesForagedPerAgent )
 
             # Calculate the total amount of resources foraged
             resourcesForaged = resourcesForagedPerAgent * agentCount
+
+#            print( "resources/agent", resourcesForagedPerAgent,"   total",resourcesForaged )
 
             # Update the remaining resources
             resourcesRemaining -= resourcesForaged
@@ -88,13 +83,11 @@ def calcDepletion( resourcesInitial,
             # Calculate the current slope
             foragingSlope = 0
             if( time > 0 ):
-                foragingSlope = percentageOfResourcesForaged / time
+                foragingSlope = resourcesForagedTotal / time
 
             # Update the data
             foragingData = { 'resourceDensity': resourceDensity,
                              'areaForagingEffective': areaForagingEffective,
-                             'resourcesForagedPerAgentMax': resourcesForagedPerAgentMax,
-                             'resourcesForagedPerAgentPreferred': resourcesForagedPerAgentPreferred,
                              'resourcesForagedPerAgent': resourcesForagedPerAgent,
                              'resourcesForaged': resourcesForaged,
                              'resourcesRemaining': resourcesRemaining,
@@ -108,7 +101,7 @@ def calcDepletion( resourcesInitial,
                 # Yup
                 foragingSlopeMax['slope'] = foragingSlope
                 foragingSlopeMax['time'] = time
-                foragingSlopeMax['resources'] = percentageOfResourcesForaged
+                foragingSlopeMax['resources'] = resourcesForagedTotal
 
         foragingHistory.append( foragingData )
 
@@ -117,20 +110,23 @@ def calcDepletion( resourcesInitial,
 
 def buildPlotData( rawData ):
     times=[]
-    resourcePercentages=[]
+    resourcesForaged=[]
     for foragingData in rawData['history']:
         times.append( foragingData['time'] )
-        resourcePercentages.append( foragingData['percentageOfResourcesForaged'] )
+        resourcesForaged.append( foragingData['resourcesForagedTotal'] )
 #        print( foragingData['time'], foragingData['percentageOfResourcesForaged'] )
 
-    return {'x': times, 'y': resourcePercentages }
+    return {'x': times, 'y': resourcesForaged }
 
-rawData = calcDepletion( 100, 30, 5, 25, 1, 20, 200 )
+
+
+rawData = calcDepletion( 100, 30, 5, 25, 1, 20, timeStepsMax )
 plotSource = ColumnDataSource( data=buildPlotData( rawData ) )
-slopeSource = ColumnDataSource( data={'x': [0, 1/(rawData['slope']['slope'])], 'y': [0,1] } )
+print( "slope", rawData['slope']['slope'] )
+slopeSource = ColumnDataSource( data={'x': [0, 200/(rawData['slope']['slope'])], 'y': [0,200] } )
 
 
-plot = figure(plot_height=600, plot_width=700, x_range=[0,200], y_range=[0,1] )
+plot = figure(plot_height=600, plot_width=700, x_range=[0,timeStepsMax], y_range=[0,200] )
 plot.line( 'x', 'y', source=plotSource )
 plot.line( 'x', 'y', source=slopeSource, line_color="#FF6666" )
 
@@ -143,7 +139,6 @@ def update():
     consumptionRateMax = consumptionRateMaxSlider.value
     areaForaging = areaForagingSlider.value
     travelTime = travelTimeSlider.value
-    timeStepsMax = timeStepsMaxSlider.value
 
     rawData = calcDepletion( resources,
                              areaPatch,
@@ -155,12 +150,12 @@ def update():
 
     #plot.x_range = [0, timeStepsMax]
     plotSource.data = buildPlotData( rawData )
-    slopeSource.data = {'x': [0, 1/(rawData['slope']['slope'])], 'y': [0,1] }
+    slopeSource.data = {'x': [0, 200/(rawData['slope']['slope'])], 'y': [0,200] }
 
 
 controls = [ resourcesSlider, areaPatchSlider, agentCountSlider,
              consumptionRateMaxSlider, areaForagingSlider,
-             travelTimeSlider, timeStepsMaxSlider ]
+             travelTimeSlider ]
 for control in controls:
     control.on_change('value', lambda attr, old, new: update())
 
