@@ -87,9 +87,9 @@ resourcesSlider = Slider(title="Initial resources",
         callback=callback)
 callback.args["resources"] = resourcesSlider
 areaPatchSlider = Slider(title="Patch area",
-        value=30,
+        value=50,
         start=10,
-        end=100,
+        end=200,
         step=5,
         callback=callback)
 callback.args["areaPatch"] = areaPatchSlider
@@ -101,17 +101,17 @@ agentCountSlider = Slider(title="Agent count",
         callback=callback)
 callback.args["agentCount"] = agentCountSlider
 consumptionRateMaxSlider = Slider(title="Consumption rate maximum",
-        value=10,
+        value=3,
         start=1,
-        end=20,
+        end=6,
         step=1,
         callback=callback)
 callback.args["consumptionRateMax"] = consumptionRateMaxSlider
 areaForagingSlider = Slider(title="Agent foraging area",
         value=1,
-        start=1,
-        end=10,
-        step=1,
+        start=0.5,
+        end=5,
+        step=0.25,
         callback=callback)
 callback.args["areaForaging"] = areaForagingSlider
 travelTimeSlider = Slider(title="Travel time",
