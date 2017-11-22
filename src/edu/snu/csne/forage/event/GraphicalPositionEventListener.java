@@ -61,6 +61,9 @@ public class GraphicalPositionEventListener
     /** Key for the agent color */
     private static final String _AGENT_COLOR_KEY = "agent-color";
     
+    /** Key for the follower to leader color */
+    private static final String _LEADER_LINE_COLOR_KEY = "leader-line-color";
+
     /** Key for the grid step size */
     private static final String _GRID_STEP_KEY = "grid-step";
     
@@ -124,6 +127,11 @@ public class GraphicalPositionEventListener
                 + _AGENT_COLOR_KEY );
         Validate.notEmpty( agentColorStr, "Agent color may not be blank" );
         Color agentColor = MiscUtils.parseAWTColor( agentColorStr );;
+        String leaderLineColorStr = props.getProperty( _DISPLAY_PREFIX_KEY
+                + "."
+                + _LEADER_LINE_COLOR_KEY );
+        Validate.notEmpty( leaderLineColorStr, "Leader line color may not be blank" );
+        Color leaderLineColor = MiscUtils.parseAWTColor( leaderLineColorStr );;
         
         // Create the graphics panel
         _panel = new GraphicalPositionPanel( width,
@@ -132,6 +140,7 @@ public class GraphicalPositionEventListener
                 bgColor,
                 gridColor,
                 agentColor,
+                leaderLineColor,
                 displayScale,
                 agentDrawSize,
                 simState );

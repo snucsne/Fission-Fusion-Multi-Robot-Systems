@@ -22,7 +22,10 @@ package edu.snu.csne.forage.decision;
 // Imports
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
@@ -110,23 +113,32 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
             List<Agent> nonTeammates = agent.getSensedNonTeammates();
             if( 0 < nonTeammates.size() )
             {
-                // Yup.  Randomly choose one to follow.
-                Agent leader = nonTeammates.get( _rng.nextInt( nonTeammates.size() ) );
+                // Get all the sensed team leaders
+                Map<String,Agent> sensedLeaders = agent.getSensedTeamLeaders();
+                
+                // Remove the agent's current team
+                sensedLeaders.remove( agent.getTeam().getID() );
+                
+                // Randomly choose a team
+                Object[] teamIDs = sensedLeaders.keySet().toArray();
+                String teamID = (String) teamIDs[ _rng.nextInt( teamIDs.length ) ];
+                Agent leader = sensedLeaders.get( teamID );
                 decision = Decision.buildFollowDecision(
                         _simState.getCurrentSimulationStep(),
                         leader,
-                        1.5f,
+                        2.0f,
                         1.0f,
                         1.0f,
-                        1.0f,
+                        1.25f,
                         1.0f );
+                _LOG.debug( "Agent [" + agent.getID() + "] is following agent [" + leader.getID() + "]" );
             }
             else
             {
                 // Nope, navigate to a patch.
                 String patchID = _patchIDs.remove( 0 );
                 Patch patch = _simState.getPatch( patchID );
-                _LOG.debug( "Navigating to patch [" + patchID + "] at [" + patch.getPosition() + "]" );
+                _LOG.debug( "Agent [" + agent.getID() + "] is navigating to patch [" + patchID + "] at [" + patch.getPosition() + "]" );
                 decision = Decision.buildNavigateDecision(
                         _simState.getCurrentSimulationStep(),
                         _simState.createNewTeam(),
@@ -134,7 +146,7 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
                         1.5f,
                         1.0f,
                         1.0f,
-                        1.0f,
+                        1.5f,
                         1.0f );
                 
                 // Put the patch at the end of the list
@@ -159,7 +171,7 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
                         patch,
                         1.5f,
                         1.0f,
-                        1.0f,
+                        0.5f,
                         1.5f,
                         1.0f );
                 

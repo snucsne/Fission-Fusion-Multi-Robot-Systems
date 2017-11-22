@@ -90,6 +90,9 @@ public class SimulationState
     /** Key for the agent's arrival scale distance */
     private static final String _ARRIVAL_SCALE_DISTANCE_KEY = "arrival-scale-distance";
     
+    /** Key for the agent's minimum separation */
+    private static final String _MIN_SEPARATION_KEY = "min-separation";
+
     /** Key for the agent's desired separation */
     private static final String _DESIRED_SEPARATION_KEY = "desired-separation";
     
@@ -636,6 +639,12 @@ public class SimulationState
                 "Arrival scale distance is required " );
         _LOG.debug( "arrivalScaleDistance=[" + arrivalScaleDistance + "]" );
 
+        // Get the minimum separation
+        float minSeparation = MiscUtils.loadNonEmptyFloatProperty( _props,
+                _MIN_SEPARATION_KEY,
+                "Minimum separation is required " );
+        _LOG.debug( "minSeparation=[" + minSeparation + "]" );
+
         // Get the desired separation
         float desiredSeparation = MiscUtils.loadNonEmptyFloatProperty( _props,
                 _DESIRED_SEPARATION_KEY,
@@ -740,6 +749,7 @@ public class SimulationState
                     maxSpeed,
                     maxForce,
                     arrivalScaleDistance,
+                    minSeparation,
                     desiredSeparation,
                     maxForagingArea,
                     agentSensor,

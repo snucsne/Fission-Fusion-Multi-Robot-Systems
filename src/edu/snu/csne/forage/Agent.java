@@ -19,10 +19,13 @@
  */
 package edu.snu.csne.forage;
 
+import java.util.HashMap;
 // Imports
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +48,8 @@ public class Agent
     private static final Logger _LOG = LogManager.getLogger(
             Agent.class.getName() );
     
+    /** Maximum strength of the separation force */
+    private static final float _MAX_SEPARATION_STRENGTH = 0.000001f;
     
     /** This agent's unique ID */
     private String _id = null;
@@ -88,6 +93,9 @@ public class Agent
     /** The distance at which the velocity is scaled to arrive at a destination */
     private float _arrivalScaleDistance = 0.0f;
     
+    /** The min separation distance */
+    private float _minSeparation = 0.0f;
+    
     /** The desired separation distance */
     private float _desiredSeparation = 0.0f;
     
@@ -109,6 +117,9 @@ public class Agent
     /** The patches currently sensed */
     private List<Patch> _sensedPatches = new LinkedList<Patch>();
     
+    /** The known team memberships */
+    private Map<String,List<Agent>> _knownTeamMemberships =
+            new HashMap<String,List<Agent>>();
     
     /**
      * Builds this Agent object
@@ -133,6 +144,7 @@ public class Agent
             float maxSpeed,
             float maxForce,
             float arrivalScaleDistance,
+            float minSeparation,
             float desiredSeparation,
             float maxForagingArea,
             AgentSensor agentSensor,
@@ -190,6 +202,9 @@ public class Agent
         
         // Which ones are teammates?
         findSensedTeammates();
+        
+        // Determine team memberships
+        findTeamMemberships();
         
 //        _LOG.debug( "Sensed [" + _sensedTeammates.size() + "] teammates" );
         
@@ -276,6 +291,8 @@ public class Agent
 //                + _velocity
 //                + " position="
 //                + _position );
+        
+        ForageUtils.limitMagnitude( _acceleration, _maxForce );
         
         // Apply the acceleration to the velocity and move the agent
         _velocity.addLocal( _acceleration );
@@ -396,6 +413,28 @@ public class Agent
     }
     
     /**
+     * Returns a map of all the sensed teams and the first known member
+     * (referred to as the leader)
+     *
+     * @return The sensed team leaders
+     */
+    public Map<String,Agent> getSensedTeamLeaders()
+    {
+        // Build a map that stores teamID -> agent
+        // Where the agent is the first sensed team member
+        Map<String,Agent> sensedLeaders = new HashMap<String,Agent>();
+        Iterator<String> teamIDIter = _knownTeamMemberships.keySet().iterator();
+        while( teamIDIter.hasNext() )
+        {
+            String teamID = teamIDIter.next();
+            Agent agent = _knownTeamMemberships.get( teamID ).get( 0 );
+            sensedLeaders.put( teamID, agent );
+        }
+        
+        return sensedLeaders;
+    }
+    
+    /**
      * Searches for teammates among the sensed agents
      */
     private void findSensedTeammates()
@@ -417,6 +456,93 @@ public class Agent
                 _sensedNonTeammates.add( current );
             }
         }
+    }
+    
+    /**
+     * Searches for team memberships (ordered by observed join time)
+     * among the sensed agents
+     */
+    private void findTeamMemberships()
+    {
+        _LOG.trace( "Entering findTeamMemberships()" );
+
+        // Create a new map for team memberships
+        Map<String,List<Agent>> currentKnownTeamMemberships =
+                new HashMap<String,List<Agent>>();
+        
+        // Build a map of all the observed agents
+        Map<String,Agent> sensedAgentMap = new HashMap<String,Agent>();
+        Iterator<Agent> agentIter = _sensedAgents.iterator();
+        while( agentIter.hasNext() )
+        {
+            Agent current = agentIter.next();
+            sensedAgentMap.put( current.getID(), current );
+        }
+        
+        // Iterate through all the teamIDs in the existing team membership map
+        Iterator<String> teamIDIter = _knownTeamMemberships.keySet().iterator();
+        while( teamIDIter.hasNext() )
+        {
+            // Iterate through all the sensed agents in this team
+            String teamID = teamIDIter.next();
+            List<Agent> newTeamMembers = new LinkedList<Agent>();
+            List<Agent> oldTeamMembers = _knownTeamMemberships.get( teamID );
+            Iterator<Agent> oldTeamMemberIter = oldTeamMembers.iterator();
+            while( oldTeamMemberIter.hasNext() )
+            {
+                // Did we sense this agent?
+                Agent agent = oldTeamMemberIter.next();
+                if( sensedAgentMap.containsKey( agent.getID() ) )
+                {
+                    // Yup.  Add it to the new list of team members
+                    newTeamMembers.add( agent );
+                    // Remove it from the map of sensed agents
+                    sensedAgentMap.remove( agent.getID() );
+                }
+            }
+            
+//            _LOG.debug( "Team=[" + teamID + "]  Previous members=[" + newTeamMembers.size() + "]" );
+            
+            // Did we sense any team members for this team?
+            if( newTeamMembers.size() > 0 )
+            {
+                // Yup add it to the map
+                currentKnownTeamMemberships.put( teamID, newTeamMembers );
+            }
+        }
+        
+        // Process all the agents we haven't observed to be part of a team
+        Iterator<String> unprocessedAgentIDIter = sensedAgentMap.keySet().iterator();
+        while( unprocessedAgentIDIter.hasNext() )
+        {
+            // Get the agent and their teamID
+            String agentID = unprocessedAgentIDIter.next();
+            Agent agent = sensedAgentMap.get( agentID );
+            String teamID = agent.getTeam().getID();
+            
+            // Get the observed members of that team
+            List<Agent> observedTeamMembers = currentKnownTeamMemberships.get( teamID );
+            if( null == observedTeamMembers )
+            {
+                // We haven't observed any for that team, create the list and
+                // add it to the map
+                observedTeamMembers = new LinkedList<Agent>();
+                currentKnownTeamMemberships.put( teamID, observedTeamMembers );
+                
+                _LOG.debug( "New team [" + teamID + "]" );
+            }
+            
+            // Add the agent to the end of the list
+            observedTeamMembers.add( agent );
+//            _LOG.debug( "Added agent [" + agentID + "] to team [" + teamID + "]" );
+        }
+        
+        // Save the team memberships
+        _knownTeamMemberships = currentKnownTeamMemberships;
+        
+//        _LOG.debug( "Sensed leaders for [" + _knownTeamMemberships.size() + "]" );
+        
+        _LOG.trace( "Leaving findTeamMemberships()" );
     }
     
     /**
@@ -453,6 +579,8 @@ public class Agent
     {
         Vector3f separation = new Vector3f();
 
+        float minMaxSeparationDiff = _desiredSeparation - _minSeparation;
+        
         // Average all the relative positions from everyone
         int separationAgentCount = 0;
 //        Iterator<Agent> agentIter = _sensedTeammates.iterator();
@@ -464,12 +592,25 @@ public class Agent
             // Calculate the vector to us 
             Vector3f fromCurrent = _position.subtract( current.getPosition() );
             float distance = fromCurrent.length();
+            _LOG.debug( "Separation distance=[" + distance + "]" );
             
             // Is the distance within the desired separation?
             if( _desiredSeparation > distance )
             {
+                /* There is a separation force that uses the distance to the agent.
+                 * Since we don't want to be closer than the minimum, anything
+                 * closer is at maximum strength.
+                 */
+                float separationStrength = (distance - _minSeparation) / minMaxSeparationDiff;
+                if( separationStrength <= 0.0f )
+                {
+                    separationStrength = _MAX_SEPARATION_STRENGTH;
+                }
                 fromCurrent.normalizeLocal();
-                fromCurrent.divideLocal( distance );
+                fromCurrent.divideLocal( separationStrength );
+                _LOG.debug( "Separation: distance=[" + distance
+                        + "] strength=[" + separationStrength
+                        + "] fromCurrent=[" + fromCurrent + "]" );
 
                 // Add it to the total separation
                 separation.addLocal( fromCurrent );
@@ -484,7 +625,7 @@ public class Agent
             separation.divideLocal( _sensedTeammates.size() );
             
             // Limit it by the max force
-            ForageUtils.limitMagnitude( separation, _maxForce );
+//            ForageUtils.limitMagnitude( separation, _maxForce );
         }
         else
         {

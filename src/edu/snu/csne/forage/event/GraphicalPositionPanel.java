@@ -28,6 +28,7 @@ import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,6 +43,8 @@ import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.forage.decision.Decision;
+import edu.snu.csne.forage.decision.DecisionType;
 import edu.snu.csne.mates.math.SphericalVector;
 import edu.snu.csne.util.MathUtils;
 
@@ -80,6 +83,9 @@ public class GraphicalPositionPanel extends JPanel
     /** Agent color */
     private Color _agentColor = null;
     
+    /** Leader line color */
+    private Color _leaderLineColor = null;
+    
     /** All the agents */
     private List<Agent> _agents = new LinkedList<Agent>();
     
@@ -96,6 +102,7 @@ public class GraphicalPositionPanel extends JPanel
             Color bgColor,
             Color gridColor,
             Color agentColor,
+            Color leaderLineColor,
             float displayScale,
             float agentDrawSize,
             SimulationState simState )
@@ -106,6 +113,7 @@ public class GraphicalPositionPanel extends JPanel
         _bgColor = bgColor;
         _gridColor = gridColor;
         _agentColor = agentColor;
+        _leaderLineColor = leaderLineColor;
         _displayScale = displayScale;
         _agentDrawSize = agentDrawSize;
         
@@ -154,6 +162,9 @@ public class GraphicalPositionPanel extends JPanel
         
         // Draw the patches
         drawPatches( g2d );
+        
+        // Draw the lines from follower to leader
+        drawLeaderLines( g2d );
         
         // Draw the agents
         drawAgents( g2d );
@@ -294,6 +305,41 @@ public class GraphicalPositionPanel extends JPanel
         }
     }
     
+    /**
+     * Draw lines from followers to leaders
+     * 
+     * @param g2d The graphics drawing object
+     */
+    private void drawLeaderLines( Graphics2D g2d )
+    {
+        Iterator<Agent> agentIter = _agents.iterator();
+        g2d.setColor( _leaderLineColor );
+        while( agentIter.hasNext() )
+        {
+            Agent current = agentIter.next();
+            Decision currentDecision = current.getDecision();
+            if( DecisionType.FOLLOW.equals( currentDecision.getType() ) )
+            {
+                // Get the original transformation
+                AffineTransform original = g2d.getTransform();
+
+                Agent leader = currentDecision.getLeader();
+                Vector3f followerPosition = convert( current.getPosition() );
+                Vector3f leaderPosition = convert( leader.getPosition() );
+                Vector3f leaderOffset = leaderPosition.subtract( followerPosition );
+                Line2D line = new Line2D.Float( 0, 0, leaderOffset.x, leaderOffset.y );
+                
+                AffineTransform followerTransform = new AffineTransform();
+                followerTransform.translate( followerPosition.x, followerPosition.y );
+                g2d.transform( followerTransform );
+                g2d.draw( line );
+
+                // Restore the original
+                g2d.setTransform( original );
+            }
+        }
+    }
+
     /**
      * Draws all the agents in the simulation
      *
