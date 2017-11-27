@@ -122,6 +122,16 @@ public class Decision
     }
     
     /**
+     * Returns the probability of making this decision
+     *
+     * @return The probability
+     */
+    public float getProbability()
+    {
+        return _probability;
+    }
+    
+    /**
      * Returns the team associated with this decision
      *
      * @return The team
@@ -151,7 +161,7 @@ public class Decision
         // The type of decisions determines the destination
         Vector3f destination = new Vector3f();
         
-        if( DecisionType.NAVIGATE_TO_PATCH.equals( _type ) )
+        if( DecisionType.NAVIGATE.equals( _type ) )
         {
             destination = _patch.getPosition();
         }
@@ -234,7 +244,7 @@ public class Decision
 
         // Create the decision
         return new Decision(
-                DecisionType.NAVIGATE_TO_PATCH,
+                DecisionType.NAVIGATE,
                 timestep,
                 team,
                 null,
@@ -342,7 +352,7 @@ public class Decision
         
         // Create the decision
         return new Decision(
-                DecisionType.NAVIGATE_TO_PATCH,
+                DecisionType.FORAGE,
                 timestep,
                 team,
                 leader,

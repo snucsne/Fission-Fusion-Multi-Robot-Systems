@@ -17,33 +17,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.snu.csne.forage.decision;
+package edu.snu.csne.forage;
 
 /**
  * TODO Class description
  *
  * @author Brent Eskridge
  */
-public enum DecisionType
-{
-    NAVIGATE,
-    EXPLORE,
-    FOLLOW,
-    FORAGE,
-    REST;
+public enum GroupBehavior {
+    SEPARATION,
+    COHESION,
+    ALIGNMENT,
+    GOAL_SEEK;
 
-    /** Key for the decision type used in loading properties */
+    /** Key for the group behavior used in loading properties */
     private final String _key;
     
-    /**
-     * Default constructor
-     */
-    private DecisionType()
+   /**
+    * Default constructor
+    */
+    private GroupBehavior()
     {
         // Build the key
         _key = name().toLowerCase().replace( '_', '-' );
     }
-
+    
     /**
      * Returns the key associated with the behavior for use in loading
      * properties
@@ -54,5 +52,4 @@ public enum DecisionType
     {
         return _key;
     }
-
 }

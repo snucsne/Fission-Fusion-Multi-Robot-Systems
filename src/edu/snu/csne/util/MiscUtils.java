@@ -214,6 +214,31 @@ public class MiscUtils
     }
 
     /**
+     * Loads an optional float value from properties
+     *
+     * @param props All the properties
+     * @param key The key of the value
+     * @param defaultValue The default value to use if the property doesn't exist
+     * @return The float value
+     */
+    public static float loadOptionalFloatProperty( Properties props,
+            String key,
+            float defaultValue )
+    {
+        // Use the default
+        float value = defaultValue;
+        
+        // Was the value specified?
+        String valueStr = props.getProperty( key );
+        if( null != valueStr )
+        {
+            value = Float.parseFloat( valueStr );
+        }
+        
+        return value;
+    }
+
+    /**
      * Loads a non-empty integer value from properties
      *
      * @param props All the properties

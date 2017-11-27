@@ -24,8 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
@@ -57,10 +55,10 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
     
     
     /**
-     * Makes a decision upon which the agent will act
+     * Initialize this agent decision-maker
      *
-     * @param agent The agent making the decision
-     * @return The decision
+     * @param simState The state of the simulation
+     * @param props The configuration properties
      * @see edu.snu.csne.forage.decision.AbstractAgentDecisionMaker#initialize(edu.snu.csne.forage.SimulationState, java.util.Properties)
      */
     @Override
@@ -85,10 +83,10 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
     }
 
     /**
-     * Initialize this agent decision-maker
+     * Makes a decision upon which the agent will act
      *
-     * @param simState The state of the simulation
-     * @param props The configuration properties
+     * @param agent The agent making the decision
+     * @return The decision
      * @see edu.snu.csne.forage.decision.AgentDecisionMaker#decide(edu.snu.csne.forage.Agent)
      */
     @Override
@@ -154,7 +152,7 @@ public class GoalSeekFlockingDecisionMaker extends AbstractAgentDecisionMaker
             }
         }
         // Nope.  Are we leading somewhere?
-        else if( DecisionType.NAVIGATE_TO_PATCH.equals( current.getType() ) )
+        else if( DecisionType.NAVIGATE.equals( current.getType() ) )
         {
             // Yup.  Are we at that destination?
             Vector3f destination = current.getDestination();

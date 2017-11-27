@@ -32,7 +32,6 @@ import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.decision.AgentDecisionMaker;
 import edu.snu.csne.forage.decision.Decision;
-import edu.snu.csne.forage.decision.DecisionType;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
 
