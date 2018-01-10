@@ -1,0 +1,44 @@
+\documentclass[letterpaper,12pt]{article}
+
+% ===================================================================
+\usepackage{amsmath}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% ===================================================================
+\title{Patch Depletion Model}
+\author{Brent Eskridge}
+% ===================================================================
+\begin{document}
+
+% -------------------------------------------------------------------
+\maketitle
+
+% -------------------------------------------------------------------
+\section{Parameters}
+
+\begin{itemize}
+ \item Amount of resources for patch at time $t$: $R_t$
+ \item Area of the patch: $A_p$
+ \item Maximum area an agent can forage per unit time: $A_f$
+ \item Number of foraging agents at time $t$: $F_t$
+ \item Maximum consumption rate (resources foraged per unit time) of an agent: $F_c$
+\end{itemize}
+
+% -------------------------------------------------------------------
+\section{Derived Values}
+
+\begin{itemize}
+ \item Density of resources at time $t$: $D_t = \dfrac{R_t}{A_p}$
+ \item Effective area available for an agent to forage at time $t$: $A_{t,eff} = \min\left({ A_f, \dfrac{A_p}{F_t} }\right)$
+ \item Amount of resources foraged by an agent at time $t$: $F_{c,t} = \min({F_c, A_{t,eff} \times D_t})$
+ \item Total amount of resources foraged at time $t$: $R_{F,t} = F_{c,t} \times F_t$
+ \item Resources remaining after time $t$: $R_{t+1} = R_{t} - R_{F,t}$
+ \item Total amount of resources foraged up to time $t$: $R_{FTot,t} = \sum_{i=0}^{t} R_{F,i}$
+ \item Value of a patch: $V = \max\left({ \dfrac{R_{FTot,t}}{t} }\right)$
+\end{itemize}
+
+
+
+
+% ===================================================================
+\end{document}

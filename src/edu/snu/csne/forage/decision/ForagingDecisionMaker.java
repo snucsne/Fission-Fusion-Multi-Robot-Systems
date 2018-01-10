@@ -32,6 +32,7 @@ import ec.util.MersenneTwisterFast;
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.util.MiscUtils;
 
 
 /**
@@ -48,6 +49,15 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
     /** Threshold distance squared to determine if patch locations are the same */
     private static final float _MAX_SAME_PATCH_DIST_SQUARED = 0.02f;
     
+    /** Property key for the initiation rate base */
+    private static final String _INITIATION_RATE_KEY = "initiation-rate";
+    
+    /** Property key for the follow alpha constant */
+    private static final String _FOLLOW_ALPHA_KEY = "follow-alpha";
+    
+    /** Property key for the follow beta constant */
+    private static final String _FOLLOW_BETA_CONSTANT = "follow-beta";
+    
     
     /** Random number generator */
     private MersenneTwisterFast _rng = null;
@@ -55,6 +65,15 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
     /** The decision builder */
     private DecisionBuilder _decisionBuilder = new DecisionBuilder();
 
+    /** The base initiation rate */
+    private float _inititationRate = 0.0f;
+    
+    /** Follow alpha constant */
+    private float _followAlpha = 0.0f;
+    
+    /** Follow beta constant */
+    private float _followBeta = 0.0f;
+    
     
     /**
      * Initialize this agent decision-maker
@@ -77,6 +96,27 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
         // Initialize the decision builder
         _decisionBuilder.initialize( simState, props );
         
+        // Load the initiation rate
+        _inititationRate = MiscUtils.loadNonEmptyFloatProperty( props,
+                _INITIATION_RATE_KEY,
+                "Initiation rate (key="
+                        + _INITIATION_RATE_KEY
+                        + ") may not be empty" );
+        
+        // Load the follow alpha constant
+        _followAlpha = MiscUtils.loadNonEmptyFloatProperty( props,
+                _FOLLOW_ALPHA_KEY,
+                "Follow alpha (key="
+                        + _FOLLOW_ALPHA_KEY
+                        + ") may not be empty" );
+
+        // Load the follow beta constant
+        _followBeta = MiscUtils.loadNonEmptyFloatProperty( props,
+                _FOLLOW_BETA_CONSTANT,
+                "Follow beta (key="
+                        + _FOLLOW_BETA_CONSTANT
+                        + ") may not be empty" );
+
         _LOG.trace( "Leaving initialize( simState, props )" );
     }
 
@@ -107,7 +147,8 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
         }
         
         // Get the minimum probability of continuing the same decision
-        float sameDecisionProbabilityMin = 0.0f;
+        // TODO
+        float sameDecisionProbabilityMin = 0.1f;
         
         // If the sum is larger than 1 minus the same decision minimum, scale everything
         float scale = 1.0f;
@@ -115,11 +156,17 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
         {
             scale = 1.0f / (decisionProbabilitiesSum + sameDecisionProbabilityMin);
         }
+        _LOG.debug( "decisionProbabilitiesSum=["
+                + decisionProbabilitiesSum
+                + "] samDecisionProbabilityMin=["
+                + sameDecisionProbabilityMin
+                + "]" );
         
         // Make a decision (defaulting to the current decision)
         Decision decision = agent.getDecision();
         boolean done = false;
         float randomDecision = _rng.nextFloat();
+        _LOG.debug( "randomDecision=[" + randomDecision + "]" );
         decisionIter = allDecisions.iterator();
         while( decisionIter.hasNext() && !done )
         {
@@ -127,6 +174,11 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
             
             // What is the probability?
             float probability = scale * possibleDecision.getProbability();
+            _LOG.debug( "probability=["
+                    + probability
+                    + "] possibleDecision=["
+                    + possibleDecision
+                    + "]" );
             
             // Is this the one?
             if( probability > randomDecision )
@@ -134,6 +186,7 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
                 // Yup
                 decision = possibleDecision;
                 done = true;
+                _LOG.debug( "Making this decision" );
             }
             else
             {
@@ -199,6 +252,12 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
             navDecisions.add( decision );
         }
         
+        _LOG.debug( "Known patches=["
+                + patches.size()
+                + "] navDecisions=["
+                + navDecisions.size()
+                + "]" );
+        
         return navDecisions;
     }
     
@@ -238,6 +297,12 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
             followDecisions.add( decision );
         }
         
+        _LOG.debug( "Known leaders=["
+                + teamLeaders.size()
+                + "] followDecisions=["
+                + followDecisions.size()
+                + "]" );
+
         return followDecisions;
     }
     
@@ -275,6 +340,12 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
                 forageDecisions.add( decision );
             }
         }
+
+        _LOG.debug( "Known patches=["
+                + patches.size()
+                + "] forageDecisions=["
+                + forageDecisions.size()
+                + "]" );
 
         return forageDecisions;
     }
