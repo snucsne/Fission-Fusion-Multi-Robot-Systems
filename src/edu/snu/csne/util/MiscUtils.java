@@ -263,6 +263,30 @@ public class MiscUtils
     }
 
     /**
+     * Loads a non-empty long value from properties
+     *
+     * @param props All the properties
+     * @param key The key of the value
+     * @param description A description of the error to generate if the value
+     * is not found
+     * @return The float value
+     */
+    public static long loadNonEmptyLongProperty( Properties props,
+            String key,
+            String description )
+    {
+        String valueStr = props.getProperty( key );
+        org.apache.commons.lang3.Validate.notEmpty( valueStr,
+                description
+                + "(key="
+                + key
+                + ") may not be empty" );
+        long value = Long.parseLong( valueStr );
+        
+        return value;
+    }
+
+    /**
      * Loads a non-empty Vector3f value from properties
      *
      * @param props All the properties

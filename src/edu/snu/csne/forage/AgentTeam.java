@@ -19,6 +19,11 @@
  */
 package edu.snu.csne.forage;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -31,6 +36,8 @@ public class AgentTeam
     /** This team's unique ID */
     private String _id = null;
     
+    /** The members of this team */
+    private Map<String,Agent> _members = new HashMap<String,Agent>();
     
     /**
      * Builds this AgentTeam object
@@ -70,5 +77,61 @@ public class AgentTeam
         return _id.equals( other._id );
     }
     
+    /**
+     * Signals the team that an agent has joined
+     *
+     * @param agent The joining agent
+     */
+    public void join( Agent agent )
+    {
+        Validate.notNull( agent, "Joining agent may not be null" );
+        _members.put( agent.getID(), agent );
+    }
     
+    /**
+     * Signals the team that an agent is leaving
+     *
+     * @param agent The leaving agent
+     */
+    public void leave( Agent agent )
+    {
+        Validate.notNull( agent, "Leaving agent may not be null" );
+        Agent leaver = _members.remove( agent.getID() );
+        Validate.notNull( leaver, "Leaving agent ["
+                + agent.getID()
+                + "] was not a member of team ["
+                + getID()
+                + "]" );
+    }
+    
+    /**
+     * Returns the size of the team
+     *
+     * @return The size
+     */
+    public int getSize()
+    {
+        return _members.size();
+    }
+    
+    /**
+     * Returns all the members of this team
+     *
+     * @return All the members
+     */
+    public List<Agent> getMembers()
+    {
+        return new ArrayList<Agent>( _members.values() );
+    }
+    
+    /**
+     * Indicates whether or not the team is active with members
+     *
+     * @return Returns <code>true</code> if the team is active and has members,
+     * otherwise <code>false</code>
+     */
+    public boolean isActive()
+    {
+        return (_members.size() > 0);
+    }
 }

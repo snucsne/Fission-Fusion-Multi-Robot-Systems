@@ -338,6 +338,27 @@ public class SimulationState
     }
     
     /**
+     * Returns all the active teams in the simulation
+     *
+     * @return All the active teams
+     */
+    public Map<String,AgentTeam> getAllActiveTeams()
+    {
+        Map<String,AgentTeam> activeTeams = new HashMap<String,AgentTeam>(); 
+        Iterator<AgentTeam> teamIter = getAllTeams().values().iterator();
+        while( teamIter.hasNext() )
+        {
+            AgentTeam current = teamIter.next();
+            if( current.isActive() )
+            {
+                activeTeams.put( current.getID(), current );
+            }
+        }
+        
+        return activeTeams;
+    }
+    
+    /**
      * Returns the team specified by the ID.  If the team does not exist,
      * it can create it.
      *

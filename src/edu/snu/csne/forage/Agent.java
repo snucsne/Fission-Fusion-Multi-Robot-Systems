@@ -19,8 +19,8 @@
  */
 package edu.snu.csne.forage;
 
+//Imports
 import java.util.HashMap;
-// Imports
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -226,8 +226,10 @@ public class Agent
         // Are we switching teams?
         if( !_decision.getTeam().equals( _team ) )
         {
-            // Yup
+            // Yup, change the team and notify them
+            _team.leave( this );
             _team = _decision.getTeam();
+            _team.join( this );
             
             // Search through the sensed agents for the new teammates
             findSensedTeammates();
@@ -308,6 +310,18 @@ public class Agent
                 + _position );
 
         _LOG.trace( "Leaving act()" );
+    }
+    
+    /**
+     * Kills this agent as a result of predation
+     */
+    public void terminate()
+    {
+        // Notify the team the agent isn't a member anymore
+        _team.leave( this );
+        
+        // Set the agent to inactive
+        _active = false;
     }
     
     /**

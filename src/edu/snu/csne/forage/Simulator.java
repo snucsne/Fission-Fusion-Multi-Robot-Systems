@@ -52,13 +52,6 @@ public class Simulator
     /** The properties used to initialize the system */
     private Properties _props = new Properties();
 
-    /** The number of times to run the simulator */
-    private int _simulationCount = 0;
-
-    /** All the event listeners */
-    private List<SimulationEventListener> _listeners =
-            new LinkedList<SimulationEventListener>();
-    
     /**
      * Main entry into the simulation
      *
@@ -96,9 +89,6 @@ public class Simulator
         _simState = new SimulationState();
         _simState.initialize( _props );
 
-        // Get the simulation count
-        _simulationCount = _simState.getSimulationRunCount();
-        
         // Signal that the simulator is about ready to start
         _simState.signalSimSetup();
 
