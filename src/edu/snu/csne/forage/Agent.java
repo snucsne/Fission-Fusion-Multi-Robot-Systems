@@ -472,6 +472,26 @@ public class Agent
     }
     
     /**
+     * Returns the maximum amount of resources the agent can consume per timestep
+     *
+     * @return The resource consumption rate
+     */
+    public float getResourceConsumptionRate()
+    {
+        return _resourceConsumptionRate;
+    }
+    
+    /**
+     * Returns the maximum area in which the agent can forage per timestep
+     *
+     * @return The max foraging area
+     */
+    public float getMaxForagingArea()
+    {
+        return _maxForagingArea;
+    }
+    
+    /**
      * Searches for team memberships (ordered by observed join time)
      * among the sensed agents
      */

@@ -40,30 +40,46 @@ public class PatchValueCalculator
 {
     public static class PatchDepletionData
     {
-        private float _resourcesGathered = 0.0f;
-        private float _totalResourcesGathered = 0.0f;
+        private float _resourcesGatheredAgent = 0.0f;
+        private float _totalResourcesGatheredAgent = 0.0f;
+        private float _resourcesGatheredGroup = 0.0f;
+        private float _totalResourcesGatheredGroup = 0.0f;
         private int _timesteps = 0;
         private int _agentsPresent = 0;
         
-        public PatchDepletionData( float resourcesGathered,
-                float totalResourcesGathered,
+        public PatchDepletionData( float resourcesGatheredAgent,
+                float totalResourcesGatheredAgent,
+                float resourcesGatheredGroup,
+                float totalResourcesGatheredGroup,
                 int timesteps,
                 int agentsPresent)
         {
-            _resourcesGathered = resourcesGathered;
-            _totalResourcesGathered = totalResourcesGathered;
+            _resourcesGatheredAgent = resourcesGatheredAgent;
+            _totalResourcesGatheredAgent = totalResourcesGatheredAgent;
+            _resourcesGatheredGroup = resourcesGatheredGroup;
+            _totalResourcesGatheredGroup = totalResourcesGatheredGroup;
             _timesteps = timesteps;
             _agentsPresent = agentsPresent;
         }
         
-        public float getResourcesGathered()
+        public float getResourcesGatheredAgent()
         {
-            return _resourcesGathered;
+            return _resourcesGatheredAgent;
         }
         
-        public float getTotalResourcesGathered()
+        public float getTotalResourcesGatheredAgent()
         {
-            return _totalResourcesGathered;
+            return _totalResourcesGatheredAgent;
+        }
+        
+        public float getResourcesGatheredGroup()
+        {
+            return _resourcesGatheredGroup;
+        }
+        
+        public float getTotalResourcesGatheredGroup()
+        {
+            return _totalResourcesGatheredGroup;
         }
         
         public int getTimesteps()
@@ -104,17 +120,17 @@ public class PatchValueCalculator
         private int _giveUpTime = 0;
         private float _giveUpSlope = 0.0f;
         private float _indResources = 0.0f;
-        private float _teamResources = 0.0f;
+        private float _groupResources = 0.0f;
         
         public PatchValue( int giveUpTime,
                 float giveUpSlope,
                 float indResources,
-                float teamResources )
+                float groupResources )
         {
             _giveUpTime = giveUpTime;
             _giveUpSlope = giveUpSlope;
             _indResources = indResources;
-            _teamResources = teamResources;
+            _groupResources = groupResources;
         }
 
         /**
@@ -148,13 +164,13 @@ public class PatchValueCalculator
         }
 
         /**
-         * Returns the teamResources for this object
+         * Returns the GroupResources for this object
          *
-         * @return The teamResources.
+         * @return The GroupResources.
          */
-        public float getTeamResources()
+        public float getGroupResources()
         {
-            return _teamResources;
+            return _groupResources;
         }
     }
     
@@ -203,7 +219,7 @@ public class PatchValueCalculator
         int giveUpTime = 0;
         float giveUpSlope = 0.0f;
         float indResources = 0.0f;
-        float teamResources = 0.0f;
+        float groupResources = 0.0f;
         
         // Calculate the agent's arrival time at the patch
         int agentArrivalTime = 0;
@@ -235,12 +251,61 @@ public class PatchValueCalculator
         }
         
         // Project the patch depletion
+        PatchDepletionData[] depletionData = new PatchDepletionData[ _maxDepletionTimesteps ];
+        float startResources = patch.getRemainingResources();
+        float remainingResources = startResources;
+        float patchArea = patch.getRadius() * patch.getRadius() * (float) Math.PI;
+        float totalResourcesForaged = 0.0f;
+        float consumptionRateMax = agent.getResourceConsumptionRate();
+        float foragingAreaMax = agent.getMaxForagingArea();
         for( int i = 0; i < _maxDepletionTimesteps; i++ )
         {
-            // 
+            // Compute the density of the remaining resources in the patch
+            float resourceDensity = remainingResources / patchArea;
+            
+            // Compute the effective foraging area for each individual agent
+            float foragingAreaEffective = (float) Math.min( foragingAreaMax,
+                    patchArea / agentCounts[i] );
+            
+            // Compute the amount of resources foraged per agent
+            float resourcesForagedPerAgent = (float) Math.min( consumptionRateMax,
+                    foragingAreaEffective * resourceDensity );
+            
+            // Compute the total amount of resources foraged this timestep
+            float resourcesForaged = resourcesForagedPerAgent * agentCounts[i];
+            
+            // Update the totals
+            remainingResources -= resourcesForaged;
+            totalResourcesForaged += resourcesForaged;
+            indResources += resourcesForagedPerAgent;
+            groupResources += resourcesForaged;
+            
+            // Store the data
+            depletionData[i] = new PatchDepletionData( resourcesForagedPerAgent,
+                    indResources,
+                    resourcesForaged,
+                    groupResources,
+                    i,
+                    agentCounts[i] );
+            
+            // Compute the slope, but only if we are past the first timestep
+            if( i > 0 )
+            {
+                /* Compute the slope of the line from the origin to the
+                 * current data point */
+                float currentSlope = totalResourcesForaged / i;
+                
+                // Is it the biggest slope?
+                if( currentSlope > giveUpSlope )
+                {
+                    // Yup, this is the best give up time so far
+                    giveUpSlope = currentSlope;
+                    giveUpTime = i;
+                }
+            }
         }
         
-        return new PatchValue( giveUpTime, giveUpSlope, indResources, teamResources );
+        return new PatchValue( giveUpTime, giveUpSlope, indResources, groupResources );
     }
 
     /**
