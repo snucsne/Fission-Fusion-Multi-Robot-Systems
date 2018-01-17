@@ -216,7 +216,7 @@ public class PatchValueCalculator
         for( int i = 0; i < agentCounts.length; i++ )
         {
             // Is the agent projected to arrive now?
-            if( i == agentArrivalTime )
+            if( agentArrivalTime <= i )
             {
                 agentCounts[i]++;
             }
@@ -225,7 +225,7 @@ public class PatchValueCalculator
             for( int j = 0; j < arrivalTimes.size(); j++ )
             {
                 PatchArrivalTime current = arrivalTimes.get( j );
-                if( current.getArrivalTime() == i )
+                if( current.getArrivalTime() <= i )
                 {
                     // Yup
                     AgentTeam team = _simState.getTeam( current.getTeamID(), false );
