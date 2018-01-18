@@ -32,6 +32,8 @@ import ec.util.MersenneTwisterFast;
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.forage.util.PatchValueCalculator;
+import edu.snu.csne.forage.util.PatchValueCalculator.PatchValue;
 import edu.snu.csne.util.MiscUtils;
 
 
@@ -73,6 +75,9 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
     
     /** Follow beta constant */
     private float _followBeta = 0.0f;
+    
+    /** Patch value calculator */
+    private PatchValueCalculator _patchValueCalc = new PatchValueCalculator();
     
     
     /**
@@ -116,6 +121,9 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
                 "Follow beta (key="
                         + _FOLLOW_BETA_CONSTANT
                         + ") may not be empty" );
+        
+        // Initialize the patch value calculator
+        _patchValueCalc.initialize( simState );
 
         _LOG.trace( "Leaving initialize( simState, props )" );
     }
@@ -239,6 +247,9 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
                 continue;
             }
             
+            // Calculate the value of the patch to the agent
+            PatchValue patchValue = _patchValueCalc.calculatePatchValue( patch, agent );
+            
             // Calculate the probability of navigating to this patch
             float probability = 0.0f;
             
@@ -284,6 +295,9 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
                 continue;
             }
             
+//            // Calculate the value of the patch to the agent
+//            PatchValue patchValue = _patchValueCalc.calculatePatchValue( patch, agent );
+
             // Calculate the probability of following this leader
             float probability = 0.0f;
             
@@ -329,6 +343,10 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
             if( patch.isInPatch( agent ) )
             {
                 // Yup.  They can forage here
+
+                // Calculate the value of the patch to the agent
+                PatchValue patchValue = _patchValueCalc.calculatePatchValue( patch, agent );
+
                 // Calculate the probability
                 float probability = 0.0f;
                 Decision decision = _decisionBuilder.buildForageDecision(

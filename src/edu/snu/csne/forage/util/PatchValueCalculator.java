@@ -117,40 +117,69 @@ public class PatchValueCalculator
     
     public static class PatchValue
     {
-        private int _giveUpTime = 0;
-        private float _giveUpSlope = 0.0f;
+        private int _giveUpTimeInd = 0;
+        private float _giveUpSlopeInd = 0.0f;
+        private int _giveUpTimeGroup = 0;
+        private float _giveUpSlopeGroup = 0.0f;
         private float _indResources = 0.0f;
         private float _groupResources = 0.0f;
+        private PatchDepletionData[] _allDepletionData = null;
         
-        public PatchValue( int giveUpTime,
-                float giveUpSlope,
+        public PatchValue( int giveUpTimeInd,
+                float giveUpSlopeInd,
+                int giveUpTimeGroup,
+                float giveUpSlopeGroup,
                 float indResources,
-                float groupResources )
+                float groupResources,
+                PatchDepletionData[] allDepletionData )
         {
-            _giveUpTime = giveUpTime;
-            _giveUpSlope = giveUpSlope;
+            _giveUpTimeInd = giveUpTimeInd;
+            _giveUpSlopeInd = giveUpSlopeInd;
+            _giveUpTimeGroup = giveUpTimeGroup;
+            _giveUpSlopeGroup = giveUpSlopeGroup;
             _indResources = indResources;
             _groupResources = groupResources;
+            _allDepletionData = allDepletionData;
         }
 
         /**
-         * Returns the giveUpTime for this object
+         * Returns the give-up time based on individual resources
          *
-         * @return The giveUpTime.
+         * @return The individual give-up time
          */
-        public int getGiveUpTime()
+        public int getGiveUpTimeInd()
         {
-            return _giveUpTime;
+            return _giveUpTimeInd;
         }
 
         /**
-         * Returns the giveUpSlope for this object
+         * Returns the give-up slope based on individual resources
          *
-         * @return The giveUpSlope.
+         * @return The individual give-up slope
          */
-        public float getGiveUpSlope()
+        public float getGiveUpSlopeInd()
         {
-            return _giveUpSlope;
+            return _giveUpSlopeInd;
+        }
+
+        /**
+         * Returns the give-up time based on group resources
+         *
+         * @return The group give-up time
+         */
+        public int getGiveUpTimeGroup()
+        {
+            return _giveUpTimeGroup;
+        }
+
+        /**
+         * Returns the give-up slope based on group resources
+         *
+         * @return The group give-up slope
+         */
+        public float getGiveUpSlopeGroup()
+        {
+            return _giveUpSlopeGroup;
         }
 
         /**
@@ -171,6 +200,11 @@ public class PatchValueCalculator
         public float getGroupResources()
         {
             return _groupResources;
+        }
+        
+        public PatchDepletionData[] getAllDepletionData()
+        {
+            return _allDepletionData;
         }
     }
     
@@ -216,8 +250,10 @@ public class PatchValueCalculator
     public PatchValue calculatePatchValue( Patch patch, Agent agent )
     {
         // Create some handy variables
-        int giveUpTime = 0;
-        float giveUpSlope = 0.0f;
+        int giveUpTimeInd = 0;
+        float giveUpSlopeInd = 0.0f;
+        int giveUpTimeGroup = 0;
+        float giveUpSlopeGroup = 0.0f;
         float indResources = 0.0f;
         float groupResources = 0.0f;
         
@@ -293,19 +329,35 @@ public class PatchValueCalculator
             {
                 /* Compute the slope of the line from the origin to the
                  * current data point */
-                float currentSlope = totalResourcesForaged / i;
+                float currentSlopeInd = indResources / i;
+                float currentSlopeGroup = totalResourcesForaged / i;
                 
-                // Is it the biggest slope?
-                if( currentSlope > giveUpSlope )
+                // Is it the biggest slope for individual resources?
+                if( currentSlopeInd > giveUpSlopeInd )
                 {
                     // Yup, this is the best give up time so far
-                    giveUpSlope = currentSlope;
-                    giveUpTime = i;
+                    giveUpSlopeInd = currentSlopeInd;
+                    giveUpTimeInd = i;
                 }
+                
+                // Is it the biggest slope for group resources?
+                if( currentSlopeGroup > giveUpSlopeGroup )
+                {
+                    // Yup, this is the best give up time so far
+                    giveUpSlopeGroup = currentSlopeGroup;
+                    giveUpTimeGroup = i;
+                }
+
             }
         }
         
-        return new PatchValue( giveUpTime, giveUpSlope, indResources, groupResources );
+        return new PatchValue( giveUpTimeInd,
+                giveUpSlopeInd,
+                giveUpTimeGroup,
+                giveUpSlopeGroup,
+                indResources,
+                groupResources,
+                depletionData );
     }
 
     /**
