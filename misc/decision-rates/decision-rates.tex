@@ -1,0 +1,94 @@
+\documentclass[letterpaper,12pt]{article}
+
+% ===================================================================
+\usepackage{amsmath}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{hyperref}
+
+% ===================================================================
+\title{Decision Rates Model}
+\author{Brent Eskridge}
+% ===================================================================
+\begin{document}
+
+% -------------------------------------------------------------------
+\maketitle
+
+
+% ===================================================================
+\section{Initiation/Navigation}
+
+% -------------------------------------------------------------------
+\subsection{Parameters}
+
+\begin{itemize}
+  \item Relative direction of patch $i$: $\Theta_{i}$
+  \item Value of patch $i$: $v_{i}$
+  \item Max sensing distance: $d_{sense}$
+  \item Mean resultant vector of individual relative to group: $\mathit{MRV}$
+\end{itemize}
+
+% -------------------------------------------------------------------
+\subsection{Derived Values}
+
+\begin{itemize}
+  \item Relative position in group: $p_{rel} = \dfrac{\vert \mathit{MRV} \rvert}{d_{sense}}$
+  \item Difference in direction to patch $i$ and current group: $d_{g} = \dfrac{\lvert \Theta_{i} - \mathit{MRV} \rvert}{\pi}$
+  \item K-value to initiate/navigate to patch $i$: $1 - p_{rel} \times d_{g} \times v_{i}$
+\end{itemize}
+
+
+% ===================================================================
+\section{Follow}
+
+% -------------------------------------------------------------------
+\subsection{Parameters}
+
+\begin{itemize}
+  \item Value of patch $i$: $v_{i}$
+  \item Agent heading: $\Theta_{h}$
+  \item Patch $i$ direction: $\Theta_{i}$
+  \item Max sensing distance: $d_{sense}$
+  \item Distance to current group: $d_{c}$
+  \item Distance to initiator's group: $d_{i}$
+\end{itemize}
+
+% -------------------------------------------------------------------
+\subsection{Derived Values}
+
+\begin{itemize}
+  \item Difference in heading and patch $i$ direction: $\Theta_{diff} = 1 - \dfrac{\lvert \Theta_{h} - \Theta_{i} \rvert}{\pi}$
+  \item Normalized difference in distance to current group and initiator's group:\\ $d_{diff} = \dfrac{d_{c} - d_{i}}{d_{sense}}$
+  \item K-value to follow group heading to patch $i$: $\Theta_{diff} \times d_{diff} \times v_{i}$
+\end{itemize}
+
+
+% ===================================================================
+\section{Forage}
+
+% -------------------------------------------------------------------
+\subsection{Parameters}
+
+\begin{itemize}
+ \item ToDo $t$: $R_t$
+\end{itemize}
+
+% -------------------------------------------------------------------
+\subsection{Derived Values}
+
+\begin{itemize}
+ \item ToDo $t$: $D_t = \dfrac{R_t}{A_p}$
+\end{itemize}
+
+
+% ===================================================================
+\section{Misc}
+
+\begin{itemize}
+  \item Two-dimensional Gaussian function:\\
+  $f(x,y) = A \exp \Bigg( - \Bigg( \dfrac{(x-x_{0})^2}{2\sigma^{2}_{x}} + \dfrac{(y-y_{0})^2}{2\sigma^{2}_{y}} \Bigg) \Bigg)$\\
+  \vskip0.5em \url{https://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function}
+\end{itemize}
+
+% ===================================================================
+\end{document}
