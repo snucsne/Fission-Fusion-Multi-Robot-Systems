@@ -51,15 +51,6 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
     /** Threshold distance squared to determine if patch locations are the same */
     private static final float _MAX_SAME_PATCH_DIST_SQUARED = 0.02f;
     
-    /** Property key for the initiation rate base */
-    private static final String _INITIATION_RATE_KEY = "initiation-rate";
-    
-    /** Property key for the follow alpha constant */
-    private static final String _FOLLOW_ALPHA_KEY = "follow-alpha";
-    
-    /** Property key for the follow beta constant */
-    private static final String _FOLLOW_BETA_CONSTANT = "follow-beta";
-    
     
     /** Random number generator */
     private MersenneTwisterFast _rng = null;
@@ -67,15 +58,6 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
     /** The decision builder */
     private DecisionBuilder _decisionBuilder = new DecisionBuilder();
 
-    /** The base initiation rate */
-    private float _inititationRate = 0.0f;
-    
-    /** Follow alpha constant */
-    private float _followAlpha = 0.0f;
-    
-    /** Follow beta constant */
-    private float _followBeta = 0.0f;
-    
     /** Patch value calculator */
     private PatchValueCalculator _patchValueCalc = new PatchValueCalculator();
     
@@ -100,27 +82,6 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
 
         // Initialize the decision builder
         _decisionBuilder.initialize( simState, props );
-        
-        // Load the initiation rate
-        _inititationRate = MiscUtils.loadNonEmptyFloatProperty( props,
-                _INITIATION_RATE_KEY,
-                "Initiation rate (key="
-                        + _INITIATION_RATE_KEY
-                        + ") may not be empty" );
-        
-        // Load the follow alpha constant
-        _followAlpha = MiscUtils.loadNonEmptyFloatProperty( props,
-                _FOLLOW_ALPHA_KEY,
-                "Follow alpha (key="
-                        + _FOLLOW_ALPHA_KEY
-                        + ") may not be empty" );
-
-        // Load the follow beta constant
-        _followBeta = MiscUtils.loadNonEmptyFloatProperty( props,
-                _FOLLOW_BETA_CONSTANT,
-                "Follow beta (key="
-                        + _FOLLOW_BETA_CONSTANT
-                        + ") may not be empty" );
         
         // Initialize the patch value calculator
         _patchValueCalc.initialize( simState );
