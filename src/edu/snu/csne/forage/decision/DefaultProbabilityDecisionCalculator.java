@@ -19,6 +19,7 @@
  */
 package edu.snu.csne.forage.decision;
 
+// Imports
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +28,9 @@ import org.apache.logging.log4j.Logger;
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.forage.util.PatchValueCalculator;
+import edu.snu.csne.forage.util.PatchValueCalculator.PatchValue;
+import edu.snu.csne.mates.math.NavigationalVector;
 import edu.snu.csne.util.MiscUtils;
 
 /**
@@ -50,6 +54,9 @@ public class DefaultProbabilityDecisionCalculator
     /** Property key for the follow beta constant */
     private static final String _FOLLOW_BETA_CONSTANT = "follow-beta";
 
+    /** Pi as a float */
+    private static final float _PI = (float) Math.PI;
+    
     
     /** The base initiation rate */
     private float _inititationRate = 0.0f;
@@ -60,6 +67,10 @@ public class DefaultProbabilityDecisionCalculator
     /** Follow beta constant */
     private float _followBeta = 0.0f;
 
+    /** Patch value calculator */
+    private PatchValueCalculator _patchValueCalc = new PatchValueCalculator();
+
+    
     /**
      * Initialize this agent decision calculator
      *
@@ -94,6 +105,10 @@ public class DefaultProbabilityDecisionCalculator
                 "Follow beta (key="
                         + _FOLLOW_BETA_CONSTANT
                         + ") may not be empty" );
+        
+        // Initialize the patch value calculator
+        _patchValueCalc.initialize( simState );
+
 
         _LOG.trace( "Leaving initialize( simState )" );        
     }
@@ -109,6 +124,28 @@ public class DefaultProbabilityDecisionCalculator
     @Override
     public float calculateNavigateProbability( Patch patch, Agent agent )
     {
+        // Calculate the mean resultant vector of the agent w.r.t. sesnsed teammates
+        NavigationalVector mrv = agent.calculateMeanResultantVectorInTeam( true );
+        
+        // Calculate the value of the patch
+        PatchValue patchValue = _patchValueCalc.calculatePatchValue( patch, agent );
+
+        // Calculate the difference in direction between the patch and the team
+        NavigationalVector toPatch = new NavigationalVector(
+                patch.getPosition().subtract( agent.getPosition() ) );
+        float dirDiff = toPatch.theta - mrv.theta;
+        if( dirDiff < -_PI )
+        {
+            dirDiff += _PI;
+        }
+        else if( dirDiff > _PI )
+        {
+            dirDiff -= _PI;
+        }
+        
+        // Calculate the k-value
+//        float k = 1.0f - mrv.r * patchValue
+        
         // TODO Auto-generated method stub
         return 0;
     }

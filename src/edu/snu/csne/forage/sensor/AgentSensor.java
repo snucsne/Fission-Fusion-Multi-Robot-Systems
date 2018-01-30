@@ -19,6 +19,7 @@
  */
 package edu.snu.csne.forage.sensor;
 
+// Imports
 import java.util.List;
 import java.util.Properties;
 
@@ -47,4 +48,11 @@ public interface AgentSensor
      * @return The sensed agents
      */
     public List<Agent> sense( Agent agent );
+    
+    /**
+     * Returns the maximum sensirng range of this sensor
+     * 
+     * @return The max sensing range
+     */
+    public float getMaxSensingRange();
 }

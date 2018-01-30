@@ -89,4 +89,18 @@ public abstract class AbstractAgentSensor implements AgentSensor
         _LOG.trace( "Leaving initialize( simState, props )" );
     }
 
+
+    /**
+     * Returns the maximum sensirng range of this sensor
+     * 
+     * @return The max sensing range
+     * @see edu.snu.csne.forage.sensor.AgentSensor#getMaxSensingRange()
+     */
+    @Override
+    public float getMaxSensingRange()
+    {
+        return _sensingDistance;
+    }
+
+    
 }

@@ -34,6 +34,7 @@ import edu.snu.csne.forage.decision.AgentDecisionMaker;
 import edu.snu.csne.forage.decision.Decision;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
+import edu.snu.csne.mates.math.NavigationalVector;
 
 
 /**
@@ -489,6 +490,44 @@ public class Agent
     public float getMaxForagingArea()
     {
         return _maxForagingArea;
+    }
+    
+    /**
+     * Calculates the mean resultant vector of the agent w.r.t. its sensed
+     * teammates.
+     *
+     * @param scale Boolean indicating whether or not to scale the results
+     * @return The mean resultant vector
+     */
+    public NavigationalVector calculateMeanResultantVectorInTeam( boolean scale )
+    {
+        _LOG.trace( "Entering calculateMeanResultantVectorInTeam()" );
+
+        Vector3f teamSum = Vector3f.ZERO;
+        
+        // Iterate through all the sensed teammates
+        Iterator<Agent> sensedTeammateIter = _sensedTeammates.iterator();
+        while( sensedTeammateIter.hasNext() )
+        {
+            Agent teammate = sensedTeammateIter.next();
+            
+            // Get the vector from the agent to the teammate
+            Vector3f toTeammate = teammate.getPosition().subtract( _position );
+            
+            // Normalize and add it to the sum of vectors
+            teamSum.add( toTeammate.normalize() );
+        }
+        
+        // Do we scale it?
+        if( scale )
+        {
+            // Yup
+            teamSum.multLocal( 1.0f / _sensedTeammates.size() );
+        }
+        
+        _LOG.trace( "Leaving calculateMeanResultantVectorInTeam()" );
+        
+        return new NavigationalVector( teamSum );
     }
     
     /**
