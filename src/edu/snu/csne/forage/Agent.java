@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +33,8 @@ import edu.snu.csne.forage.decision.AgentDecisionMaker;
 import edu.snu.csne.forage.decision.Decision;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
+import edu.snu.csne.forage.util.PatchValue;
+import edu.snu.csne.forage.util.PatchValueCalculator;
 import edu.snu.csne.mates.math.NavigationalVector;
 
 
@@ -66,6 +67,9 @@ public class Agent
     /** The decision-maker for this agent */
     private AgentDecisionMaker _decisionMaker = null;
     
+    /** Patch value calculator */
+    private PatchValueCalculator _patchValueCalc = null;
+
     /** This agent's position */
     private Vector3f _position = new Vector3f();
     
@@ -121,6 +125,27 @@ public class Agent
     private Map<String,List<Agent>> _knownTeamMemberships =
             new HashMap<String,List<Agent>>();
     
+    /** Mean resultant vectors by team */
+    private Map<String,NavigationalVector> _meanResultantVectorsByTeam =
+            new HashMap<String,NavigationalVector>();
+    
+    /** Patch value by patch ID */
+    private Map<String,PatchValue> _patchValues =
+            new HashMap<String,PatchValue>();
+
+    /** The sum of all the individual give up time slopes */
+    private float _patchValueSlopeIndSum = 0.0f;
+    
+    /** The sum of all the group give up time slopes */
+    private float _patchValueSlopeGroupSum = 0.0f;
+
+    /** The max of all the individual give up time slopes */
+    private float _patchValueSlopeIndMax = 0.0f;
+    
+    /** The max of all the group give up time slopes */
+    private float _patchValueSlopeGroupMax = 0.0f;
+    
+    
     /**
      * Builds this Agent object
      *
@@ -149,7 +174,8 @@ public class Agent
             float maxForagingArea,
             AgentSensor agentSensor,
             PatchSensor patchSensor,
-            AgentDecisionMaker decisionMaker )
+            AgentDecisionMaker decisionMaker,
+            PatchValueCalculator patchValueCalc )
     {
         // Validate the parameters
         Validate.notBlank( id, "ID may not be null" );
@@ -166,6 +192,7 @@ public class Agent
         Validate.notNull( agentSensor, "Agent sensor may not be null" );
         Validate.notNull( patchSensor, "Patch sensor may not be null" );
         Validate.notNull( decisionMaker, "Decision maker may not be null" );
+        Validate.notNull( patchValueCalc, "Patch value calculator may not be null" );
         
         // Store the parameters
         _id = id;
@@ -180,6 +207,7 @@ public class Agent
         _agentSensor = agentSensor;
         _patchSensor = patchSensor;
         _decisionMaker = decisionMaker;
+        _patchValueCalc = patchValueCalc;
         
         _decision = Decision.buildRestDecision( 0, this );
     }
@@ -206,10 +234,16 @@ public class Agent
         // Determine team memberships
         findTeamMemberships();
         
+        // Calculate the mean resultant vectors for all teams
+        calculateMeanResultantVectors();
+        
 //        _LOG.debug( "Sensed [" + _sensedTeammates.size() + "] teammates" );
         
         // Sense the patches
         _sensedPatches = _patchSensor.sense( this );
+        
+        // Calculate the value of all the sensed patches
+        calculatePatchValues();
         
 //        _LOG.trace( "Leaving sense()" );
     }
@@ -493,41 +527,55 @@ public class Agent
     }
     
     /**
-     * Calculates the mean resultant vector of the agent w.r.t. its sensed
-     * teammates.
+     * Returns the mean resultant vector for this agent for the given team
      *
-     * @param scale Boolean indicating whether or not to scale the results
+     * @param teamID The team associated with the MRV
      * @return The mean resultant vector
      */
-    public NavigationalVector calculateMeanResultantVectorInTeam( boolean scale )
+    public NavigationalVector getMRVForTeam( String teamID )
     {
-        _LOG.trace( "Entering calculateMeanResultantVectorInTeam()" );
-
-        Vector3f teamSum = Vector3f.ZERO;
+        // Validate the team ID
+        Validate.notEmpty( teamID, "Team ID is required" );
+        Validate.isTrue( _meanResultantVectorsByTeam.containsKey( teamID ),
+                "Unknown team ID [" + teamID + "]" );
         
-        // Iterate through all the sensed teammates
-        Iterator<Agent> sensedTeammateIter = _sensedTeammates.iterator();
-        while( sensedTeammateIter.hasNext() )
-        {
-            Agent teammate = sensedTeammateIter.next();
-            
-            // Get the vector from the agent to the teammate
-            Vector3f toTeammate = teammate.getPosition().subtract( _position );
-            
-            // Normalize and add it to the sum of vectors
-            teamSum.add( toTeammate.normalize() );
-        }
+        return _meanResultantVectorsByTeam.get( teamID );
+    }
+    
+    /**
+     * Returns the value of the specified patch
+     *
+     * @param patchID The patch of interest
+     * @return The patches value
+     */
+    public PatchValue getPachValue( String patchID )
+    {
+        // Validate the patch ID
+        Validate.notEmpty( patchID, "Patch ID is required" );
+        Validate.isTrue( _patchValues.containsKey( patchID ),
+                "Uknown patch ID [" + patchID + "]" );
         
-        // Do we scale it?
-        if( scale )
-        {
-            // Yup
-            teamSum.multLocal( 1.0f / _sensedTeammates.size() );
-        }
-        
-        _LOG.trace( "Leaving calculateMeanResultantVectorInTeam()" );
-        
-        return new NavigationalVector( teamSum );
+        return _patchValues.get( patchID );
+    }
+    
+    /**
+     * Returns the maximum individual patch value 
+     *
+     * @return The maximum individual patch value
+     */
+    public float getPatchValueIndMax()
+    {
+        return _patchValueSlopeIndMax;
+    }
+    
+    /**
+     * Returns the maximum group patch value
+     *
+     * @return The maximum group patch value
+     */
+    public float getPatchValueGroupMax()
+    {
+        return _patchValueSlopeGroupMax;
     }
     
     /**
@@ -615,6 +663,95 @@ public class Agent
 //        _LOG.debug( "Sensed leaders for [" + _knownTeamMemberships.size() + "]" );
         
         _LOG.trace( "Leaving findTeamMemberships()" );
+    }
+    
+    /**
+     * Calculates the mean resultant vector of this agent w.r.t. to all sensed
+     * agents by team.
+     */
+    private void calculateMeanResultantVectors()
+    {
+        _LOG.trace( "Entering calculateMeanResultantVectors()" );
+
+        // Iterate through each team
+        Iterator<String> teamIDIter = _knownTeamMemberships.keySet().iterator();
+        while( teamIDIter.hasNext() )
+        {
+            String currentTeamID = teamIDIter.next();
+            
+            // Iterate through all the agents on the team
+            Vector3f teamSum = new Vector3f();
+            List<Agent> teamMembers = _knownTeamMemberships.get( currentTeamID );
+            Iterator<Agent> currentTeamMemberIter = teamMembers.iterator();
+            while( currentTeamMemberIter.hasNext() )
+            {
+                Agent currentAgent = currentTeamMemberIter.next();
+                
+                // Get the vector from the agent to the teammate
+                Vector3f toAgent = currentAgent.getPosition().subtract( _position );
+
+                // Normalize and add it to the sum of vectors
+                teamSum.add( toAgent.normalize() );
+            }
+            
+            // Scale it by the number of agents
+            if( teamMembers.size() > 0 )
+            {
+                teamSum.multLocal( 1.0f / teamMembers.size() );
+            }
+            
+            // Store it
+            _meanResultantVectorsByTeam.put( currentTeamID,
+                    new NavigationalVector( teamSum ) );
+        }
+        
+        _LOG.trace( "Leaving calculateMeanResultantVectors()" );
+    }
+
+
+    /**
+     * Calculates the value of all the sensed patches
+     */
+    private void calculatePatchValues()
+    {
+        _LOG.trace( "Entering calculatePatchValues()" );
+        
+        // Reset the patch value sums
+        _patchValueSlopeIndSum = 0.0f;
+        _patchValueSlopeGroupSum = 0.0f;
+        _patchValueSlopeIndMax = 0.0f;
+        _patchValueSlopeGroupMax = 0.0f;
+        
+        // Iterate through each of the sensed patches
+        Iterator<Patch> patchIter = _sensedPatches.iterator();
+        while( patchIter.hasNext() )
+        {
+            Patch patch = patchIter.next();
+            
+            // Calculate the value
+            PatchValue value = _patchValueCalc.calculatePatchValue( patch, this );
+            float giveUpSlopeInd = value.getGiveUpSlopeInd();
+            float giveUpSlopeGroup = value.getGiveUpSlopeGroup();
+            
+            // Save it
+            _patchValues.put( patch.getID(), value );
+            
+            // Add it to the sums
+            _patchValueSlopeIndSum += giveUpSlopeInd;
+            _patchValueSlopeGroupSum += giveUpSlopeGroup;
+            
+            // See if they are the new maximums
+            if( _patchValueSlopeIndMax < giveUpSlopeInd )
+            {
+                _patchValueSlopeIndMax = giveUpSlopeInd;
+            }
+            if( _patchValueSlopeGroupMax < giveUpSlopeGroup )
+            {
+                _patchValueSlopeGroupMax = giveUpSlopeGroup;
+            }
+        }
+
+        _LOG.trace( "Leaving calculatePatchValues()" );
     }
     
     /**

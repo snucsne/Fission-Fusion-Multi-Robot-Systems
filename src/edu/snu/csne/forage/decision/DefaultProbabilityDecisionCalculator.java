@@ -19,6 +19,7 @@
  */
 package edu.snu.csne.forage.decision;
 
+import java.util.List;
 // Imports
 import java.util.Properties;
 
@@ -29,7 +30,7 @@ import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
 import edu.snu.csne.forage.util.PatchValueCalculator;
-import edu.snu.csne.forage.util.PatchValueCalculator.PatchValue;
+import edu.snu.csne.forage.util.PatchValue;
 import edu.snu.csne.mates.math.NavigationalVector;
 import edu.snu.csne.util.MiscUtils;
 
@@ -57,6 +58,9 @@ public class DefaultProbabilityDecisionCalculator
     /** Pi as a float */
     private static final float _PI = (float) Math.PI;
     
+    /** 2*Pi as a float */
+    private static final float _TWO_PI = 2.0f * _PI;
+    
     
     /** The base initiation rate */
     private float _inititationRate = 0.0f;
@@ -66,9 +70,10 @@ public class DefaultProbabilityDecisionCalculator
     
     /** Follow beta constant */
     private float _followBeta = 0.0f;
+    
+    /** Flag denoting individual patch values should be used */
+    private boolean _usePatchValueIndivdiual = false;
 
-    /** Patch value calculator */
-    private PatchValueCalculator _patchValueCalc = new PatchValueCalculator();
 
     
     /**
@@ -106,10 +111,6 @@ public class DefaultProbabilityDecisionCalculator
                         + _FOLLOW_BETA_CONSTANT
                         + ") may not be empty" );
         
-        // Initialize the patch value calculator
-        _patchValueCalc.initialize( simState );
-
-
         _LOG.trace( "Leaving initialize( simState )" );        
     }
 
@@ -124,11 +125,22 @@ public class DefaultProbabilityDecisionCalculator
     @Override
     public float calculateNavigateProbability( Patch patch, Agent agent )
     {
-        // Calculate the mean resultant vector of the agent w.r.t. sesnsed teammates
-        NavigationalVector mrv = agent.calculateMeanResultantVectorInTeam( true );
+        // Get the mean resultant vector of the agent w.r.t. sesnsed teammates
+        NavigationalVector mrv = agent.getMRVForTeam( agent.getTeam().getID() );
+        float mrvComponent = (1.0f - mrv.r) * (1.0f - mrv.r)
+                / (_navigateMRVSigma * _navigateMRVSigma);
         
-        // Calculate the value of the patch
-        PatchValue patchValue = _patchValueCalc.calculatePatchValue( patch, agent );
+        // Get the value of the patch
+        PatchValue patchValueData = agent.getPachValue( patch.getID() );
+        float patchValueIndMax = agent.getPatchValueIndMax();
+        float patchValueGroupMax = agent.getPatchValueGroupMax();
+        float patchValue = patchValueData.getGiveUpSlopeGroup() / patchValueGroupMax;
+        if( _usePatchValueIndivdiual )
+        {
+            patchValue = patchValueData.getGiveUpSlopeInd() / patchValueIndMax;
+        }
+        float patchValueComponent = (1.0f - patchValue) * (1.0f - patchValue)
+                / (_navigatePatchValueSigma * _navigatePatchValueSigma);
 
         // Calculate the difference in direction between the patch and the team
         NavigationalVector toPatch = new NavigationalVector(
@@ -136,15 +148,20 @@ public class DefaultProbabilityDecisionCalculator
         float dirDiff = toPatch.theta - mrv.theta;
         if( dirDiff < -_PI )
         {
-            dirDiff += _PI;
+            dirDiff += _TWO_PI;
         }
         else if( dirDiff > _PI )
         {
-            dirDiff -= _PI;
+            dirDiff -= _TWO_PI;
         }
+        dirDiff = Math.abs( dirDiff / _PI );
+        float dirComponent = (dirDiff * dirDiff)
+                / (_navigateDirDiffSigma * _navigateDirDiffSigma);
         
         // Calculate the k-value
-//        float k = 1.0f - mrv.r * patchValue
+        float k = (float) Math.exp( -0.5f * ( mrvComponent
+                + patchValueComponent
+                + dirComponent ) );
         
         // TODO Auto-generated method stub
         return 0;
@@ -162,7 +179,71 @@ public class DefaultProbabilityDecisionCalculator
     public float calculateFollowProbability( Agent leader,
             Agent agent )
     {
-        // TODO Auto-generated method stub
+        // Get the leader team's MRV
+        NavigationalVector leaderMRV = agent.getMRVForTeam( leader.getTeam().getID() );
+        
+        // Get the MRV for the agent's current team
+        NavigationalVector currentMRV = agent.getMRVForTeam( agent.getTeam().getID() );
+        
+        // Compute the difference in the MRV angles
+        float mrvDirDiff = leaderMRV.theta - currentMRV.theta;
+        if( mrvDirDiff < -_PI )
+        {
+            mrvDirDiff += _TWO_PI;
+        }
+        else if( mrvDirDiff > _PI )
+        {
+            mrvDirDiff -= _TWO_PI;
+        }
+        mrvDirDiff = Math.abs( mrvDirDiff / _PI );
+        
+        float mrvDirDiffComponent = (1.0f - mrvDirDiff) * (1.0f - mrvDirDiff)
+                / (_followMRVDirDiffSigma * _followMRVDirDiffSigma);
+
+        // Compute the difference in the MRV magnitudes
+        float mrvMagDiff = currentMRV.r - leaderMRV.r;
+        
+        // If it is negative, set it to 0
+        if( mrvMagDiff < 0.0f )
+        {
+            mrvMagDiff = 0.0f;
+        }
+        
+        float mrvMagDiffComponent = (1.0f - mrvMagDiff) * (1.0f - mrvMagDiff)
+                / (_followMRVMagDiffSigma * _followMRVMagDiffSigma);
+        
+        // Iterate through all the patches sensed by the aganet
+        NavigationalVector leaderVelocity = new NavigationalVector( leader.getVelocity() );
+        List<Patch> sensedPatches = agent.getSensedPatches();
+        for( Patch patch : sensedPatches )
+        {
+            // Compute the difference in the leader's heading and the bearing to the patch
+            NavigationalVector toPatch = new NavigationalVector(
+                    patch.getPosition().subtract( leader.getPosition() ) );
+            float dirDiff = toPatch.theta - leaderVelocity.theta;
+            if( dirDiff < -_PI )
+            {
+                dirDiff += _TWO_PI;
+            }
+            else if( dirDiff > _PI )
+            {
+                dirDiff -= _TWO_PI;
+            }
+            dirDiff = Math.abs( dirDiff / _PI );
+
+            PatchValue patchValueData = agent.getPachValue( patch.getID() );
+            float patchValueIndMax = agent.getPatchValueIndMax();
+            float patchValueGroupMax = agent.getPatchValueGroupMax();
+            float patchValue = patchValueData.getGiveUpSlopeGroup() / patchValueGroupMax;
+            if( _usePatchValueIndivdiual )
+            {
+                patchValue = patchValueData.getGiveUpSlopeInd() / patchValueIndMax;
+            }
+//            float patchValueComponent = (1.0f - patchValue) * (1.0f - patchValue)
+//                    / (_followPatchValueSigma * _followPatchValueSigma);
+
+        }
+        
         return 0;
     }
 
@@ -177,7 +258,17 @@ public class DefaultProbabilityDecisionCalculator
     @Override
     public float calculateForageProbability( Patch patch, Agent agent )
     {
-        // TODO Auto-generated method stub
+        // Get the value of the patch
+        PatchValue patchValueData = agent.getPachValue( patch.getID() );
+        float patchValueIndMax = agent.getPatchValueIndMax();
+        float patchValueGroupMax = agent.getPatchValueGroupMax();
+
+        float patchValue = patchValueData.getGiveUpSlopeGroup() / patchValueGroupMax;
+        if( _usePatchValueIndivdiual )
+        {
+            patchValue = patchValueData.getGiveUpSlopeInd() / patchValueIndMax;
+        }
+
         return 0;
     }
 
