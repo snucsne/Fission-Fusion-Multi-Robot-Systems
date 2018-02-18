@@ -24,6 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.jme3.math.Vector3f;
+
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.AgentTeam;
 import edu.snu.csne.forage.Patch;
@@ -115,6 +120,9 @@ public class PatchValueCalculator
         }
     }
     
+    /** Our logger */
+    private static final Logger _LOG = LogManager.getLogger(
+            PatchValueCalculator.class.getName() );
     
     /** Property key for the maximum timesteps that patch depletion is calculated */
     private static final String _MAX_DEPLETION_TIMESTEPS_KEY =
@@ -126,6 +134,9 @@ public class PatchValueCalculator
 
     /** The maximum timesteps that patch depletion is calculated */
     protected int _maxDepletionTimesteps = 0;
+    
+    /** Average speed as a percentage of the max speed */
+    private float _avgSpeedPercentage = 0.5f;
     
     
     /**
@@ -157,6 +168,12 @@ public class PatchValueCalculator
      */
     public PatchValue calculatePatchValue( Patch patch, Agent agent )
     {
+//        _LOG.debug( "Calculating value: patch=["
+//                + patch.getID()
+//                + "] agent=["
+//                + agent.getID()
+//                + "]" );
+        
         // Create some handy variables
         int giveUpTimeInd = 0;
         float giveUpSlopeInd = 0.0f;
@@ -166,7 +183,13 @@ public class PatchValueCalculator
         float groupResources = 0.0f;
         
         // Calculate the agent's arrival time at the patch
-        int agentArrivalTime = 0;
+        Vector3f toPatch = patch.getPosition().subtract( agent.getPosition() );
+        float distance = toPatch.length() - patch.getRadius();
+        int agentArrivalTime = (int) Math.ceil( distance /
+                (agent.getMaxSpeed() * _avgSpeedPercentage ) );
+//        _LOG.debug( "Projected agent arrival time ["
+//                + agentArrivalTime
+//                + "]" );
         
         // Get the arrival times of teams
         List<PatchArrivalTime> arrivalTimes = findTeamArrivalsAtPatch( patch );
@@ -192,6 +215,12 @@ public class PatchValueCalculator
                     agentCounts[i] += team.getSize();
                 }
             }
+            
+//            _LOG.debug( "Agent count at ["
+//                    + i
+//                    + "]=["
+//                    + agentCounts[i]
+//                    + "]" );
         }
         
         // Project the patch depletion
@@ -223,6 +252,22 @@ public class PatchValueCalculator
             totalResourcesForaged += resourcesForaged;
             indResources += resourcesForagedPerAgent;
             groupResources += resourcesForaged;
+            
+//            _LOG.debug( "Time=[" + i + "]: agents=["
+//                    + agentCounts[i]
+//                    + "] resourceDensity=["
+//                    + resourceDensity
+//                    + "] foragingAreaEffective=["
+//                    + foragingAreaEffective
+//                    + "] resourcesForagedPerAgent=["
+//                    + resourcesForagedPerAgent
+//                    + "] resourcesForaged=["
+//                    + resourcesForaged
+//                    + "] remainingResources=["
+//                    + remainingResources
+//                    + "] totalResourcesForaged=["
+//                    + totalResourcesForaged
+//                    + "]" );
             
             // Store the data
             depletionData[i] = new PatchDepletionData( resourcesForagedPerAgent,
@@ -256,6 +301,11 @@ public class PatchValueCalculator
                     giveUpTimeGroup = i;
                 }
 
+//                _LOG.debug( "  currentSlopeInd=["
+//                        + currentSlopeInd
+//                        + "] currentSlopeGroup=["
+//                        + currentSlopeGroup
+//                        + "]" );
             }
         }
         

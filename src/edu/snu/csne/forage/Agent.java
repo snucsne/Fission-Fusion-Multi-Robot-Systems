@@ -125,6 +125,9 @@ public class Agent
     private Map<String,List<Agent>> _knownTeamMemberships =
             new HashMap<String,List<Agent>>();
     
+    /** The known team mean positions */
+    private Map<String,Vector3f> _meanTeamPositions = new HashMap<String,Vector3f>();
+    
     /** Mean resultant vectors by team */
     private Map<String,NavigationalVector> _meanResultantVectorsByTeam =
             new HashMap<String,NavigationalVector>();
@@ -196,9 +199,10 @@ public class Agent
         
         // Store the parameters
         _id = id;
-        _position = initialPosition;
-        _velocity = initialVelocity;
+        _position = initialPosition.clone();
+        _velocity = initialVelocity.clone();
         _team = team;
+        _resourceConsumptionRate = resourceConsumptionRate;
         _maxSpeed = maxSpeed;
         _maxForce = maxForce;
         _arrivalScaleDistance = arrivalScaleDistance;
@@ -217,7 +221,7 @@ public class Agent
      */
     public void sense()
     {
-//        _LOG.trace( "Entering sense()" );
+        _LOG.trace( "Entering sense()" );
 
         // Clear out all the previously sensed objects
         _sensedAgents.clear();
@@ -245,7 +249,7 @@ public class Agent
         // Calculate the value of all the sensed patches
         calculatePatchValues();
         
-//        _LOG.trace( "Leaving sense()" );
+        _LOG.trace( "Leaving sense()" );
     }
 
     /**
@@ -253,7 +257,7 @@ public class Agent
      */
     public void plan()
     {
-//        _LOG.trace( "Entering plan()" );
+        _LOG.trace( "Entering plan()" );
 
         // Get the new decision
         _decision = _decisionMaker.decide( this );
@@ -270,7 +274,7 @@ public class Agent
             findSensedTeammates();
         }
         
-//        _LOG.trace( "Leaving plan()" );
+        _LOG.trace( "Leaving plan()" );
     }
 
     /**
@@ -322,17 +326,14 @@ public class Agent
             _acceleration.addLocal( goalSeek );
         }
         
-//        _LOG.debug( "Current " + getID()
-//                + ": vel="
-//                + _velocity
-//                + " position="
-//                + _position );
-        
         ForageUtils.limitMagnitude( _acceleration, _maxForce );
         
         // Apply the acceleration to the velocity and move the agent
-        _velocity.addLocal( _acceleration );
-        ForageUtils.limitMagnitude( _velocity, _maxSpeed );
+        if( _acceleration.lengthSquared() > 0.0001f )
+        {
+            _velocity.addLocal( _acceleration );
+            ForageUtils.limitMagnitude( _velocity, _maxSpeed );
+        }
         _position.addLocal( _velocity );
         
         _LOG.debug( "Action "
@@ -396,7 +397,17 @@ public class Agent
      */
     public Vector3f getVelocity()
     {
-        return _velocity;
+        return _velocity.clone();
+    }
+    
+    /**
+     * Returns this agent's max speed
+     *
+     * @return This agent's max speed
+     */
+    public float getMaxSpeed()
+    {
+        return _maxSpeed;
     }
     
     /**
@@ -428,6 +439,16 @@ public class Agent
     public Decision getDecision()
     {
         return _decision;
+    }
+    
+    /**
+     * Returns all the agents sensed by this agent
+     * 
+     * @return The sensed agents
+     */
+    public List<Agent> getSensedAgents()
+    {
+        return _sensedAgents;
     }
     
     /**
@@ -543,6 +564,22 @@ public class Agent
     }
     
     /**
+     * Returns the mean position of the given team
+     *
+     * @param teamID The team
+     * @return The mean position
+     */
+    public Vector3f getMeanPositionOfTeam( String teamID )
+    {
+        // Validate the team ID
+        Validate.notEmpty( teamID, "Team ID is required" );
+        Validate.isTrue( _meanTeamPositions.containsKey( teamID ),
+                "Unknown team ID [" + teamID + "]" );
+        
+        return _meanTeamPositions.get( teamID );
+    }
+    
+    /**
      * Returns the value of the specified patch
      *
      * @param patchID The patch of interest
@@ -614,10 +651,19 @@ public class Agent
                 Agent agent = oldTeamMemberIter.next();
                 if( sensedAgentMap.containsKey( agent.getID() ) )
                 {
-                    // Yup.  Add it to the new list of team members
-                    newTeamMembers.add( agent );
-                    // Remove it from the map of sensed agents
-                    sensedAgentMap.remove( agent.getID() );
+                    // Was it in the same team?
+                    if( teamID.equals( agent.getTeam().getID() ) )
+                    {
+                        // Yup.  Add it to the new list of team members
+                        newTeamMembers.add( agent );
+                        
+                        // Remove it from the map of sensed agents
+                        sensedAgentMap.remove( agent.getID() );
+                        
+//                        _LOG.debug( "Found previous member of ["
+//                                + teamID
+//                                + "]" );
+                    }
                 }
             }
             
@@ -631,7 +677,7 @@ public class Agent
             }
         }
         
-        // Process all the agents we haven't observed to be part of a team
+        // Process all the agents we haven't previously observed to be part of a team
         Iterator<String> unprocessedAgentIDIter = sensedAgentMap.keySet().iterator();
         while( unprocessedAgentIDIter.hasNext() )
         {
@@ -639,6 +685,10 @@ public class Agent
             String agentID = unprocessedAgentIDIter.next();
             Agent agent = sensedAgentMap.get( agentID );
             String teamID = agent.getTeam().getID();
+            
+//            _LOG.debug( "Found new member of ["
+//                    + teamID
+//                    + "]" );
             
             // Get the observed members of that team
             List<Agent> observedTeamMembers = currentKnownTeamMemberships.get( teamID );
@@ -649,7 +699,7 @@ public class Agent
                 observedTeamMembers = new LinkedList<Agent>();
                 currentKnownTeamMemberships.put( teamID, observedTeamMembers );
                 
-                _LOG.debug( "New team [" + teamID + "]" );
+//                _LOG.debug( "New team [" + teamID + "]" );
             }
             
             // Add the agent to the end of the list
@@ -660,6 +710,39 @@ public class Agent
         // Save the team memberships
         _knownTeamMemberships = currentKnownTeamMemberships;
         
+        // Compute the mean positions of all the teams
+        teamIDIter = _knownTeamMemberships.keySet().iterator();
+        while( teamIDIter.hasNext() )
+        {
+            // Iterate through all the sensed agents in this team
+            String teamID = teamIDIter.next();
+            Vector3f meanPosition = new Vector3f();
+            List<Agent> teamMembers = _knownTeamMemberships.get( teamID );
+            Iterator<Agent> teamMemberIter = teamMembers.iterator();
+            while( teamMemberIter.hasNext() )
+            {
+                meanPosition.addLocal( teamMemberIter.next().getPosition() );
+            }
+            
+            meanPosition.divideLocal( teamMembers.size() );
+            
+            // Add it to the map
+            _meanTeamPositions.put( teamID, meanPosition );
+//            _LOG.debug( "Mean position: teamID=["
+//                    + teamID
+//                    + "] position=["
+//                    + meanPosition
+//                    + "]" );
+        }
+        
+        // If we didn't find any team members, create an empty MRV for our team
+        if( !_meanTeamPositions.containsKey( getTeam().getID() ) )
+        {
+            _meanTeamPositions.put( getTeam().getID(),
+                    new Vector3f() );
+        }
+
+
 //        _LOG.debug( "Sensed leaders for [" + _knownTeamMemberships.size() + "]" );
         
         _LOG.trace( "Leaving findTeamMemberships()" );
@@ -691,18 +774,42 @@ public class Agent
                 Vector3f toAgent = currentAgent.getPosition().subtract( _position );
 
                 // Normalize and add it to the sum of vectors
-                teamSum.add( toAgent.normalize() );
+                teamSum.addLocal( toAgent.normalize() );
+                
+//                _LOG.debug( "ToAgent ["
+//                        + toAgent
+//                        + "] teamSum=["
+//                        + teamSum
+//                        + "]" );
             }
             
             // Scale it by the number of agents
+            Vector3f mrv = new Vector3f( teamSum );
             if( teamMembers.size() > 0 )
             {
-                teamSum.multLocal( 1.0f / teamMembers.size() );
+                mrv.multLocal( 1.0f / teamMembers.size() );
             }
             
             // Store it
             _meanResultantVectorsByTeam.put( currentTeamID,
-                    new NavigationalVector( teamSum ) );
+                    new NavigationalVector( mrv ) );
+            
+            _LOG.debug( "MRV Team=["
+                    + currentTeamID
+                    + "]: mrv=["
+                    + mrv
+                    + "] teamSum=["
+                    + teamSum
+                    + "] size=["
+                    + teamMembers.size()
+                    + "]" );
+        }
+        
+        // If we didn't find any team members, create an empty MRV for our team
+        if( !_meanResultantVectorsByTeam.containsKey( getTeam().getID() ) )
+        {
+            _meanResultantVectorsByTeam.put( getTeam().getID(),
+                    new NavigationalVector() );
         }
         
         _LOG.trace( "Leaving calculateMeanResultantVectors()" );
@@ -773,7 +880,7 @@ public class Agent
         alignment.divideLocal( _sensedTeammates.size() );
         
         // Limit it by the max force
-        alignment.subtractLocal( _velocity );
+        alignment.subtractLocal( getVelocity() );
         ForageUtils.limitMagnitude( alignment, _maxForce );
 
         return alignment;
@@ -801,7 +908,7 @@ public class Agent
             // Calculate the vector to us 
             Vector3f fromCurrent = _position.subtract( current.getPosition() );
             float distance = fromCurrent.length();
-            _LOG.debug( "Separation distance=[" + distance + "]" );
+//            _LOG.debug( "Separation distance=[" + distance + "]" );
             
             // Is the distance within the desired separation?
             if( _desiredSeparation > distance )
@@ -817,9 +924,9 @@ public class Agent
                 }
                 fromCurrent.normalizeLocal();
                 fromCurrent.divideLocal( separationStrength );
-                _LOG.debug( "Separation: distance=[" + distance
-                        + "] strength=[" + separationStrength
-                        + "] fromCurrent=[" + fromCurrent + "]" );
+//                _LOG.debug( "Separation: distance=[" + distance
+//                        + "] strength=[" + separationStrength
+//                        + "] fromCurrent=[" + fromCurrent + "]" );
 
                 // Add it to the total separation
                 separation.addLocal( fromCurrent );
@@ -875,6 +982,12 @@ public class Agent
         // Get the destination from the decision
         Vector3f goal = _decision.getDestination();
         
+        _LOG.debug( "Position=["
+                + _position
+                + "] Goal=["
+                + goal
+                + "]" );
+        
         return seek( goal.subtract( _position ), true );
     }
     
@@ -908,7 +1021,7 @@ public class Agent
             }
             
             // Calculate steering change
-            steer = desired.subtract( _velocity );
+            steer = desired.subtract( getVelocity() );
         }
         else
         {

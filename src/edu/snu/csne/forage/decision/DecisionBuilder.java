@@ -102,6 +102,13 @@ public class DecisionBuilder
                 
                 // Add it to the map
                 weights.put( gb, Float.valueOf( weight ) );
+                _LOG.debug( "Weight: "
+                        + key
+                        + "=["
+                        + weight
+                        + "] type=["
+                        + dt
+                        + "]" );
             }
 
         }
@@ -117,7 +124,8 @@ public class DecisionBuilder
 
         // Build the decision
         Decision decision = Decision.buildNavigateDecision( _simState.getCurrentSimulationStep(),
-                _simState.createNewTeam(),
+//                _simState.createNewTeam(),
+                null,
                 patch,
                 navWeights.get( GroupBehavior.SEPARATION ).floatValue(),
                 navWeights.get( GroupBehavior.COHESION ).floatValue(),

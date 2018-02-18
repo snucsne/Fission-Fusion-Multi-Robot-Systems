@@ -27,6 +27,7 @@ import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.AgentTeam;
 import edu.snu.csne.forage.Patch;
+import edu.snu.csne.forage.SimulationState;
 
 
 /**
@@ -87,7 +88,7 @@ public class Decision
         _type = type;
         Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
         _timestep = timestep;
-        Validate.notNull( type, "Agent team may not be null" );
+//        Validate.notNull( type, "Agent team may not be null" );
         _team = team;
         
         // Optional parameters
@@ -109,6 +110,20 @@ public class Decision
                         + probability
                         + "]" );
         _probability = probability;
+    }
+    
+    /**
+     * Signal the decision that it has been chosen as the active decision
+     *
+     * @param simState The current state of the simulation
+     */
+    public void choose( SimulationState simState )
+    {
+        // Create a team for the agent if there is no team associated with it
+        if( null == _team )
+        {
+            _team = simState.createNewTeam();
+        }
     }
     
     /**
@@ -233,7 +248,7 @@ public class Decision
             float probability )
     {
         Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
-        Validate.notNull( team, "Agent team may not be null" );
+//        Validate.notNull( team, "Agent team may not be null" );
         Validate.notNull( patch, "Patch may not be null" );
         Validate.inclusiveBetween( 0.0f,
                 1.0f,
@@ -357,7 +372,7 @@ public class Decision
                 team,
                 leader,
                 patch,
-                null,
+                patch.getPosition(),
                 separationWeight,
                 cohesionWeight,
                 alignmentWeight,

@@ -36,6 +36,7 @@ import edu.snu.csne.forage.event.DecisionEvent;
 import edu.snu.csne.forage.event.SimulationEventListener;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
+import edu.snu.csne.forage.util.PatchValueCalculator;
 import edu.snu.csne.util.MiscUtils;
 
 
@@ -152,6 +153,8 @@ public class SimulationState
     /** Key format string for event listener indices */
     private static final String _EVENT_LISTENER_INDEX_FORMAT_STR = "%02d";
 
+    /** Key for the flag denoting whether or not agent's have an initial velocity */
+    private static final String _ALLOW_INITIAL_VELOCITY_KEY = "allow-initial-velocity";
     
     
     /** The simulation properties */
@@ -404,7 +407,7 @@ public class SimulationState
     public AgentTeam createNewTeam()
     {
         // Generate an ID
-        String id = "GeneratedTeam" + String.format( "%05d", _newTeamCount++ );
+        String id = "GenTeam" + String.format( "%05d", ++_newTeamCount );
         
         // Build the team
         AgentTeam team = new AgentTeam( id );
@@ -689,7 +692,13 @@ public class SimulationState
                 _MAX_FORAGING_AREA_KEY,
                 "Resource consumption rate is required " );
         _LOG.debug( "maxForagingArea=[" + maxForagingArea + "]" );
-
+        
+        // Do we allow initial velocities?
+        boolean allowInitialVelocity = MiscUtils.loadNonEmptyBooleanProperty(
+                _props,
+                _ALLOW_INITIAL_VELOCITY_KEY,
+                "Allow initial velocity" );
+        
         // Get the agent sensor class
         String agentSensorClassName = _props.getProperty( _AGENT_SENSOR_CLASS_KEY );
         AgentSensor agentSensor = (AgentSensor) MiscUtils.loadAndInstantiate(
@@ -724,6 +733,9 @@ public class SimulationState
                 + agentPropertiesFile
                 + "]" );
         
+        PatchValueCalculator patchValueCalc = new PatchValueCalculator();
+        patchValueCalc.initialize( this );
+        
         // Load the properties
         Properties agentProps = MiscUtils.loadPropertiesFromFile( agentPropertiesFile );
         
@@ -749,9 +761,13 @@ public class SimulationState
                     "Agent [" + formattedIdx + "] position " );
             
             // Get the velocity
-            Vector3f velocity = MiscUtils.loadNonEmptyVector3fProperty( agentProps,
+            Vector3f velocity = new Vector3f();
+            if( allowInitialVelocity )
+            {
+                velocity = MiscUtils.loadNonEmptyVector3fProperty( agentProps,
                     prefix + _VELOCITY_KEY,
                     "Agent [" + formattedIdx + "] velocity " );
+            }
 
             // Get the team
             String teamID = agentProps.getProperty( prefix + _TEAM_KEY );
@@ -775,10 +791,14 @@ public class SimulationState
                     maxForagingArea,
                     agentSensor,
                     patchSensor,
-                    decisionMaker );
+                    decisionMaker,
+                    patchValueCalc );
             
             // Add it to the map
             _agents.put( id, agent );
+            
+            // Add it to its team
+            team.join( agent );
         }
         
         _LOG.trace( "Leaving createAgents()" );

@@ -19,6 +19,8 @@
  */
 package edu.snu.csne.forage.decision;
 
+import java.util.Map;
+
 // Imports
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.Patch;
@@ -55,13 +57,13 @@ public interface ProbabilityDecisionCalculator
      * @return The probability
      */
     public float calculateFollowProbability( Agent leader, Agent agent );
-    
+
     /**
-     * Calculates the probability of foraging in a given patch
-     *
-     * @param patch The patch in which the agent would forage
+     * Calculate all the probabilities that a given agent forages in the
+     * patches it currently is in
+     * 
      * @param agent The agent making the decision
-     * @return The probability
+     * @return The probabilities for foraging at each patch indexed by patch ID
      */
-    public float calculateForageProbability( Patch patch, Agent agent );
+    public Map<String, Float> calculatePatchForageProbabilities( Agent agent );
 }

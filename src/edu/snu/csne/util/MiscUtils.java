@@ -285,6 +285,30 @@ public class MiscUtils
         
         return value;
     }
+    
+    /**
+     * Loads a non-empty boolean value from properties
+     *
+     * @param props All the properties
+     * @param key The key of the value
+     * @param description A description of the error to generate if the value
+     * is not found
+     * @return The boolean value
+     */
+    public static boolean loadNonEmptyBooleanProperty( Properties props,
+            String key,
+            String description )
+    {
+        String valueStr = props.getProperty( key );
+        org.apache.commons.lang3.Validate.notEmpty( valueStr,
+                description
+                + "(key="
+                + key
+                + ") may not be empty" );
+        Boolean value = Boolean.parseBoolean( valueStr );
+        
+        return value;
+    }
 
     /**
      * Loads a non-empty Vector3f value from properties
