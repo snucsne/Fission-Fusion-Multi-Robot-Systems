@@ -342,9 +342,12 @@ public class DefaultProbabilityDecisionCalculator
         // Compute the k value
 //        float k = (float) Math.exp( -2.0f * ( mrvDirDiffComponent
 //                + mrvMagDiffComponent ) );
-        float k = 1.0f / (1.0f + (float) Math.exp( 2.0f * ( mrvDirDiffComponent
-                + mrvMagDiffComponent
-                - 0.5f ) ) );
+        float positionComponent = mrvDirDiffComponent + mrvMagDiffComponent;
+//        float k = 1.0f / (1.0f + (float) Math.exp( 2.0f * ( mrvDirDiffComponent
+//                + mrvMagDiffComponent
+//                - 0.5f ) ) );
+        float k = (1.0f/(1.0f + (float) Math.exp( 6.0f * (positionComponent - 0.75f))))
+                / (1.0f/(1.0f + (float) Math.exp( 6.0f * (-0.75f))));
 
         // Compute the probability
         float departed = leader.getTeam().getSize();
@@ -355,7 +358,8 @@ public class DefaultProbabilityDecisionCalculator
         {
             probability = k / (_followAlpha + ( ( _followBeta * currentTeamSize / departed ) ) );
         }
-        
+//        probability = 1.0f / (_followAlpha + ( ( _followBeta * currentTeamSize / departed ) ) );
+
         if( _LOG.isDebugEnabled() )
         {
             _LOG.debug( "Follow: mrvDirDiffComponent=["
@@ -364,6 +368,12 @@ public class DefaultProbabilityDecisionCalculator
                     + mrvMagDiffComponent
                     + "] k=["
                     + k
+                    + "] currentTeamSize=["
+                    + currentTeamSize
+                    + "] departed=["
+                    + departed
+                    + "] groupSize=["
+                    + groupSize
                     + "] probability=["
                     + String.format( "%10.8f", probability )
                     + "]" );

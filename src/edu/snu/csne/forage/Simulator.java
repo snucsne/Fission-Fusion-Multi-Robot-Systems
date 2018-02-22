@@ -63,9 +63,12 @@ public class Simulator
         {
             _LOG.debug( "Starting simulation..." );
 
+            // Get the properties
+            Properties props = MiscUtils.loadProperties( _PROPS_FILE_KEY );
+            
             // Build, initialize, run
             Simulator sim = new Simulator();
-            sim.initialize();
+            sim.initialize( props );
             sim.run();
         }
         catch( Exception e )
@@ -77,13 +80,15 @@ public class Simulator
 
     /**
      * Initializes this simulator
+     * 
+     * @param props The simulator properties
      */
-    public void initialize()
+    public void initialize( Properties props )
     {
-        _LOG.trace( "Entering initialize()" );
+        _LOG.trace( "Entering initialize( Properties )" );
         
-        // Load the properties
-        _props = MiscUtils.loadProperties( _PROPS_FILE_KEY );
+        // Save the properties
+        _props = new Properties( props );
 
         // Initialize the simulation state
         _simState = new SimulationState();
@@ -92,7 +97,7 @@ public class Simulator
         // Signal that the simulator is about ready to start
         _simState.signalSimSetup();
 
-        _LOG.trace( "Leaving initialize()" );
+        _LOG.trace( "Leaving initialize( Properties )" );
     }
     
     public void run()

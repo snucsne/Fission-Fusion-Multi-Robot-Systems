@@ -58,6 +58,8 @@ public interface ProbabilityDecisionCalculator
      */
     public float calculateFollowProbability( Agent leader, Agent agent );
 
+//    public float calculateForageProbability( Patch patch, Agent agent );
+    
     /**
      * Calculate all the probabilities that a given agent forages in the
      * patches it currently is in

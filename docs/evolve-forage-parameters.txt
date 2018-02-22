@@ -1,0 +1,24 @@
+Navigation/Initiation
+- Base initiation rate
+- k Exponent multiplier
+- k Exponent offset
+? MVR length Sigma
+? Patch value sigma
+
+Follow
+- Alpha
+- Beta
+- k Exponent multiplier
+- k Exponent offset
+? MVR theta diff sigma
+? Mean position relative distance sigma
+
+Forage
+- Base forage rate
+- k Exponent multiplier
+- k Exponent offset
+
+
+Fitness
+- % of patches with X% of resources foraged / total time
+- 

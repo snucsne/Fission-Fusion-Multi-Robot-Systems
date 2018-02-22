@@ -73,8 +73,8 @@ rest-alignment-weight = 0
 rest-goal-seek-weight = 0
 
 # Agent parameters
-max-speed = 1
-max-force = 0.05
+max-speed = 0.5
+max-force = 0.025
 min-separation = 1
 desired-separation = 2
 resource-consumption-rate = 1
