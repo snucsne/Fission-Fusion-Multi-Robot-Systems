@@ -1,24 +1,59 @@
-Navigation/Initiation
-- Base initiation rate
-- k Exponent multiplier
-- k Exponent offset
-? MVR length Sigma
-? Patch value sigma
+Navigation/Initiation: 26 bits
+- Base initiation rate [1:500]
+  Codon: 8 bits [0:255]+1
+  Scaling: 1.0
+- k Exponent multiplier [1:10]
+  Codon: 3 bits [0:7]+1
+  Scaling: 1.0
+- k Exponent offset [0:1]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
+? MVR length Sigma [0:2]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
+? Patch value sigma [0:2]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
 
-Follow
-- Alpha
-- Beta
-- k Exponent multiplier
-- k Exponent offset
-? MVR theta diff sigma
-? Mean position relative distance sigma
 
-Forage
-- Base forage rate
-- k Exponent multiplier
-- k Exponent offset
+Follow: 34 bits
+- Alpha [1:100]
+  Codon: 8 bits [0:255]+1
+  Scaling: 0.3
+- Beta [1:50]
+  Codon: 8 bits [0:255]+1
+  Scaling: 0.2
+- k Exponent multiplier [1:10]
+  Codon: 3 bits [0:7]+1
+  Scaling: 1.0
+- k Exponent offset [0:1]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
+? MVR theta diff sigma [0:2]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
+? Mean position relative distance sigma [0:2]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
 
+
+Forage: 21 bits
+- Base forage rate [1:100]
+  Codon: 8 bits [0:255]+1
+  Scaling: 0.3
+- k Exponent multiplier [1:10]
+  Codon: 3 bits [0:7]+1
+  Scaling: 1.0
+- k Exponent offset [0:1]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
+? Patch value sigma [0:2]
+  Codon: 5 bits [0:31]+1
+  Scaling: 0.05
+
+
+Total: 81 bits
 
 Fitness
 - % of patches with X% of resources foraged / total time
-- 
+- # of resources foraged in a specific time
