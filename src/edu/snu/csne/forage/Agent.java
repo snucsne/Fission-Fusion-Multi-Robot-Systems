@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.decision.AgentDecisionMaker;
 import edu.snu.csne.forage.decision.Decision;
+import edu.snu.csne.forage.event.DecisionEvent;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
 import edu.snu.csne.forage.util.PatchValue;
@@ -148,6 +149,8 @@ public class Agent
     /** The max of all the group give up time slopes */
     private float _patchValueSlopeGroupMax = 0.0f;
     
+    /** The current state of the simulation */
+    private SimulationState _simState = null;
     
     /**
      * Builds this Agent object
@@ -162,6 +165,7 @@ public class Agent
      * @param agentSensor
      * @param patchSensor
      * @param decisionMaker
+     * @param simState
      */
     public Agent( String id,
             Vector3f initialPosition,
@@ -178,7 +182,8 @@ public class Agent
             AgentSensor agentSensor,
             PatchSensor patchSensor,
             AgentDecisionMaker decisionMaker,
-            PatchValueCalculator patchValueCalc )
+            PatchValueCalculator patchValueCalc,
+            SimulationState simState )
     {
         // Validate the parameters
         Validate.notBlank( id, "ID may not be null" );
@@ -196,6 +201,7 @@ public class Agent
         Validate.notNull( patchSensor, "Patch sensor may not be null" );
         Validate.notNull( decisionMaker, "Decision maker may not be null" );
         Validate.notNull( patchValueCalc, "Patch value calculator may not be null" );
+        Validate.notNull( simState, "Simulation state may not be null" );
         
         // Store the parameters
         _id = id;
@@ -212,6 +218,7 @@ public class Agent
         _patchSensor = patchSensor;
         _decisionMaker = decisionMaker;
         _patchValueCalc = patchValueCalc;
+        _simState = simState;
         
         _decision = Decision.buildRestDecision( 0, this );
     }
@@ -273,6 +280,12 @@ public class Agent
             // Search through the sensed agents for the new teammates
             findSensedTeammates();
         }
+        
+        // Signal this decision
+        _simState.signalAgentDecision( new DecisionEvent(
+                _decision,
+                this,
+                _simState.getCurrentSimulationStep() ) );
         
         _LOG.trace( "Leaving plan()" );
     }

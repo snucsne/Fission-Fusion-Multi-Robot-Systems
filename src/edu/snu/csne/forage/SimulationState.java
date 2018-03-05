@@ -556,7 +556,7 @@ public class SimulationState
     }
 
     /**
-     * Signal all the listeners that an event made a decision
+     * Signal all the listeners that an agent made a decision
      */
     public void signalAgentDecision( DecisionEvent event )
     {
@@ -792,7 +792,8 @@ public class SimulationState
                     agentSensor,
                     patchSensor,
                     decisionMaker,
-                    patchValueCalc );
+                    patchValueCalc,
+                    this );
             
             // Add it to the map
             _agents.put( id, agent );

@@ -1,13 +1,208 @@
+/*
+ *  The Bio-inspired Leadership Toolkit is a set of tools used to
+ *  simulate the emergence of leaders in multi-agent systems.
+ *  Copyright (C) 2014 Southern Nazarene University
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package edu.snu.csne.forage;
 
+// Imports
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Properties;
 
-public abstract AbstractForageProblem extends Problem
+import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import ec.EvolutionState;
+import ec.Individual;
+import ec.Problem;
+import ec.simple.SimpleProblemForm;
+import ec.util.MersenneTwisterFast;
+import ec.util.Parameter;
+import ec.vector.BitVectorIndividual;
+import edu.snu.csne.forage.decision.DefaultProbabilityDecisionCalculator;
+import edu.snu.csne.util.IndividualDescriber;
+import edu.snu.csne.util.MiscUtils;
+
+public abstract class AbstractForageProblem extends Problem
         implements SimpleProblemForm, IndividualDescriber
 {
     /** Default serial version UID */
     private static final long serialVersionUID = 1L;
+    
+    /** Our logger */
+    private static final Logger _LOG = LogManager.getLogger(
+            AbstractForageProblem.class.getName() );
+
+    /** Parameter key for the initiation base rate */
+    private static final String _P_INITIATE_BASE_RATE = "initiate-base-rate.";
+    
+    /** Parameter key for the initiation K exponent multiplier */
+    private static final String _P_INITIATE_K_EXP_MULT = "initiate-k-exp-mult.";
+    
+    /** Parameter key for the inititation K exponent offset */
+    private static final String _P_INITIATE_K_EXP_OFFSET = "initiate-k-exp-offset.";
+    
+    /** Parameter key for the initiation MRV length sigma */
+    private static final String _P_INITIATE_MRV_LEN_SIGMA = "initiate-mrv-len-sigma.";
+    
+    /** Parameter key for the initiation patch value sigma */
+    private static final String _P_INITIATE_PATCH_VALUE_SIGMA = "initiate-patch-value-sigma";
+    
+    
+    /** Parameter key for the follow alpha */
+    private static final String _P_FOLLOW_ALPHA = "follow-alpha.";
+
+    /** Parameter key for the follow beta */
+    private static final String _P_FOLLOW_BETA = "follow-beta.";
+
+    /** Parameter key for the follow K exponent multiplier */
+    private static final String _P_FOLLOW_K_EXP_MULT = "follow-k-exp-mult.";
+
+    /** Parameter key for the follow K exponent offset */
+    private static final String _P_FOLLOW_K_EXP_OFFSET = "follow-k-exp-offset.";
+
+    /** Parameter key for the follow MRV difference sigma */
+    private static final String _P_FOLLOW_MRV_DIFF_SIGMA = "follow-mrv-diff-sigma.";
+
+    /** Parameter key for the follow mean position relative distance sigma */
+    private static final String _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA = "follow-mean-pos-rel-dist-sigma.";
+
+    
+    /** Parameter key for the forage base rate */
+    private static final String _P_FORAGE_BASE_RATE = "forage-base-rate.";
+
+    /** Parameter key for the forage K exponent multiplier */
+    private static final String _P_FORAGE_K_EXP_MULT = "forage-k-exp-mult.";
+
+    /** Parameter key for the forage K exponent offset */
+    private static final String _P_FORAGE_K_EXP_OFFSET = "forage-k-exp-offset.";
+
+    /** Parameter key for the forage patch value sigma*/
+    private static final String _P_FORAGE_PATCH_VALUE_SIGM = "forage-patch-value-sigma.";
 
 
+    /** Parameter key postfix for scaling factors */
+    private static final String _SCALING_POSTFIX = "scaling";
+
+    /** Parameter key postfix for codon size */
+    private static final String _CODON_SIZE_POSTFIX = "codon-size";
+
+    /** Parameter key for flag to force re-evaluation of individuals */
+    private static final String _P_FORCE_REEVALUATION = "force-reevaluation";
+
+    
+    /** Initiation base rate: codon size */
+    private int _initiateBaseRateCodonSize = 0;
+    
+    /** Initiation base rate: scaling */
+    private float _initiateBaseRateScaling = 0.0f;
+    
+    /** Initiation k exponent multiplier: codon size */
+    private int _initiateKExpMultCodonSize = 0;
+    
+    /** Initiation k exponent multiplier scaling */
+    private float _initiateKExpMultScaling = 0.0f;
+    
+    /** Initiation k exponent offset: codon size */
+    private int _initiateKExpOffsetCodonSize = 0;
+    
+    /** Initiation k exponent offset: scaling */
+    private float _initiateKExpOffsetScaling = 0.0f;
+    
+    /** Initiation MRV length sigma: codon size */
+    private int _initiateMRVLenSigmaCodonSize = 0;
+    
+    /** Initiation MRV length sigma: scaling */
+    private float _initiateMRVLenSigmaScaling = 0.0f;
+    
+    /** Initiation patch value sigma: codon size */
+    private int _initiatePatchValueSigmaCodonSize = 0;
+    
+    /** Initiation patch value sigma: scaling */
+    private float _initiatePatchValueSigmaScaling = 0.0f;
+    
+    
+    /** Follow alpha: codon size */
+    private int _followAlphaCodonSize = 0;
+    
+    /** Follow alpha: scaling */
+    private float _followAlphaScaling = 0.0f;
+    
+    /** Follow beta: codon size */
+    private int _followBetaCodonSize = 0;
+    
+    /** Follow beta: scaling */
+    private float _followBetaScaling = 0.0f;
+    
+    /** Follow k exponent multiplier: codon size */
+    private int _followKExpMultCodonSize = 0;
+    
+    /** Follow k exponent multiplier: scaling */
+    private float _followKExpMultScaling = 0.0f;
+    
+    /** Follow k exponent offset: codon size */
+    private int _followKExpOffsetCodonSize = 0;
+    
+    /** Follow k exponent offset: scaling */
+    private float _followKExpOffsetScaling = 0.0f;
+    
+    /** Follow MRV difference sigma: codon size */
+    private int _followMRVDiffSigmaCodonSize = 0;
+    
+    /** Follow MRV difference sigma: scaling */
+    private float _followMRVDiffSigmaScaling = 0.0f;
+    
+    /** Follow relative distance in mean position: codon size */
+    private int _followMeanPosRelDistSigmaCodonSize = 0;
+    
+    /** Follow relative distance in mean position: scaling */
+    private float _followMeanPosRelDistSigmaScaling = 0.0f;
+    
+    
+    /** Forage base rate: codon size */
+    private int _forageBaseRateCodonSize = 0;
+    
+    /** Forage base rate: scaling */
+    private float _forageBaseRateScaling = 0.0f;
+    
+    /** Forage k exponent multiplier: codon size */
+    private int _forageKExpMultCodonSize = 0;
+    
+    /** Forage k exponent multiplier: scaling */
+    private float _forageKExpMultScaling = 0.0f;
+    
+    /** Forage k exponent offset: codon size */
+    private int _forageKExpOffsetCodonSize = 0;
+    
+    /** Forage k exponent offset: scaling */
+    private float _forageKExpOffsetScaling = 0.0f;
+    
+    /** Forage patch value sigma: codon size */
+    private int _foragePatchValueSigmaCodonSize = 0;
+    
+    /** Forage patch value sigma: scaling */
+    private float _foragePatchValueSigmaScaling = 0.0f;
+    
+    
+    /** Flag indicating that individuals should be re-evaluated every generation */
+    private boolean _forceReevaluation = false;
+
+    
     /**
      * Sets up the object by reading it from the parameters stored in
      * state, built off of the parameter base base.
@@ -24,6 +219,196 @@ public abstract AbstractForageProblem extends Problem
         // Call the superclass implementation
         super.setup( state, base );
 
+        // Load the initiation base rate values
+        _initiateBaseRateCodonSize = loadIntParameter(
+                _P_INITIATE_BASE_RATE + _CODON_SIZE_POSTFIX,
+                "initiation base rate codon size",
+                state,
+                base );
+        _initiateBaseRateScaling = loadFloatParameter(
+                _P_INITIATE_BASE_RATE + _SCALING_POSTFIX,
+                "initiation base rate scaling",
+                state,
+                base );
+        
+        // Load the initiation k exponent multiplier values
+        _initiateKExpMultCodonSize = loadIntParameter(
+                _P_INITIATE_K_EXP_MULT + _CODON_SIZE_POSTFIX,
+                "initiation k exponent multiplier codon size",
+                state,
+                base );
+        _initiateKExpMultScaling = loadFloatParameter(
+                _P_INITIATE_K_EXP_MULT + _SCALING_POSTFIX,
+                "initiation k exponent multiplier scaling",
+                state,
+                base );
+        
+        // Load the initiation k exponent offset values
+        _initiateKExpOffsetCodonSize = loadIntParameter(
+                _P_INITIATE_K_EXP_OFFSET + _CODON_SIZE_POSTFIX,
+                "initiation k exponent offset codon size",
+                state,
+                base );
+        _initiateKExpOffsetScaling = loadFloatParameter(
+                _P_INITIATE_K_EXP_OFFSET + _SCALING_POSTFIX,
+                "initiation k exponent offset scaling",
+                state,
+                base );
+        
+        // Load the initiation MRV length sigma values
+        _initiateMRVLenSigmaCodonSize = loadIntParameter(
+                _P_INITIATE_MRV_LEN_SIGMA + _CODON_SIZE_POSTFIX,
+                "initiation MRV length sigma codon size",
+                state,
+                base );
+        _initiateMRVLenSigmaScaling = loadFloatParameter(
+                _P_INITIATE_MRV_LEN_SIGMA + _SCALING_POSTFIX,
+                "initiation MRV length sigma scaling",
+                state,
+                base );
+        
+        // Load the initiation patch value values
+        _initiatePatchValueSigmaCodonSize = loadIntParameter(
+                _P_INITIATE_PATCH_VALUE_SIGMA + _CODON_SIZE_POSTFIX,
+                "initiation patch value sigma codon size",
+                state,
+                base );
+        _initiatePatchValueSigmaScaling = loadFloatParameter(
+                _P_INITIATE_PATCH_VALUE_SIGMA + _SCALING_POSTFIX,
+                "initiation patch value scaling",
+                state,
+                base );
+        
+        // Load the follow alpha values
+        _followAlphaCodonSize = loadIntParameter(
+                _P_FOLLOW_ALPHA + _CODON_SIZE_POSTFIX,
+                " codon size",
+                state,
+                base );
+        _followAlphaScaling = loadFloatParameter(
+                _P_FOLLOW_ALPHA + _SCALING_POSTFIX,
+                " scaling",
+                state,
+                base );
+
+        // Load the follow beta values
+        _followBetaCodonSize= loadIntParameter(
+                _P_FOLLOW_BETA + _CODON_SIZE_POSTFIX,
+                " codon size",
+                state,
+                base );
+        _followBetaScaling = loadFloatParameter(
+                _P_FOLLOW_BETA + _SCALING_POSTFIX,
+                " scaling",
+                state,
+                base );
+        
+        // Load the follow k exponent multiplier values
+        _followKExpMultCodonSize = loadIntParameter(
+                _P_FOLLOW_BETA + _CODON_SIZE_POSTFIX,
+                " codon size",
+                state,
+                base );
+        _followKExpMultScaling = loadFloatParameter(
+                _P_FOLLOW_BETA + _SCALING_POSTFIX,
+                " scaling",
+                state,
+                base );
+        
+         // Load the follow k exponent offset values
+        _followKExpOffsetCodonSize = loadIntParameter(
+                _P_FOLLOW_K_EXP_OFFSET + _CODON_SIZE_POSTFIX,
+                " codon size",
+                state,
+                base );
+        _followKExpOffsetScaling= loadFloatParameter(
+                _P_FOLLOW_K_EXP_OFFSET + _SCALING_POSTFIX,
+                " scaling",
+                state,
+                base );
+        
+         // Load the follow MRV difference sigma values
+        _followMRVDiffSigmaCodonSize= loadIntParameter(
+                _P_FOLLOW_MRV_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
+                " codon size",
+                state,
+                base );
+        _followMRVDiffSigmaScaling = loadFloatParameter(
+                _P_FOLLOW_MRV_DIFF_SIGMA + _SCALING_POSTFIX,
+                " scaling",
+                state,
+                base );
+        
+        // Load the follow mean position relative distance sigma values
+        _followMeanPosRelDistSigmaCodonSize = loadIntParameter(
+                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _CODON_SIZE_POSTFIX,
+                " codon size",
+                state,
+                base );
+        _followMeanPosRelDistSigmaScaling = loadFloatParameter(
+                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _SCALING_POSTFIX,
+                " scaling",
+                state,
+                base );
+        
+        // Load the forage base rate values
+        _forageBaseRateCodonSize = loadIntParameter(
+                _P_FORAGE_BASE_RATE + _CODON_SIZE_POSTFIX,
+                "forage base rate codon size",
+                state,
+                base );
+        _forageBaseRateScaling = loadFloatParameter(
+                _P_FORAGE_BASE_RATE + _SCALING_POSTFIX,
+                "forage base rate scaling",
+                state,
+                base );
+        
+        // Load the forage k exponent multiplier values
+        _forageKExpMultCodonSize = loadIntParameter(
+                _P_FORAGE_K_EXP_MULT + _CODON_SIZE_POSTFIX,
+                "forage k exponent multiplier codon size",
+                state,
+                base );
+        _forageKExpMultScaling = loadFloatParameter(
+                _P_FORAGE_K_EXP_MULT + _SCALING_POSTFIX,
+                "forage k exponent multiplier scaling",
+                state,
+                base );
+        
+        // Load the forage k exponent offset values
+        _forageKExpOffsetCodonSize = loadIntParameter(
+                _P_FORAGE_K_EXP_MULT + _CODON_SIZE_POSTFIX,
+                "forage k exponent offset codon size",
+                state,
+                base );
+        _forageKExpOffsetScaling = loadFloatParameter(
+                _P_FORAGE_K_EXP_MULT + _SCALING_POSTFIX,
+                "forage k exponent offset scaling",
+                state,
+                base );
+        
+        // Load the forage patch value sigma values
+        _foragePatchValueSigmaCodonSize = loadIntParameter(
+                _P_FORAGE_PATCH_VALUE_SIGM + _CODON_SIZE_POSTFIX,
+                "forage patch value sigma codon size",
+                state,
+                base );
+        _foragePatchValueSigmaScaling = loadFloatParameter(
+                _P_FORAGE_PATCH_VALUE_SIGM + _SCALING_POSTFIX,
+                "forage patch value sigma scaling",
+                state,
+                base );
+
+
+        // Do we force reevaluation?
+        Validate.isTrue( state.parameters.exists(
+                base.push( _P_FORCE_REEVALUATION ), null ),
+                "Force reevaluation flag is required " );
+        _forceReevaluation = state.parameters.getBoolean(
+                 base.push( _P_FORCE_REEVALUATION ),
+                 null,
+                 false );
+        _LOG.info( "Using _forceReevaluation=[" + _forceReevaluation + "]" );
 
         _LOG.trace( "Leaving setup( state, base )" );
     }
@@ -66,46 +451,45 @@ public abstract AbstractForageProblem extends Problem
         BitVectorIndividual bitInd = (BitVectorIndividual) ind;
 
         // Decode the genome
-        EvolutionInputParameters inputParameters = decodeGenome( bitInd.genome,
+        Properties genomeProps = decodeGenome( bitInd.genome,
                 state.random[threadnum] );
+        
+        
     }
 
     /**
-     * TODO Method description
+     * Returns a description of the specified individual using the specified
+     * line prefix.
      *
-     * @param ind
-     * @param prefix
-     * @param statDir
-     * @return
-     * @see edu.snu.leader.util.IndividualDescriber#describe(ec.Individual, java.lang.String, java.lang.String)
+     * @param ind The individual to describe
+     * @param prefix The prefix for every line in the description
+     * @return A description of the individual
+     * @see edu.snu.csne.util.IndividualDescriber#describe(ec.Individual, java.lang.String)
      */
     @Override
-    public String describe( Individual ind, String prefix, String statDir )
+    public String describe( Individual ind, String prefix )
     {
         // Cast it to the proper type
         BitVectorIndividual bitInd = (BitVectorIndividual) ind;
 
         // Decode the genome
-        EvolutionInputParameters inputParameters = decodeGenome( bitInd.genome, null );
+        Properties genomeProps = decodeGenome( bitInd.genome, null );
 
         StringBuilder builder = new StringBuilder();
         builder.append( prefix );
-        builder.append( "decoded-parameters = " );
+        builder.append( "decoded-genome = " );
+        
+        StringWriter writer = new StringWriter();
+        try
+        {
+            genomeProps.store( writer, "" );
+            builder.append( writer.getBuffer() );
+        }
+        catch( IOException ioe )
+        {
+            _LOG.error( "Unable to convert decoded genome to string", ioe );
+        }
 
-        // Describe the parameters
-        builder.append( "alpha=[" );
-        builder.append( String.format( "%08.6f", inputParameters.getAlpha() ) );
-        builder.append( "] beta=[" );
-        builder.append( String.format( "%08.6f", inputParameters.getBeta() ) );
-        builder.append( "] S=[" );
-        builder.append( String.format( "%2d", inputParameters.getS() ) );
-        builder.append( "] q=[" );
-        builder.append( String.format( "%08.6f", inputParameters.getQ() ) );
-        builder.append( "] alphaC=[" );
-        builder.append( String.format( "%08.6f", inputParameters.getAlphaC() ) );
-        builder.append( "] betaC=[" );
-        builder.append( String.format( "%+09.6f", inputParameters.getBetaC() ) );
-        builder.append( "]" );
         builder.append( System.getProperty( "line.separator" ) );
 
         return builder.toString();
@@ -116,71 +500,186 @@ public abstract AbstractForageProblem extends Problem
      *
      * @param genome
      */
-    protected EvolutionInputParameters decodeGenome( boolean[] genome,
+    protected Properties decodeGenome( boolean[] genome,
             MersenneTwisterFast random )
     {
+        // Build the properties object
+        Properties props = new Properties();
+        
         int codonIdx = 0;
 
-        // Decode each codon in the genome, starting with alpha
-        float maxValue = (float) Math.pow( 2.0, _alphaCodonSize );
-        int rawAlpha = decodeAndConvert( genome, 0, _alphaCodonSize );
-        float normalizedAlpha = ( rawAlpha / maxValue );
-        float alpha = normalizedAlpha * _alphaScalingFactor;
-        codonIdx += _alphaCodonSize;
+        /* Decode each codon in the genome, starting with the base
+         * initiation rate */
+        float initiateBaseRate = decodeCodon( genome,
+                _initiateBaseRateCodonSize,
+                _initiateBaseRateScaling,
+                codonIdx );
+        codonIdx += _initiateBaseRateCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_RATE_KEY,
+                Float.toString( initiateBaseRate ) );
 
-        maxValue = (float) Math.pow( 2.0, _betaCodonSize );
-        int rawBeta = decodeAndConvert( genome, codonIdx, _betaCodonSize );
-        float normalizedBeta = rawBeta / maxValue;
-        float beta = normalizedBeta * _betaScalingFactor;
-        codonIdx += _betaCodonSize;
+        // Initiation K exponent multiplier
+        float initiateKExpMult = decodeCodon( genome,
+                _initiateKExpMultCodonSize,
+                _initiateKExpMultScaling,
+                codonIdx );
+        codonIdx += _initiateKExpMultCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_MULT_KEY,
+                Float.toString( initiateKExpMult ) );
 
-        int rawS = decodeAndConvert( genome, codonIdx, _sCodonSize );
-        int s = rawS % _sModulus;
-        codonIdx += _sCodonSize;
+        // Initiation K exponent offset
+        float initiateKExpOffset = decodeCodon( genome,
+                _initiateKExpOffsetCodonSize,
+                _initiateKExpOffsetScaling,
+                codonIdx );
+        codonIdx += _initiateKExpOffsetCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_OFFSET_KEY,
+                Float.toString( initiateKExpOffset ) );
 
-        maxValue = (float) Math.pow( 2.0, _qCodonSize );
-        int rawQ = decodeAndConvert( genome, codonIdx, _qCodonSize );
-        float normalizedQ = rawQ / maxValue;
-        float q = normalizedQ * _qScalingFactor;
-        codonIdx += _qCodonSize;
+        // Initiation MRV length sigma
+        float initiateMRVLenSigma = decodeCodon( genome,
+                _initiateMRVLenSigmaCodonSize,
+                _initiateMRVLenSigmaScaling,
+                codonIdx );
+        codonIdx += _initiateMRVLenSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_MRV_SIGMA_KEY,
+                Float.toString( initiateMRVLenSigma ) );
 
-        maxValue = (float) Math.pow( 2.0, _alphaCCodonSize );
-        int rawAlphaC = decodeAndConvert( genome, codonIdx, _alphaCCodonSize );
-        float normalizedAlphaC = rawAlphaC / maxValue;
-        float alphaC = normalizedAlphaC * _alphaCScalingFactor;
-        codonIdx += _alphaCCodonSize;
+        // Initiation patch value sigma
+        float initiatePatchValueSigma = decodeCodon( genome,
+                _initiatePatchValueSigmaCodonSize,
+                _initiatePatchValueSigmaScaling,
+                codonIdx );
+        codonIdx += _initiatePatchValueSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_SIGMA_KEY,
+                Float.toString( initiatePatchValueSigma ) );
 
-        maxValue = (float) Math.pow( 2.0, _betaCCodonSize );
-        int rawBetaC = decodeAndConvert( genome, codonIdx, _betaCCodonSize );
-        float normalizedBetaC = rawBetaC / maxValue;
-        float betaC = normalizedBetaC * _betaCScalingFactor;
+        // Follow alpha
+        float followAlpha = decodeCodon( genome,
+                _followAlphaCodonSize,
+                _followAlphaScaling,
+                codonIdx );
+        codonIdx += _followAlphaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_ALPHA_KEY,
+                Float.toString( followAlpha ) );
 
-        // Build the destinations
-        DestinationRunCounts[] destinationInfo =
-                new DestinationRunCounts[ _destinationFiles.length ];
-        for(int i = 0; i < destinationInfo.length; i++ )
-        {
-            long seed = 0;
-            if( null != random )
-            {
-                seed = random.nextInt();
-            }
-            destinationInfo[i] = new DestinationRunCounts(
-                    _destinationFiles[i],
-                    _destinationSimCounts[i],
-                    seed );
+        // Follow beta
+        float followBeta = decodeCodon( genome,
+                _followBetaCodonSize,
+                _followBetaScaling,
+                codonIdx );
+        codonIdx += _followBetaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_BETA_KEY,
+                Float.toString( followBeta ) );
 
-        }
+        // Follow k exponent multiplier
+        float followkExpMult = decodeCodon( genome,
+                _followKExpMultCodonSize,
+                _followKExpMultScaling,
+                codonIdx );
+        codonIdx += _followKExpMultCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_MULT_KEY,
+                Float.toString( followkExpMult ) );
+
+        // Follow k exponent offset
+        float followKExpOffset = decodeCodon( genome,
+                _followKExpOffsetCodonSize,
+                _followKExpOffsetScaling,
+                codonIdx );
+        codonIdx += _followKExpOffsetCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_OFFSET_KEY,
+                Float.toString( followKExpOffset ) );
+
+        // Follow MRV difference sigma
+        float followMRVDiffSigma = decodeCodon( genome,
+                _followMRVDiffSigmaCodonSize,
+                _followMRVDiffSigmaScaling,
+                codonIdx );
+        codonIdx += _followMRVDiffSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIFF_SIGMA_KEY,
+                Float.toString( followMRVDiffSigma ) );
+
+        // Follow mean position relative distance sigma
+        float followMeanPosRelDistSigma = decodeCodon( genome,
+                _followMeanPosRelDistSigmaCodonSize,
+                _followMeanPosRelDistSigmaScaling,
+                codonIdx );
+        codonIdx += _followMeanPosRelDistSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
+                Float.toString( followMeanPosRelDistSigma ) );
+
+        // Forage base rate
+        float forageBaseRate = decodeCodon( genome,
+                _forageBaseRateCodonSize,
+                _forageBaseRateScaling,
+                codonIdx );
+        codonIdx += _forageBaseRateCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_RATE_KEY,
+                Float.toString( forageBaseRate ) );
+
+        // Forage k exponent multiplier
+        float forageKExpMult = decodeCodon( genome,
+                _forageKExpMultCodonSize,
+                _forageKExpMultScaling,
+                codonIdx );
+        codonIdx += _forageKExpMultCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_MULT_KEY,
+                Float.toString( forageKExpMult ) );
+
+        // Forage k exponent offset
+        float forageKExpOffset = decodeCodon( genome,
+                _forageKExpOffsetCodonSize,
+                _forageKExpOffsetScaling,
+                codonIdx );
+        codonIdx += _forageKExpOffsetCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_OFFSET_KEY,
+                Float.toString( forageKExpOffset ) );
+
+        // Forage patch value
+        float foragePatchValueSigma = decodeCodon( genome,
+                _foragePatchValueSigmaCodonSize,
+                _foragePatchValueSigmaScaling,
+                codonIdx );
+        codonIdx += _foragePatchValueSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_SIGMA_KEY,
+                Float.toString( foragePatchValueSigma ) );
+
+//        // 
+//        float  = decodeCodon( genome,
+//                ,
+//                ,
+//                codonIdx );
+//        codonIdx += ;
+//        props.setProperty( DefaultProbabilityDecisionCalculator.,
+//                Float.toString(  ) );
+
+
+//        // Build the destinations
+//        DestinationRunCounts[] destinationInfo =
+//                new DestinationRunCounts[ _destinationFiles.length ];
+//        for(int i = 0; i < destinationInfo.length; i++ )
+//        {
+//            long seed = 0;
+//            if( null != random )
+//            {
+//                seed = random.nextInt();
+//            }
+//            destinationInfo[i] = new DestinationRunCounts(
+//                    _destinationFiles[i],
+//                    _destinationSimCounts[i],
+//                    seed );
+//
+//        }
 
         // Store the values
-        EvolutionInputParameters inputParameters = new EvolutionInputParameters(
-                alpha,
-                beta,
-                s,
-                q,
-                alphaC,
-                betaC,
-                destinationInfo );
+//        EvolutionInputParameters inputParameters = new EvolutionInputParameters(
+//                alpha,
+//                beta,
+//                s,
+//                q,
+//                alphaC,
+//                betaC,
+//                destinationInfo );
 //        EvolutionInputParameters inputParameters = new EvolutionInputParameters(
 //                0.006161429f,
 //                0.013422819f,
@@ -191,12 +690,79 @@ public abstract AbstractForageProblem extends Problem
 //                destinationInfo );
 
         // Log it
-        _LOG.debug( inputParameters.toString() );
+        if( _LOG.isDebugEnabled() )
+        {
+            StringWriter writer = new StringWriter();
+            try
+            {
+                props.store( writer, "" );
+                _LOG.debug( "Decoded genome: " + writer.getBuffer() );
+            }
+            catch( IOException ioe )
+            {
+                _LOG.error( "Unable to display decoded genome", ioe );
+            }
+        }
 
         // Return them
-        return inputParameters;
+        return props;
     }
 
+    protected int loadIntParameter( String key,
+            String description,
+            EvolutionState state,
+            Parameter base )
+    {
+        Validate.isTrue( state.parameters.exists(
+                base.push( key ), null ),
+                "Required parameter missing [" + description + "]" );
+        int intValue = state.parameters.getInt( base.push(
+                 key ),
+                 null );
+        _LOG.info( "Using "
+                + description
+                + " ["
+                + _initiateBaseRateCodonSize
+                + "]" );
+
+        return intValue;
+    }
+    
+    protected float loadFloatParameter( String key,
+            String description,
+            EvolutionState state,
+            Parameter base )
+    {
+        Validate.isTrue( state.parameters.exists(
+                base.push( key ), null ),
+                "Required parameter missing [" + description + "]" );
+        float floatValue = state.parameters.getFloat( base.push(
+                 key ),
+                 null );
+        _LOG.info( "Using "
+                + description
+                + " ["
+                + _initiateBaseRateCodonSize
+                + "]" );
+
+        return floatValue;
+    }
+
+    protected float decodeCodon( boolean[] genome,
+            int codonSize,
+            float scaling,
+            int startIdx )
+    {
+        int rawValue = decodeAndConvert( genome,
+                startIdx,
+                codonSize );
+        float maxValue = (float) Math.pow( codonSize, 2 );
+        float value = (rawValue / maxValue )
+                * scaling;
+
+        return value;
+    }
+    
     /**
      * Decode a codon to a gray code and convert it to binary
      *

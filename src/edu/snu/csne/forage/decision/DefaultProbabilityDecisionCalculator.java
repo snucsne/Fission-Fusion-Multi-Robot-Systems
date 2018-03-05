@@ -52,31 +52,65 @@ public class DefaultProbabilityDecisionCalculator
             DefaultProbabilityDecisionCalculator.class.getName() );
     
     /** Property key for the initiation rate base */
-    private static final String _INITIATION_RATE_KEY = "initiation-rate";
+    public static final String _INITIATE_RATE_KEY = "initiate-rate";
     
-    /** Property key for the follow alpha constant */
-    private static final String _FOLLOW_ALPHA_KEY = "follow-alpha";
+    /** Property key for the initiation k exponent multiplier */
+    public static final String _INITIATE_K_EXP_MULT_KEY = "initiate-k-exp-multiplier";
     
-    /** Property key for the follow beta constant */
-    private static final String _FOLLOW_BETA_KEY = "follow-beta";
+    /** Property key for the initiation k exponent offset */
+    public static final String _INITIATE_K_EXP_OFFSET_KEY = "initiate-k-exp-offset";
+    
+    /** Property key for the initiation MRV sigma */
+    public static final String _INITIATE_MRV_SIGMA_KEY = "initiate-mrv-sigma";
+    
+    /** Property key for the initiation patch value sigma */
+    public static final String _INITIATE_PATCH_VALUE_SIGMA_KEY = "initiate-patch-value-sigma";
+    
+    /** Property key for the initiation direction difference sigma */
+    public static final String _INITIATE_DIR_DIFF_SIGMA_KEY = "initiate-dir-diff-sigma";
+    
+    
+    /** Property key for the follow alpha */
+    public static final String _FOLLOW_ALPHA_KEY = "follow-alpha";
+    
+    /** Property key for the follow beta */
+    public static final String _FOLLOW_BETA_KEY = "follow-beta";
 
-    /** Property key for the navigate MRV sigma */
-    private static final String _NAVIGATE_MRV_SIGMA_KEY = "navigate-mrv-sigma";
+    /** Property key for the follow k exponent multiplier */
+    public static final String _FOLLOW_K_EXP_MULT_KEY = "follow-k-exp-multiplier";
     
-    /** Property key for the navigate patch value sigma */
-    private static final String _NAVIGATE_PATCH_VALUE_SIGMA_KEY = "navigate-patch-value-sigma";
+    /** Property key for the follow k exponent offset */
+    public static final String _FOLLOW_K_EXP_OFFSET_KEY = "follow-k-exp-offset";
     
-    /** Property key for the navigate direction difference sigma */
-    private static final String _NAVIGATE_DIR_DIFF_SIGMA_KEY = "navigate-dir-diff-sigma";
+    /** Property key for the follow MRV difference sigma */
+    public static final String _FOLLOW_MRV_DIFF_SIGMA_KEY = "follow-mrv-diff-sigma";
+
+    /** Property key for the follow mean position relative distance sigma */
+    public static final String _FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY = "follow-mean-pos-rel-dist-sigma";
+
+    
+    /** Property key for the forage rate base */
+    public static final String _FORAGE_RATE_KEY = "forage-rate";
+
+    /** Property key for the forage k exponent multiplier */
+    public static final String _FORAGE_K_EXP_MULT_KEY = "forage-k-exp-multiplier";
+    
+    /** Property key for the forage k exponent offset */
+    public static final String _FORAGE_K_EXP_OFFSET_KEY = "forage-k-exp-offset";
+    
+    /** Property key for the forage patch value sigma */
+    public static final String _FORAGE_PATCH_VALUE_SIGMA_KEY = "forage-patch-value-sigma";
+
     
     /** Property key for the follow MRV direction difference sigma */
-    private static final String _FOLLOW_MRV_DIR_DIFF_SIGMA_KEY = "follow-mrv-dir-diff-sigma";
+    protected static final String _FOLLOW_MRV_DIR_DIFF_SIGMA_KEY = "follow-mrv-dir-diff-sigma";
     
     /** Property key for the follow MRV magnitude difference sigma */
-    private static final String _FOLLOW_MRV_MAG_DIFF_SIGMA_KEY = "follow-mrv-mag-diff-sigma";
+    protected static final String _FOLLOW_MRV_MAG_DIFF_SIGMA_KEY = "follow-mrv-mag-diff-sigma";
+    
     
     /** Property key for the flag indicating individual patch value should be used */
-    private static final String _USE_PATCH_VALUE_INDIVIDUAL_KEY = "use-patch-value-individual";
+    protected static final String _USE_PATCH_VALUE_INDIVIDUAL_KEY = "use-patch-value-individual";
     
     /** Pi as a float */
     private static final float _PI = (float) Math.PI;
@@ -134,7 +168,7 @@ public class DefaultProbabilityDecisionCalculator
         
         // Load the initiation rate
         _inititationRate = MiscUtils.loadNonEmptyFloatProperty( props,
-                _INITIATION_RATE_KEY,
+                _INITIATE_RATE_KEY,
                 "Initiation rate" );
         
         // Load the follow alpha constant
@@ -149,17 +183,17 @@ public class DefaultProbabilityDecisionCalculator
         
         // Load the navigate MRV sigma value
         _navigateMRVSigma = MiscUtils.loadNonEmptyFloatProperty( props,
-                _NAVIGATE_MRV_SIGMA_KEY,
+                _INITIATE_MRV_SIGMA_KEY,
                 "Navigate MRV sigma" );
         
         // Load the navigate patch value sigma value
         _navigatePatchValueSigma = MiscUtils.loadNonEmptyFloatProperty( props,
-                _NAVIGATE_PATCH_VALUE_SIGMA_KEY,
+                _INITIATE_PATCH_VALUE_SIGMA_KEY,
                 "Navigate patch value sigma" );
         
         // Load the navigate direction difference sigma value
         _navigateDirDiffSigma = MiscUtils.loadNonEmptyFloatProperty( props,
-                _NAVIGATE_DIR_DIFF_SIGMA_KEY,
+                _INITIATE_DIR_DIFF_SIGMA_KEY,
                 "Navigate direction difference sigma" );
         
         // Load the follow MRV direction difference sigma value

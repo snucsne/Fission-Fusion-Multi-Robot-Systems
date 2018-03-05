@@ -140,6 +140,20 @@ public class Patch
         return _radius;
     }
     
+    public boolean setResourcesForaged( float resources )
+    {
+        boolean success = false;
+        
+        // Ensure that there are sufficient resources
+        if( resources  <= _remainingResources )
+        {
+            _remainingResources -= resources;
+            success = true;
+        }
+        
+        return success;
+    }
+    
     /**
      * Returns the amount of resources remaining at this patch
      *
@@ -149,4 +163,26 @@ public class Patch
     {
         return _remainingResources;
     }
+
+    /**
+     * Returns the predationProbability for this patch
+     *
+     * @return The predationProbability.
+     */
+    public float getPredationProbability()
+    {
+        return _predationProbability;
+    }
+
+    /**
+     * Returns the minAgentForageCount for this patch
+     *
+     * @return The minAgentForageCount.
+     */
+    public int getMinAgentForageCount()
+    {
+        return _minAgentForageCount;
+    }
+    
+    
 }
