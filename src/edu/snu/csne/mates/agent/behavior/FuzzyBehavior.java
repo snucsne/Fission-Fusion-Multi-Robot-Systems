@@ -27,7 +27,7 @@ import edu.snu.csne.mates.agent.Agent;
 import edu.snu.csne.mates.agent.parameter.Parameter;
 import edu.snu.csne.mates.agent.parameter.ParameterKey;
 import edu.snu.csne.mates.sim.SimulationState;
-import edu.snu.csne.mates.util.NotYetImplementedException;
+import edu.snu.csne.util.NotYetImplementedException;
 import edu.snu.fuzzy.RuleSet;
 import edu.snu.fuzzy.ValueDatabase;
 

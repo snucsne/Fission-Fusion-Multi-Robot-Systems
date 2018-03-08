@@ -21,7 +21,8 @@ package edu.snu.csne.mates.agent;
 
 // Imports
 import org.apache.commons.lang3.Validate;
-import edu.snu.csne.mates.util.NotYetImplementedException;
+
+import edu.snu.csne.util.NotYetImplementedException;
 import edu.snu.fuzzy.OutputValue;
 
 

@@ -32,7 +32,7 @@ import com.jme3.app.state.AppStateManager;
 import edu.snu.csne.mates.agent.Agent;
 import edu.snu.csne.mates.sim.event.SimUpdateEvent;
 import edu.snu.csne.mates.sim.event.SimulatorEventListener;
-import edu.snu.csne.mates.util.NotYetImplementedException;
+import edu.snu.csne.util.NotYetImplementedException;
 
 /**
  * TODO Class description

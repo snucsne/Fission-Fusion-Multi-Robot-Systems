@@ -27,7 +27,7 @@ import com.jme3.math.Vector3f;
 
 import edu.snu.csne.mates.agent.Agent;
 import edu.snu.csne.mates.sim.SimulationState;
-import edu.snu.csne.mates.util.NotYetImplementedException;
+import edu.snu.csne.util.NotYetImplementedException;
 
 /**
  * TODO Class description

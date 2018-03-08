@@ -1,7 +1,8 @@
 /*
- *  The Bio-inspired Leadership Toolkit is a set of tools used to
- *  simulate the emergence of leaders in multi-agent systems.
- *  Copyright (C) 2014 Southern Nazarene University
+ *  The Fission-Fusion in Multi-Robot Systems Toolkit is open-source
+ *  software for for investigating fission-fusion processes in
+ *  multi-robot systems.
+ *  Copyright (C) 2017 Southern Nazarene University
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,7 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.snu.csne.forage;
+package edu.snu.csne.forage.evolve;
 
 // Imports
 import java.io.IOException;
@@ -35,9 +36,14 @@ import ec.util.MersenneTwisterFast;
 import ec.util.Parameter;
 import ec.vector.BitVectorIndividual;
 import edu.snu.csne.forage.decision.DefaultProbabilityDecisionCalculator;
-import edu.snu.csne.util.IndividualDescriber;
 import edu.snu.csne.util.MiscUtils;
 
+
+/**
+ * TODO Class description
+ *
+ * @author Brent Eskridge
+ */
 public abstract class AbstractForageProblem extends Problem
         implements SimpleProblemForm, IndividualDescriber
 {
@@ -102,6 +108,9 @@ public abstract class AbstractForageProblem extends Problem
     /** Parameter key postfix for codon size */
     private static final String _CODON_SIZE_POSTFIX = "codon-size";
 
+    /** Parameter key for the fold properties file */
+    private static final String _P_FOLD_PROPERTIES = "fold-properties";
+    
     /** Parameter key for flag to force re-evaluation of individuals */
     private static final String _P_FORCE_REEVALUATION = "force-reevaluation";
 
@@ -198,6 +207,9 @@ public abstract class AbstractForageProblem extends Problem
     /** Forage patch value sigma: scaling */
     private float _foragePatchValueSigmaScaling = 0.0f;
     
+    
+    /** Fold property files */
+    private FoldProperties _foldProps = new FoldProperties();
     
     /** Flag indicating that individuals should be re-evaluated every generation */
     private boolean _forceReevaluation = false;
@@ -399,6 +411,16 @@ public abstract class AbstractForageProblem extends Problem
                 state,
                 base );
 
+        // Load the fold properties
+        Validate.isTrue( state.parameters.exists(
+                base.push( _P_FOLD_PROPERTIES ), null ),
+                "Fold properties file is required " );
+        String foldPropsDefFile = state.parameters.getString(
+                 base.push( _P_FOLD_PROPERTIES ),
+                 null );
+        _LOG.info( "Using foldPropsDefFile=[" + foldPropsDefFile + "]" );
+        _foldProps.initialize( foldPropsDefFile );
+
 
         // Do we force reevaluation?
         Validate.isTrue( state.parameters.exists(
@@ -464,7 +486,7 @@ public abstract class AbstractForageProblem extends Problem
      * @param ind The individual to describe
      * @param prefix The prefix for every line in the description
      * @return A description of the individual
-     * @see edu.snu.csne.util.IndividualDescriber#describe(ec.Individual, java.lang.String)
+     * @see edu.snu.csne.forage.evolve.IndividualDescriber#describe(ec.Individual, java.lang.String)
      */
     @Override
     public String describe( Individual ind, String prefix )

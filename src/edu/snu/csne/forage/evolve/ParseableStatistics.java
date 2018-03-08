@@ -17,7 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.snu.csne.forage.util;
+package edu.snu.csne.forage.evolve;
 
 //Imports
 import java.io.File;
@@ -40,7 +40,6 @@ import ec.Subpopulation;
 import ec.simple.SimpleFitness;
 import ec.util.Output;
 import ec.util.Parameter;
-import edu.snu.csne.util.IndividualDescriber;
 
 /**
  * TODO Class description
