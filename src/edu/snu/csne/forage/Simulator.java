@@ -21,13 +21,10 @@ package edu.snu.csne.forage;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import edu.snu.csne.forage.event.SimulationEventListener;
 import edu.snu.csne.util.MiscUtils;
 
 /**
@@ -42,7 +39,7 @@ public class Simulator
             Simulator.class.getName() );
     
     /** Key for simulation properties file */
-    private static final String _PROPS_FILE_KEY = "sim-properties";
+    public static final String PROPS_FILE_KEY = "sim-properties";
 
     
     
@@ -64,7 +61,7 @@ public class Simulator
             _LOG.debug( "Starting simulation..." );
 
             // Get the properties
-            Properties props = MiscUtils.loadProperties( _PROPS_FILE_KEY );
+            Properties props = MiscUtils.loadProperties( PROPS_FILE_KEY );
             
             // Build, initialize, run
             Simulator sim = new Simulator();

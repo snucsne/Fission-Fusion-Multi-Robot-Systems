@@ -27,6 +27,8 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.snu.csne.util.MiscUtils;
+
 /**
  * TODO Class description
  *
@@ -72,22 +74,7 @@ public class FoldProperties
     public void initialize( String propDefsFile )
     {
         // Load the properties file
-        Properties propDefs = new Properties();
-        try
-        {
-            propDefs.load( new FileReader( propDefsFile ) );
-        }
-        catch( Exception e )
-        {
-            _LOG.error( "Unable to load fold properties definitions file ["
-                    + propDefsFile
-                    + "]",
-                    e );
-            throw new RuntimeException( "Unable to load fold properties definitions file ["
-                    + propDefsFile
-                    + "]",
-                    e );
-        }
+        Properties propDefs = MiscUtils.loadPropertiesFromFile( propDefsFile );
         
         for( FoldType foldType : FoldType.values() )
         {
@@ -109,30 +96,7 @@ public class FoldProperties
                 Properties[] props = new Properties[ propFiles.length ];
                 for( int i = 0; i < propFiles.length; i++ )
                 {
-                    props[i] = new Properties();
-                    try
-                    {
-                        props[i].load( new FileReader( propFiles[i] ) );
-                    }
-                    catch( Exception e )
-                    {
-                        _LOG.error( "Unable to load fold properties file: foldType=["
-                                + foldType
-                                + "] propType=["
-                                + propType
-                                + "] file=["
-                                + propFiles[i]
-                                + "]",
-                                e );
-                        throw new RuntimeException( "Unable to load fold properties file: foldType=["
-                                + foldType
-                                + "] propType=["
-                                + propType
-                                + "] file=["
-                                + propFiles[i]
-                                + "]",
-                                e );
-                    }
+                    props[i] = MiscUtils.loadPropertiesFromFile( propFiles[i] );
                 }
                 
                 foldProps.put( propType, props );

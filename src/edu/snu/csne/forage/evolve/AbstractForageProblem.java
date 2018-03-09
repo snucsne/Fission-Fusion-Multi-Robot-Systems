@@ -35,7 +35,10 @@ import ec.simple.SimpleProblemForm;
 import ec.util.MersenneTwisterFast;
 import ec.util.Parameter;
 import ec.vector.BitVectorIndividual;
+import edu.snu.csne.forage.Simulator;
 import edu.snu.csne.forage.decision.DefaultProbabilityDecisionCalculator;
+import edu.snu.csne.forage.evolve.FoldProperties.FoldType;
+import edu.snu.csne.forage.evolve.FoldProperties.PropertyType;
 import edu.snu.csne.util.MiscUtils;
 
 
@@ -207,6 +210,8 @@ public abstract class AbstractForageProblem extends Problem
     /** Forage patch value sigma: scaling */
     private float _foragePatchValueSigmaScaling = 0.0f;
     
+    /** Default simulator properties */
+    private Properties _defaultSimProperties = null;
     
     /** Fold property files */
     private FoldProperties _foldProps = new FoldProperties();
@@ -411,6 +416,9 @@ public abstract class AbstractForageProblem extends Problem
                 state,
                 base );
 
+        // Load the default simulator properties
+        _defaultSimProperties = MiscUtils.loadProperties( Simulator.PROPS_FILE_KEY );
+        
         // Load the fold properties
         Validate.isTrue( state.parameters.exists(
                 base.push( _P_FOLD_PROPERTIES ), null ),
@@ -476,6 +484,39 @@ public abstract class AbstractForageProblem extends Problem
         Properties genomeProps = decodeGenome( bitInd.genome,
                 state.random[threadnum] );
         
+        // Get fold training properties
+        Properties[] foldAgentProperties = _foldProps.getProperties(
+                FoldType.TRAINING,
+                PropertyType.AGENT );
+        Properties[] foldPatchProperties = _foldProps.getProperties(
+                FoldType.TRAINING,
+                PropertyType.PATCH );
+
+        // Iterate through all the training properties
+        for( int i = 0; i < foldAgentProperties.length; i++ )
+        {
+            // Get the default properties
+            Properties simProps = new Properties();
+            simProps.putAll( _defaultSimProperties );
+            // TODO
+//            simProps.
+            
+            // Override the fold specific properties
+            simProps.putAll( foldAgentProperties[i] );
+            simProps.putAll( foldPatchProperties[i] );
+            
+            // Override the genome specific properties
+            simProps.putAll( genomeProps );
+            
+            // Create the simulator
+            Simulator sim = new Simulator();
+            sim.initialize( simProps );
+            
+            // Run it
+            sim.run();
+            
+            // Get the fitness
+        }
         
     }
 
