@@ -58,7 +58,7 @@ public interface ProbabilityDecisionCalculator
      */
     public float calculateFollowProbability( Agent leader, Agent agent );
 
-//    public float calculateForageProbability( Patch patch, Agent agent );
+    public float calculateForageProbability( Patch patch, Agent agent );
     
     /**
      * Calculate all the probabilities that a given agent forages in the
@@ -67,5 +67,5 @@ public interface ProbabilityDecisionCalculator
      * @param agent The agent making the decision
      * @return The probabilities for foraging at each patch indexed by patch ID
      */
-    public Map<String, Float> calculatePatchForageProbabilities( Agent agent );
+//    public Map<String, Float> calculatePatchForageProbabilities( Agent agent );
 }

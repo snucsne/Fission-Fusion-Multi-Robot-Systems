@@ -86,8 +86,8 @@ public class Agent
     /** The rate of resources this agent can consume */
     private float _resourceConsumptionRate = 0.0f;
     
-    /** The amount of resources this agent has consumed */
-    private float _resourcesConsumed = 0.0f;
+    /** The amount of resources this agent has foraged */
+    private float _resourcesForaged = 0.0f;
     
     /** The maximum speed of this agent */
     private float _maxSpeed = 0.0f;
@@ -424,13 +424,26 @@ public class Agent
     }
     
     /**
-     * Returns the amount of resources this agent has consumed
+     * Returns the amount of resources this agent has foraged
      *
-     * @return The amount of resources this agent has consumed
+     * @return The amount of resources this agent has foraged
      */
-    public float getResourcesConsumed()
+    public float getResourcesForaged()
     {
-        return _resourcesConsumed;
+        return _resourcesForaged;
+    }
+    
+    /**
+     * TODO Method description
+     *
+     * @param resourcesForaged
+     */
+    public void addResourcesForaged( float resourcesForaged )
+    {
+        Validate.isTrue( resourcesForaged >= 0.0f, "Resources foraged must be non-negative: ["
+                + resourcesForaged
+                + "]" );
+        _resourceConsumptionRate += resourcesForaged;
     }
     
     /**

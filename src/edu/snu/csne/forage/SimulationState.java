@@ -273,15 +273,28 @@ public class SimulationState
                             + eventListenerClassName
                             + "]" );
             
-            // Initialize it and add it to the list
-            eventListener.initialize( this );
-            _listeners.add( eventListener );
+            // Add it
+            addEventListener( eventListener );
         }
 
         
         _LOG.trace( "Leaving initialize( props )" );
     }
 
+    /**
+     * TODO Method description
+     *
+     * @param listener
+     */
+    public void addEventListener( SimulationEventListener listener )
+    {
+        // Initialize it
+        listener.initialize( this );
+        
+        // Add it to the list
+        _listeners.add( listener );
+    }
+    
     /**
      * Determines if the simulations are finished
      *

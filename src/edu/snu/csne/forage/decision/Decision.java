@@ -167,6 +167,16 @@ public class Decision
     }
 
     /**
+     * Returns the patch (if any) associated with this decision
+     *
+     * @return The patch (if any)
+     */
+    public Patch getPatch()
+    {
+        return _patch;
+    }
+    
+    /**
      * Returns the destination for the goal seek behavior
      *
      * @return The destination

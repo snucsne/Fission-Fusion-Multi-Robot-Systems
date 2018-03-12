@@ -172,5 +172,8 @@ public class Simulator
         _LOG.trace( "Leaving runSimStep()" );
     }
     
-
+    public SimulationState getSimState()
+    {
+        return _simState;
+    }
 }

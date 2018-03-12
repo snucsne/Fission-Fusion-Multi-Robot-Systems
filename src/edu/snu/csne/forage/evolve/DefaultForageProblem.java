@@ -35,8 +35,10 @@ import ec.simple.SimpleProblemForm;
 import ec.util.MersenneTwisterFast;
 import ec.util.Parameter;
 import ec.vector.BitVectorIndividual;
+import edu.snu.csne.forage.SimulationState;
 import edu.snu.csne.forage.Simulator;
 import edu.snu.csne.forage.decision.DefaultProbabilityDecisionCalculator;
+import edu.snu.csne.forage.event.PatchDepletionListener;
 import edu.snu.csne.forage.evolve.FoldProperties.FoldType;
 import edu.snu.csne.forage.evolve.FoldProperties.PropertyType;
 import edu.snu.csne.util.MiscUtils;
@@ -47,7 +49,7 @@ import edu.snu.csne.util.MiscUtils;
  *
  * @author Brent Eskridge
  */
-public abstract class AbstractForageProblem extends Problem
+public class DefaultForageProblem extends Problem
         implements SimpleProblemForm, IndividualDescriber
 {
     /** Default serial version UID */
@@ -55,7 +57,7 @@ public abstract class AbstractForageProblem extends Problem
     
     /** Our logger */
     private static final Logger _LOG = LogManager.getLogger(
-            AbstractForageProblem.class.getName() );
+            DefaultForageProblem.class.getName() );
 
     /** Parameter key for the initiation base rate */
     private static final String _P_INITIATE_BASE_RATE = "initiate-base-rate.";
@@ -70,8 +72,11 @@ public abstract class AbstractForageProblem extends Problem
     private static final String _P_INITIATE_MRV_LEN_SIGMA = "initiate-mrv-len-sigma.";
     
     /** Parameter key for the initiation patch value sigma */
-    private static final String _P_INITIATE_PATCH_VALUE_SIGMA = "initiate-patch-value-sigma";
+    private static final String _P_INITIATE_PATCH_VALUE_SIGMA = "initiate-patch-value-sigma.";
     
+    /** Parameter key for the initiation direction difference sigma */
+    private static final String _P_INITIATE_DIR_DIFF_SIGMA = "initiate-dir-diff-sigma.";
+
     
     /** Parameter key for the follow alpha */
     private static final String _P_FOLLOW_ALPHA = "follow-alpha.";
@@ -147,6 +152,13 @@ public abstract class AbstractForageProblem extends Problem
     
     /** Initiation patch value sigma: scaling */
     private float _initiatePatchValueSigmaScaling = 0.0f;
+    
+    /** Initiation direction difference sigma: codon size */
+    private int _initiateDirDiffSigmaCodonSize = 0;
+    
+    /** Initiation direction difference sigma: scaling */
+    private float _initiateDirDiffSigmaScaling = 0.0f;
+
     
     
     /** Follow alpha: codon size */
@@ -296,75 +308,87 @@ public abstract class AbstractForageProblem extends Problem
                 state,
                 base );
         
+        // Load the initiation direction difference values
+        _initiateDirDiffSigmaCodonSize = loadIntParameter(
+                _P_INITIATE_DIR_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
+                "initiation direction difference sigma codon size",
+                state,
+                base );
+        _initiateDirDiffSigmaScaling = loadFloatParameter(
+                _P_INITIATE_DIR_DIFF_SIGMA + _SCALING_POSTFIX,
+                "initiation direction difference scaling",
+                state,
+                base );
+        
         // Load the follow alpha values
         _followAlphaCodonSize = loadIntParameter(
                 _P_FOLLOW_ALPHA + _CODON_SIZE_POSTFIX,
-                " codon size",
+                "follow alpha codon size",
                 state,
                 base );
         _followAlphaScaling = loadFloatParameter(
                 _P_FOLLOW_ALPHA + _SCALING_POSTFIX,
-                " scaling",
+                "follow alpha scaling",
                 state,
                 base );
 
         // Load the follow beta values
         _followBetaCodonSize= loadIntParameter(
                 _P_FOLLOW_BETA + _CODON_SIZE_POSTFIX,
-                " codon size",
+                "follow beta codon size",
                 state,
                 base );
         _followBetaScaling = loadFloatParameter(
                 _P_FOLLOW_BETA + _SCALING_POSTFIX,
-                " scaling",
+                "follow beta scaling",
                 state,
                 base );
         
         // Load the follow k exponent multiplier values
         _followKExpMultCodonSize = loadIntParameter(
-                _P_FOLLOW_BETA + _CODON_SIZE_POSTFIX,
-                " codon size",
+                _P_FOLLOW_K_EXP_MULT + _CODON_SIZE_POSTFIX,
+                "follow k exponent multiplier codon size",
                 state,
                 base );
         _followKExpMultScaling = loadFloatParameter(
-                _P_FOLLOW_BETA + _SCALING_POSTFIX,
-                " scaling",
+                _P_FOLLOW_K_EXP_MULT + _SCALING_POSTFIX,
+                "follow k exponent multiplier scaling",
                 state,
                 base );
         
          // Load the follow k exponent offset values
         _followKExpOffsetCodonSize = loadIntParameter(
                 _P_FOLLOW_K_EXP_OFFSET + _CODON_SIZE_POSTFIX,
-                " codon size",
+                "follow k exponent offset codon size",
                 state,
                 base );
         _followKExpOffsetScaling= loadFloatParameter(
                 _P_FOLLOW_K_EXP_OFFSET + _SCALING_POSTFIX,
-                " scaling",
+                "follow k exponent offset scaling",
                 state,
                 base );
         
          // Load the follow MRV difference sigma values
         _followMRVDiffSigmaCodonSize= loadIntParameter(
                 _P_FOLLOW_MRV_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
-                " codon size",
+                "follow MRV difference sigma codon size",
                 state,
                 base );
         _followMRVDiffSigmaScaling = loadFloatParameter(
                 _P_FOLLOW_MRV_DIFF_SIGMA + _SCALING_POSTFIX,
-                " scaling",
+                "follow MRV difference sigma scaling",
                 state,
                 base );
         
         // Load the follow mean position relative distance sigma values
         _followMeanPosRelDistSigmaCodonSize = loadIntParameter(
                 _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _CODON_SIZE_POSTFIX,
-                " codon size",
+                "follow mean position relative distance sigma codon size",
                 state,
                 base );
         _followMeanPosRelDistSigmaScaling = loadFloatParameter(
                 _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _SCALING_POSTFIX,
-                " scaling",
+                "follow mean position relative distance sigma scaling",
                 state,
                 base );
         
@@ -394,12 +418,12 @@ public abstract class AbstractForageProblem extends Problem
         
         // Load the forage k exponent offset values
         _forageKExpOffsetCodonSize = loadIntParameter(
-                _P_FORAGE_K_EXP_MULT + _CODON_SIZE_POSTFIX,
+                _P_FORAGE_K_EXP_OFFSET + _CODON_SIZE_POSTFIX,
                 "forage k exponent offset codon size",
                 state,
                 base );
         _forageKExpOffsetScaling = loadFloatParameter(
-                _P_FORAGE_K_EXP_MULT + _SCALING_POSTFIX,
+                _P_FORAGE_K_EXP_OFFSET + _SCALING_POSTFIX,
                 "forage k exponent offset scaling",
                 state,
                 base );
@@ -477,6 +501,8 @@ public abstract class AbstractForageProblem extends Problem
             state.output.fatal( "Individual is not the correct type" );
         }
 
+//        _LOG.info( "Evaluating individual" );
+        
         // Cast it to the proper type
         BitVectorIndividual bitInd = (BitVectorIndividual) ind;
 
@@ -488,13 +514,22 @@ public abstract class AbstractForageProblem extends Problem
         Properties[] foldAgentProperties = _foldProps.getProperties(
                 FoldType.TRAINING,
                 PropertyType.AGENT );
+        _LOG.debug( "Training agent fold properties ["
+                + foldAgentProperties.length
+                + "]" );
         Properties[] foldPatchProperties = _foldProps.getProperties(
                 FoldType.TRAINING,
                 PropertyType.PATCH );
+        _LOG.debug( "Training patch fold properties ["
+                + foldPatchProperties.length
+                + "]" );
 
         // Iterate through all the training properties
+        float totalResourcesForaged = 0.0f;
         for( int i = 0; i < foldAgentProperties.length; i++ )
         {
+//            _LOG.info( "Running sim [" + i + "]" );
+            
             // Get the default properties
             Properties simProps = new Properties();
             simProps.putAll( _defaultSimProperties );
@@ -512,12 +547,42 @@ public abstract class AbstractForageProblem extends Problem
             Simulator sim = new Simulator();
             sim.initialize( simProps );
             
+            // Add our own patch depletion listener
+            PatchDepletionListener patchListener = new PatchDepletionListener();
+            SimulationState simState = sim.getSimState();
+            simState.addEventListener( patchListener );
+            
             // Run it
             sim.run();
             
-            // Get the fitness
+            // Get the resources foraged
+            float resourcesForaged = patchListener.getTotalResourcesForaged();
+            totalResourcesForaged += resourcesForaged;
+            
+            _LOG.debug( "Run ["
+                    + i
+                    + "] resourcesForaged=["
+                    + resourcesForaged
+                    + "]" );
         }
         
+        // Compute the mean resources foraged
+        float meanResourcesForaged = totalResourcesForaged / foldAgentProperties.length;
+        _LOG.debug( "Fitness: totalResourcesForaged=["
+                + totalResourcesForaged
+                + "] foldAgentProperties.length=["
+                + foldAgentProperties.length
+                + "] meanResourcesForaged=["
+                + meanResourcesForaged
+                + "]" );
+        
+        // Save the fitness
+        ((CrossValidationFitness) ind.fitness).setFitness( state,
+                meanResourcesForaged,
+                false );
+        
+        // Mark the individual as evaluated
+        bitInd.evaluated = true;
     }
 
     /**
@@ -557,6 +622,30 @@ public abstract class AbstractForageProblem extends Problem
 
         return builder.toString();
     }
+
+    
+//    /**
+//     * TODO Method description
+//     *
+//     * @param ind
+//     * @param state
+//     * @param subpopulation
+//     * @param threadnum
+//     * @param log
+//     * @param verbosity
+//     * @see ec.simple.SimpleProblemForm#describe(ec.Individual, ec.EvolutionState, int, int, int, int)
+//     */
+//    @Override
+//    public void describe( Individual ind,
+//            EvolutionState state,
+//            int subpopulation,
+//            int threadnum,
+//            int log,
+//            int verbosity )
+//    {
+//        // TODO Auto-generated method stub
+//        _LOG.warn( "SimpleProblemForm.describe was called" );
+//    }
 
     /**
      * Decode the genome
@@ -616,6 +705,15 @@ public abstract class AbstractForageProblem extends Problem
         codonIdx += _initiatePatchValueSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_SIGMA_KEY,
                 Float.toString( initiatePatchValueSigma ) );
+
+        // Initiation direction difference sigma
+        float initiateDirDiffSigma = decodeCodon( genome,
+                _initiateDirDiffSigmaCodonSize,
+                _initiateDirDiffSigmaScaling,
+                codonIdx );
+        codonIdx += _initiateDirDiffSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_DIR_DIFF_SIGMA_KEY,
+                Float.toString( initiateDirDiffSigma ) );
 
         // Follow alpha
         float followAlpha = decodeCodon( genome,
@@ -753,19 +851,19 @@ public abstract class AbstractForageProblem extends Problem
 //                destinationInfo );
 
         // Log it
-        if( _LOG.isDebugEnabled() )
-        {
-            StringWriter writer = new StringWriter();
-            try
-            {
-                props.store( writer, "" );
-                _LOG.debug( "Decoded genome: " + writer.getBuffer() );
-            }
-            catch( IOException ioe )
-            {
-                _LOG.error( "Unable to display decoded genome", ioe );
-            }
-        }
+//        if( _LOG.isDebugEnabled() )
+//        {
+//            StringWriter writer = new StringWriter();
+//            try
+//            {
+//                props.store( writer, "" );
+//                _LOG.debug( "Decoded genome: " + writer.getBuffer() );
+//            }
+//            catch( IOException ioe )
+//            {
+//                _LOG.error( "Unable to display decoded genome", ioe );
+//            }
+//        }
 
         // Return them
         return props;

@@ -24,6 +24,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -73,6 +74,8 @@ public class FoldProperties
     
     public void initialize( String propDefsFile )
     {
+        _LOG.trace( "Entering initialize( propDefsFile )" );
+
         // Load the properties file
         Properties propDefs = MiscUtils.loadPropertiesFromFile( propDefsFile );
         
@@ -81,6 +84,7 @@ public class FoldProperties
             
             Map<PropertyType,Properties[]> foldProps =
                     new EnumMap<PropertyType,Properties[]>( PropertyType.class );
+            _props.put( foldType, foldProps );
             for( PropertyType propType : PropertyType.values() )
             {
                 // Build the property key
@@ -91,6 +95,9 @@ public class FoldProperties
                 
                 // Get all the properties files
                 String propFilesStr = propDefs.getProperty( key );
+                Validate.notEmpty( propFilesStr, "Fold property with key ["
+                        + key
+                        + "] is required" );
                 String[] propFiles = propFilesStr.split( " " );
                 
                 Properties[] props = new Properties[ propFiles.length ];
@@ -100,8 +107,22 @@ public class FoldProperties
                 }
                 
                 foldProps.put( propType, props );
+                
+                _LOG.debug( "Fold: key=["
+                        + key
+                        + "] propFileCount=["
+                        + propFiles.length
+                        + "]" );
             }
+            
+            _LOG.debug( "Fold: foldType=["
+                    + foldType
+                     +"] propCount=["
+                     + foldProps.size()
+                     + "]" );
         }
+        
+        _LOG.trace( "Leaving initialize( propDefsFile )" );        
     }
     
     public void setProperties( FoldType foldType,

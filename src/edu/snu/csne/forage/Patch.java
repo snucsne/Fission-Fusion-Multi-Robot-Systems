@@ -140,6 +140,14 @@ public class Patch
         return _radius;
     }
     
+    /**
+     * Sets the amount of resources foraged at a given time
+     *
+     * @param resources Tha amount of resources foraged
+     * @return Returns <code>true</code> if the patch was able to support
+     * the foraging of the requested amount of resources, otherwise,
+     * <code>false</code>
+     */
     public boolean setResourcesForaged( float resources )
     {
         boolean success = false;
@@ -182,6 +190,53 @@ public class Patch
     public int getMinAgentForageCount()
     {
         return _minAgentForageCount;
+    }
+
+    /**
+     * TODO Method description
+     *
+     * @return
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        // Use the hashcode of the ID
+        return _id.hashCode();
+    }
+
+    /**
+     * TODO Method description
+     *
+     * @param obj
+     * @return
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals( Object obj )
+    {
+        boolean equals = false;
+        
+        // Simply compare the IDs if it is a Patch
+        if( obj instanceof Patch )
+        {
+            equals = _id.equals( ((Patch) obj)._id );
+        }
+        
+        return equals;
+    }
+
+    /**
+     * TODO Method description
+     *
+     * @return
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        // TODO Auto-generated method stub
+        return super.toString();
     }
     
     

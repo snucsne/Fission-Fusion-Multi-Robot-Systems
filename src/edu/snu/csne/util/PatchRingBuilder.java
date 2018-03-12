@@ -293,7 +293,7 @@ public class PatchRingBuilder
                     + (int) patches[i].getRadius() );
             writer.println( prefix
                     + "predation-probability = "
-                    + patches[i].getPredationProbability() );
+                    + String.format( "%09.6f", patches[i].getPredationProbability() ) );
             writer.println( prefix
                     + "min-agent-forage-count = "
                     + patches[i].getMinAgentForageCount());
@@ -367,8 +367,8 @@ public class PatchRingBuilder
 
             // Build the output file name
             String fileName = filePrefix
-                    + String.format( "%05d", randomSeed )
-                    + ".dat";
+                    + String.format( "%03d", randomSeed )
+                    + ".parameters";
 
             // Build the patches
             Patch[] patches = builder.buildPatches();

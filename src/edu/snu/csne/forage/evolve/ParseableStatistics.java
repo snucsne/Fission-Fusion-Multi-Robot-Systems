@@ -38,7 +38,6 @@ import ec.Problem;
 import ec.Statistics;
 import ec.Subpopulation;
 import ec.simple.SimpleFitness;
-import ec.util.Output;
 import ec.util.Parameter;
 
 /**
@@ -116,13 +115,15 @@ public class ParseableStatistics extends Statistics
     @Override
     public void setup( EvolutionState state, Parameter base )
     {
+        _LOG.trace( "Entering setup( state, base )" );
+
         // Call the superclass impl
         super.setup( state, base );
 
         // Get our statistics file
         File statFile = state.parameters.getFile( base.push( P_STATISTICS_FILE ),
                 null );
-        _LOG.debug( "Using statFile=[" + statFile + "]" );
+        _LOG.info( "Using statFile=[" + statFile + "]" );
         _statDir = statFile.getParent();
 
         // Add it as our log
@@ -139,16 +140,12 @@ public class ParseableStatistics extends Statistics
                 if( compress )
                 {
                     _statLog = state.output.addLog( statFile,
-                            Output.V_VERBOSE,
-                            false,
                             false,
                             compress );
                 }
                 else
                 {
                     _statLog = state.output.addLog( statFile,
-                            Output.V_VERBOSE,
-                            false,
                             false );
                 }
             }
@@ -160,7 +157,11 @@ public class ParseableStatistics extends Statistics
                         + "]: "
                         + ioe );
             }
+            
+            _LOG.info( "Statistics: _statLog=[" + _statLog + "]" );
         }
+
+        _LOG.trace( "Leaving setup( state, base )" );
     }
 
     /**
@@ -190,6 +191,7 @@ public class ParseableStatistics extends Statistics
         paramBuilder.append( paramStr.replaceAll("\n", "\n# ") );
         paramBuilder.append( newline );
         paramBuilder.append( "# =========================================================" );
+        paramBuilder.append( newline );
         println( paramBuilder.toString(),
                 state,
                 false );
@@ -531,21 +533,24 @@ public class ParseableStatistics extends Statistics
             final EvolutionState state,
             boolean useGen )
     {
-        // Prepend the job number
-        StringBuilder builder = new StringBuilder( "job[" );
-        builder.append( _2_DIGIT_FORMATTER.format( state.job[0] ) );
-        builder.append( "]." );
-        if( useGen )
+        // Prepend the job number if it isn't a comment
+        StringBuilder builder = new StringBuilder();
+        if( !str.startsWith( "#" ) )
         {
-            builder.append( "gen[" );
-            builder.append( _5_DIGIT_FORMATTER.format( state.generation ) );
+            builder.append( "job[" );
+            builder.append( _2_DIGIT_FORMATTER.format( state.job[0] ) );
             builder.append( "]." );
+            if( useGen )
+            {
+                builder.append( "gen[" );
+                builder.append( _5_DIGIT_FORMATTER.format( state.generation ) );
+                builder.append( "]." );
+            }
         }
         builder.append( str );
 
         // Display the string
-        state.output.println( builder.toString() ,
-                Output.V_VERBOSE,
+        state.output.println( builder.toString(),
                 _statLog );
     }
 
@@ -559,7 +564,6 @@ public class ParseableStatistics extends Statistics
     {
         // Display the string
         state.output.print( str,
-                Output.V_VERBOSE,
                 _statLog );
     }
 

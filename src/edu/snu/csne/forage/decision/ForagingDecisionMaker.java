@@ -298,25 +298,29 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
         List<Decision> forageDecisions = new LinkedList<Decision>();
         
         // Get the probabilities
-        Map<String,Float> patchProbabilities =
-                _probDecisionCalc.calculatePatchForageProbabilities( agent );
-        Iterator<String> patchIDIter = patchProbabilities.keySet().iterator();
-        while( patchIDIter.hasNext() )
+        Iterator<Patch> patchIter = agent.getSensedPatches().iterator();
+        while( patchIter.hasNext() )
         {
-            String patchID = patchIDIter.next();
+            // Get the patch
+            Patch patch = patchIter.next();
             
-            // Get the patch and the probability
-            Patch patch = _simState.getPatch( patchID );
-            float probability = patchProbabilities.get( patchID ).floatValue();
-            
-            // Build the decision
-            Decision decision = _decisionBuilder.buildForageDecision(
-                    agent,
-                    patch,
-                    probability );
-            
-            // Add it to the list of decisions
-            forageDecisions.add( decision );
+            // is the agent in the patch?
+            if( patch.isInPatch( agent ) )
+            {
+                // Yup, get the probability of foraging there
+                float probability = _probDecisionCalc.calculateForageProbability(
+                        patch,
+                        agent );
+
+                // Build the decision
+                Decision decision = _decisionBuilder.buildForageDecision(
+                        agent,
+                        patch,
+                        probability );
+
+                // Add it to the list of decisions
+                forageDecisions.add( decision );
+            }
         }
         
         return forageDecisions;

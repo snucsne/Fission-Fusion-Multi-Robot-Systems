@@ -75,8 +75,6 @@ public class MiscUtils
      */
     public static Properties loadPropertiesFromFile( String propsFilename )
     {
-        _LOG.trace( "Entering loadPropertiesFromFile( propsFilename )" );
-
         // Load the specified properties file
         Properties props = new Properties();
         File propsFile = new File( propsFilename );
@@ -119,8 +117,6 @@ public class MiscUtils
                 props.setProperty( key, value );
             }
         }
-
-        _LOG.trace( "Leaving loadPropertiesFromFile( propsFilename )" );
 
         return props;
     }
