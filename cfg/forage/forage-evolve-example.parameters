@@ -11,9 +11,9 @@ eval.problem = edu.snu.csne.forage.evolve.DefaultForageProblem
 
 # Initiation
 eval.problem.initiate-base-rate.codon-size = 8
-eval.problem.initiate-base-rate.scaling = 1.0
+eval.problem.initiate-base-rate.scaling = 200.0
 eval.problem.initiate-k-exp-mult.codon-size = 3
-eval.problem.initiate-k-exp-mult.scaling = 1.0
+eval.problem.initiate-k-exp-mult.scaling = 8.0
 eval.problem.initiate-k-exp-offset.codon-size = 5
 eval.problem.initiate-k-exp-offset.scaling = 0.05
 eval.problem.initiate-mrv-len-sigma.codon-size = 5
@@ -24,22 +24,22 @@ eval.problem.initiate-dir-diff-sigma.codon-size = 5
 eval.problem.initiate-dir-diff-sigma.scaling = 0.05
 
 eval.problem.follow-alpha.codon-size = 8
-eval.problem.follow-alpha.scaling = 0.3
+eval.problem.follow-alpha.scaling = 100.0
 eval.problem.follow-beta.codon-size = 8
-eval.problem.follow-beta.scaling = 0.2
+eval.problem.follow-beta.scaling = 50.0
 eval.problem.follow-k-exp-mult.codon-size = 3
-eval.problem.follow-k-exp-mult.scaling = 1.0
+eval.problem.follow-k-exp-mult.scaling = 8.0
 eval.problem.follow-k-exp-offset.codon-size = 5
 eval.problem.follow-k-exp-offset.scaling = 0.05
 eval.problem.follow-mrv-diff-sigma.codon-size = 5
 eval.problem.follow-mrv-diff-sigma.scaling = 0.05
 eval.problem.follow-mean-pos-rel-dist-sigma.codon-size = 5
-eval.problem.follow-mean-pos-rel-dist-sigma.scaling = 0.5
+eval.problem.follow-mean-pos-rel-dist-sigma.scaling = 0.05
 
 eval.problem.forage-base-rate.codon-size = 8
-eval.problem.forage-base-rate.scaling = 0.3
+eval.problem.forage-base-rate.scaling = 100.0
 eval.problem.forage-k-exp-mult.codon-size = 3
-eval.problem.forage-k-exp-mult.scaling = 1.0
+eval.problem.forage-k-exp-mult.scaling = 8.0
 eval.problem.forage-k-exp-offset.codon-size = 5
 eval.problem.forage-k-exp-offset.scaling = 0.05
 eval.problem.forage-patch-value-sigma.codon-size = 5

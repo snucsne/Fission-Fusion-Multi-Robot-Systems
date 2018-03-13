@@ -993,7 +993,7 @@ public class DefaultForageProblem extends Problem
         int rawValue = decodeAndConvert( genome,
                 startIdx,
                 codonSize );
-        float maxValue = (float) Math.pow( codonSize, 2 );
+        float maxValue = (float) Math.pow( 2, codonSize );
         float value = (rawValue / maxValue )
                 * scaling;
 
