@@ -475,7 +475,7 @@ public class ParseableStatistics extends Statistics
         builder.append( NEWLINE );
 
         Problem problem = state.evaluator.p_problem;
-        if( !useGen && ( problem instanceof IndividualDescriber ) )
+        if( ( problem instanceof IndividualDescriber ) )
         {
             builder.append( ((IndividualDescriber) problem).describe(
                     ind,

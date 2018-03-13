@@ -144,22 +144,22 @@ public class Patch
      * Sets the amount of resources foraged at a given time
      *
      * @param resources Tha amount of resources foraged
-     * @return Returns <code>true</code> if the patch was able to support
-     * the foraging of the requested amount of resources, otherwise,
-     * <code>false</code>
+     * @return Returns the actual amount of resources foraged
      */
-    public boolean setResourcesForaged( float resources )
+    public float setResourcesForaged( float resources )
     {
-        boolean success = false;
-        
-        // Ensure that there are sufficient resources
-        if( resources  <= _remainingResources )
+        float actual = resources;
+        if( _remainingResources < resources )
+        {
+            actual = _remainingResources;
+            _remainingResources = 0.0f;
+        }
+        else
         {
             _remainingResources -= resources;
-            success = true;
         }
         
-        return success;
+        return actual;
     }
     
     /**

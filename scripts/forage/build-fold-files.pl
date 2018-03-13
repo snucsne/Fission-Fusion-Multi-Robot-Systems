@@ -9,6 +9,7 @@ my $fullCommandLine = "$0 $commandLineArgs";
 
 # Get the command line arguments
 my $foldCount = shift( @ARGV );
+my $itemsPerFold = shift( @ARGV );
 my $outputFilePrefix = shift(@ARGV);
 my $fullAgentFilePrefix = shift( @ARGV );
 my $fullPatchFilePrefix = shift( @ARGV );
@@ -36,18 +37,22 @@ print "Found [$patchFileCount] patch files in [$patchDir]\n";
 #print "\n\n";
 
 # -------------------------------------------------------------------
-# Ensure the array lengths match
-if( $agentFileCount > $patchFileCount )
+# Ensure the array are the correct size
+my $maxItems = $foldCount * $itemsPerFold;
+if( $agentFileCount < $maxItems )
 {
-#    $#agentFiles = $patchFileCount;
-    splice( @agentFiles, $patchFileCount);
-    $agentFileCount = (scalar @agentFiles);
+    die( "Insufficent agent files: agentFileCount=[$agentFileCount] maxItems[$maxItems]\n" );
 }
-elsif( $patchFileCount > $agentFileCount )
+splice( @agentFiles, $maxItems );
+$agentFileCount = (scalar @agentFiles);
+
+if( $patchFileCount < $maxItems )
 {
-    $#patchFiles = $agentFileCount;
-    $patchFileCount = (scalar @patchFiles);
+    die( "Insufficent patch files: patchFileCount=[$patchFileCount] maxItems[$maxItems]\n" );
 }
+splice( @patchFiles, $maxItems );
+$patchFileCount = (scalar @patchFiles);
+
 
 # -------------------------------------------------------------------
 # Build the folds
@@ -97,7 +102,7 @@ for( my $i = 0; $i < $foldCount; $i++ )
     print OUTPUT "#   patchFileCount=[$patchFileCount]\n";
     print OUTPUT "#   itemsPerFold=[$itemsPerFold]\n";
     print OUTPUT "# -------------------------------------------------------------------\n";
-    print OUTPUT "# Fold [".sprintf( "%02d", $i )."] of [".sprintf( "%02d", $foldCount )."]\n\n";
+    print OUTPUT "# Fold [".sprintf( "%02d", $i + 1 )."] of [".sprintf( "%02d", $foldCount )."]\n\n";
 
     # Build the training data
     my $trainingAgentFiles = "";

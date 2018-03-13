@@ -22,6 +22,8 @@ package edu.snu.csne.forage.evolve;
 // Imports
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.commons.lang3.Validate;
@@ -115,6 +117,16 @@ public class DefaultForageProblem extends Problem
 
     /** Parameter key postfix for codon size */
     private static final String _CODON_SIZE_POSTFIX = "codon-size";
+
+    
+    /** Parameter key for the minimum k exponent multiplier value */
+    private static final String _P_MIN_K_EXP_MULT_VALUE = "min-k-exp-mult-value";
+    
+    /** Parameter key for the minimum k exponent offset value */
+    private static final String _P_MIN_K_EXP_OFFSET_VALUE = "min-k-exp-offset-value";
+    
+    /** Parameter key for the minimum sigma value */
+    private static final String _P_MIN_SIGMA_VALUE = "min-sigma-value";
 
     /** Parameter key for the fold properties file */
     private static final String _P_FOLD_PROPERTIES = "fold-properties";
@@ -222,6 +234,7 @@ public class DefaultForageProblem extends Problem
     /** Forage patch value sigma: scaling */
     private float _foragePatchValueSigmaScaling = 0.0f;
     
+    
     /** Default simulator properties */
     private Properties _defaultSimProperties = null;
     
@@ -230,6 +243,15 @@ public class DefaultForageProblem extends Problem
     
     /** Flag indicating that individuals should be re-evaluated every generation */
     private boolean _forceReevaluation = false;
+    
+    /** Minimum value for k exponent multipliers */
+    private float _minKExpMultValue = 0.0f;
+    
+    /** Minimum value for k exponent offsets */
+    private float _minKExpOffsetValue = 0.0f;
+    
+    /** Minimum value for sigmas */
+    private float _minSigmaValue = 0.0f;
 
     
     /**
@@ -453,6 +475,22 @@ public class DefaultForageProblem extends Problem
         _LOG.info( "Using foldPropsDefFile=[" + foldPropsDefFile + "]" );
         _foldProps.initialize( foldPropsDefFile );
 
+        // Load the minimum values
+        _minKExpMultValue = loadFloatParameter(
+                _P_MIN_K_EXP_MULT_VALUE,
+                "minimum k exponent multiplier value",
+                state,
+                base );
+        _minKExpOffsetValue = loadFloatParameter(
+                _P_MIN_K_EXP_OFFSET_VALUE,
+                 "minimum k exponent offset value",
+                 state,
+                 base );
+        _minSigmaValue = loadFloatParameter(
+                _P_MIN_SIGMA_VALUE,
+                 "minimum sigma value",
+                 state,
+                 base );
 
         // Do we force reevaluation?
         Validate.isTrue( state.parameters.exists(
@@ -594,6 +632,7 @@ public class DefaultForageProblem extends Problem
      * @return A description of the individual
      * @see edu.snu.csne.forage.evolve.IndividualDescriber#describe(ec.Individual, java.lang.String)
      */
+    @SuppressWarnings( "unchecked" )
     @Override
     public String describe( Individual ind, String prefix )
     {
@@ -605,18 +644,43 @@ public class DefaultForageProblem extends Problem
 
         StringBuilder builder = new StringBuilder();
         builder.append( prefix );
-        builder.append( "decoded-genome = " );
+        builder.append( "decoded-genome =" );
         
-        StringWriter writer = new StringWriter();
-        try
+        String[] genomeKeys =  { DefaultProbabilityDecisionCalculator._INITIATE_RATE_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_MULT_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_OFFSET_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_MRV_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_DIR_DIFF_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_ALPHA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_BETA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_MULT_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_OFFSET_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIFF_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FORAGE_RATE_KEY,
+                DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_MULT_KEY,
+                DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_OFFSET_KEY,
+                DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_SIGMA_KEY };
+        
+        for( int i = 0; i < genomeKeys.length; i++ )
         {
-            genomeProps.store( writer, "" );
-            builder.append( writer.getBuffer() );
+            builder.append( " " );
+            builder.append( genomeKeys[i] );
+            builder.append( "=[" );
+            builder.append( genomeProps.getProperty( genomeKeys[i] ) );
+            builder.append( "]" );
         }
-        catch( IOException ioe )
-        {
-            _LOG.error( "Unable to convert decoded genome to string", ioe );
-        }
+//        StringWriter writer = new StringWriter();
+//        try
+//        {
+//            genomeProps.store( writer, "" );
+//            builder.append( writer.getBuffer() );
+//        }
+//        catch( IOException ioe )
+//        {
+//            _LOG.error( "Unable to convert decoded genome to string", ioe );
+//        }
 
         builder.append( System.getProperty( "line.separator" ) );
 
@@ -674,7 +738,8 @@ public class DefaultForageProblem extends Problem
         float initiateKExpMult = decodeCodon( genome,
                 _initiateKExpMultCodonSize,
                 _initiateKExpMultScaling,
-                codonIdx );
+                codonIdx )
+                + _minKExpMultValue;
         codonIdx += _initiateKExpMultCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_MULT_KEY,
                 Float.toString( initiateKExpMult ) );
@@ -683,7 +748,8 @@ public class DefaultForageProblem extends Problem
         float initiateKExpOffset = decodeCodon( genome,
                 _initiateKExpOffsetCodonSize,
                 _initiateKExpOffsetScaling,
-                codonIdx );
+                codonIdx )
+                + _minKExpOffsetValue;
         codonIdx += _initiateKExpOffsetCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_OFFSET_KEY,
                 Float.toString( initiateKExpOffset ) );
@@ -692,7 +758,8 @@ public class DefaultForageProblem extends Problem
         float initiateMRVLenSigma = decodeCodon( genome,
                 _initiateMRVLenSigmaCodonSize,
                 _initiateMRVLenSigmaScaling,
-                codonIdx );
+                codonIdx )
+                + _minSigmaValue;
         codonIdx += _initiateMRVLenSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_MRV_SIGMA_KEY,
                 Float.toString( initiateMRVLenSigma ) );
@@ -701,7 +768,8 @@ public class DefaultForageProblem extends Problem
         float initiatePatchValueSigma = decodeCodon( genome,
                 _initiatePatchValueSigmaCodonSize,
                 _initiatePatchValueSigmaScaling,
-                codonIdx );
+                codonIdx )
+                + _minSigmaValue;
         codonIdx += _initiatePatchValueSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_SIGMA_KEY,
                 Float.toString( initiatePatchValueSigma ) );
@@ -710,7 +778,8 @@ public class DefaultForageProblem extends Problem
         float initiateDirDiffSigma = decodeCodon( genome,
                 _initiateDirDiffSigmaCodonSize,
                 _initiateDirDiffSigmaScaling,
-                codonIdx );
+                codonIdx )
+                + _minSigmaValue;
         codonIdx += _initiateDirDiffSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_DIR_DIFF_SIGMA_KEY,
                 Float.toString( initiateDirDiffSigma ) );
@@ -737,7 +806,8 @@ public class DefaultForageProblem extends Problem
         float followkExpMult = decodeCodon( genome,
                 _followKExpMultCodonSize,
                 _followKExpMultScaling,
-                codonIdx );
+                codonIdx )
+                + _minKExpMultValue;
         codonIdx += _followKExpMultCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_MULT_KEY,
                 Float.toString( followkExpMult ) );
@@ -746,7 +816,8 @@ public class DefaultForageProblem extends Problem
         float followKExpOffset = decodeCodon( genome,
                 _followKExpOffsetCodonSize,
                 _followKExpOffsetScaling,
-                codonIdx );
+                codonIdx )
+                + _minKExpOffsetValue;
         codonIdx += _followKExpOffsetCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_OFFSET_KEY,
                 Float.toString( followKExpOffset ) );
@@ -755,7 +826,8 @@ public class DefaultForageProblem extends Problem
         float followMRVDiffSigma = decodeCodon( genome,
                 _followMRVDiffSigmaCodonSize,
                 _followMRVDiffSigmaScaling,
-                codonIdx );
+                codonIdx )
+                + _minSigmaValue;
         codonIdx += _followMRVDiffSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIFF_SIGMA_KEY,
                 Float.toString( followMRVDiffSigma ) );
@@ -764,7 +836,8 @@ public class DefaultForageProblem extends Problem
         float followMeanPosRelDistSigma = decodeCodon( genome,
                 _followMeanPosRelDistSigmaCodonSize,
                 _followMeanPosRelDistSigmaScaling,
-                codonIdx );
+                codonIdx )
+                + _minSigmaValue;
         codonIdx += _followMeanPosRelDistSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
                 Float.toString( followMeanPosRelDistSigma ) );
@@ -782,7 +855,8 @@ public class DefaultForageProblem extends Problem
         float forageKExpMult = decodeCodon( genome,
                 _forageKExpMultCodonSize,
                 _forageKExpMultScaling,
-                codonIdx );
+                codonIdx )
+                + _minKExpMultValue;
         codonIdx += _forageKExpMultCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_MULT_KEY,
                 Float.toString( forageKExpMult ) );
@@ -791,16 +865,18 @@ public class DefaultForageProblem extends Problem
         float forageKExpOffset = decodeCodon( genome,
                 _forageKExpOffsetCodonSize,
                 _forageKExpOffsetScaling,
-                codonIdx );
+                codonIdx )
+                + _minKExpOffsetValue;
         codonIdx += _forageKExpOffsetCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_OFFSET_KEY,
                 Float.toString( forageKExpOffset ) );
 
-        // Forage patch value
+        // Forage patch value sigma
         float foragePatchValueSigma = decodeCodon( genome,
                 _foragePatchValueSigmaCodonSize,
                 _foragePatchValueSigmaScaling,
-                codonIdx );
+                codonIdx )
+                + _minSigmaValue;
         codonIdx += _foragePatchValueSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_SIGMA_KEY,
                 Float.toString( foragePatchValueSigma ) );

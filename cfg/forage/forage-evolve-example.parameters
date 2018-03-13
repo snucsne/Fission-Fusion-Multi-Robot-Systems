@@ -45,23 +45,26 @@ eval.problem.forage-k-exp-offset.scaling = 0.05
 eval.problem.forage-patch-value-sigma.codon-size = 5
 eval.problem.forage-patch-value-sigma.scaling = 0.05
 
+eval.problem.min-k-exp-mult-value = 1
+eval.problem.min-k-exp-offset-value = 0
+eval.problem.min-sigma-value = 1
 
 eval.problem.codon-size = 86
 
 eval.problem.force-reevaluation = true
 
-eval.problem.fold-properties = cfg/forage/evolve-parameters/forage-agents-030-fold-00.parameters
+eval.problem.fold-properties = cfg/forage/evolve-parameters/forage-agents-020-fold-00.parameters
 
 # ==============================================================
 # Population parameters
 # ==============================================================
 
 # Population size
-pop.subpop.0.size = 3
-breed.elite.0 =	1
+pop.subpop.0.size = 40
+breed.elite.0 =	0
 
 # Number of generations
-generations = 3
+generations = 25
 
 # Crossover parameters
 pop.subpop.0.species.crossover-type = one
@@ -88,7 +91,7 @@ pop.subpop.0.species.pipe = ec.vector.breed.VectorMutationPipeline
 pop.subpop.0.species.pipe.source.0 = ec.vector.breed.VectorCrossoverPipeline
 pop.subpop.0.species.pipe.source.0.source.0	= ec.select.TournamentSelection
 pop.subpop.0.species.pipe.source.0.source.1	= ec.select.TournamentSelection
-select.tournament.size		= 7
+select.tournament.size		= 3
 
 
 # ==============================================================

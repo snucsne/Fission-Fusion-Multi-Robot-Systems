@@ -1,6 +1,6 @@
 Navigation/Initiation: 26 bits
 - Base initiation rate [1:500]
-  Codon: 8 bits [0:255]+1
+  Codon: 8 bits [0:255]
   Scaling: 1.0
 - k Exponent multiplier [1:10]
   Codon: 3 bits [0:7]+1

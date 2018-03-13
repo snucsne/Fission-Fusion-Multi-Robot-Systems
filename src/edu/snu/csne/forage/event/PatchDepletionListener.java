@@ -132,13 +132,11 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
             float totalResourcesForaged = resourcesForagedPerAgent * agentCount;
             
             // Tell the patch how much was foraged
-            boolean success = patch.setResourcesForaged( totalResourcesForaged );
-            Validate.isTrue( success,
-                    "Foraging alculations resulted in too many resources foraged: calculated=["
-                        + totalResourcesForaged
-                        + "] remainingInPatch=["
-                        + patch.getRemainingResources()
-                        + "]" );
+            float actualResourcesForaged = patch.setResourcesForaged( totalResourcesForaged );
+            if( actualResourcesForaged < totalResourcesForaged )
+            {
+                resourcesForagedPerAgent = actualResourcesForaged / agentCount;
+            }
             
             // Notify each agent how much it foraged
             Iterator<Agent> agentIter = patchForagingAgents.iterator();
