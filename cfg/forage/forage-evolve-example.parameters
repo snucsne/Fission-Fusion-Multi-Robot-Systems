@@ -60,7 +60,7 @@ eval.problem.fold-properties = cfg/forage/evolve-parameters/forage-agents-020-fo
 # ==============================================================
 
 # Population size
-pop.subpop.0.size = 40
+pop.subpop.0.size = 10
 breed.elite.0 =	0
 
 # Number of generations

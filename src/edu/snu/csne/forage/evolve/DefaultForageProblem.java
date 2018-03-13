@@ -33,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import ec.EvolutionState;
 import ec.Individual;
 import ec.Problem;
+import ec.simple.SimpleFitness;
 import ec.simple.SimpleProblemForm;
 import ec.util.MersenneTwisterFast;
 import ec.util.Parameter;
@@ -539,7 +540,7 @@ public class DefaultForageProblem extends Problem
             state.output.fatal( "Individual is not the correct type" );
         }
 
-//        _LOG.info( "Evaluating individual" );
+        _LOG.info( "Evaluating individual" );
         
         // Cast it to the proper type
         BitVectorIndividual bitInd = (BitVectorIndividual) ind;
@@ -564,6 +565,7 @@ public class DefaultForageProblem extends Problem
 
         // Iterate through all the training properties
         float totalResourcesForaged = 0.0f;
+        float[] fitnessValues = new float[foldAgentProperties.length];
         for( int i = 0; i < foldAgentProperties.length; i++ )
         {
 //            _LOG.info( "Running sim [" + i + "]" );
@@ -596,7 +598,8 @@ public class DefaultForageProblem extends Problem
             // Get the resources foraged
             float resourcesForaged = patchListener.getTotalResourcesForaged();
             totalResourcesForaged += resourcesForaged;
-            
+            fitnessValues[i] = resourcesForaged;
+
             _LOG.debug( "Run ["
                     + i
                     + "] resourcesForaged=["
@@ -615,9 +618,9 @@ public class DefaultForageProblem extends Problem
                 + "]" );
         
         // Save the fitness
-        ((CrossValidationFitness) ind.fitness).setFitness( state,
-                meanResourcesForaged,
-                false );
+        CrossValidationFitness cvFitness = (CrossValidationFitness) ind.fitness;
+        cvFitness.setTrainingResults( fitnessValues );
+        cvFitness.setFitness( state, cvFitness.getTrainingFitnessMean(), false );
         
         // Mark the individual as evaluated
         bitInd.evaluated = true;

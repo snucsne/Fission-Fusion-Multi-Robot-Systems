@@ -37,11 +37,13 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
     {
         final long simStep;
         final float resourcesDepleted;
+        final String patchID;
         
-        DepletionEvent( long simStep, float resourcesDepleted )
+        DepletionEvent( long simStep, float resourcesDepleted, String patchID )
         {
             this.simStep = simStep;
             this.resourcesDepleted = resourcesDepleted;
+            this.patchID = patchID;
         }
     }
     
@@ -70,7 +72,7 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
         super.initialize( simState );
         
         // Add a zero depletion event to help with later calculations
-        _depletonEvents.add( new DepletionEvent( -1l, 0.0f ) );
+        _depletonEvents.add( new DepletionEvent( -1l, 0.0f, null ) );
     }
 
     /**
@@ -148,9 +150,34 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
             
             // Log it
             _depletonEvents.add( new DepletionEvent( _simState.getCurrentSimulationStep(),
-                    totalResourcesForaged ) );
+                    actualResourcesForaged,
+                    patch.getID() ) );
             
             _totalResourcesForaged += totalResourcesForaged;
+
+            _LOG.warn( "Patch depletion: time=["
+                    + _simState.getCurrentSimulationStep()
+                    + "] resources=["
+                    + totalResourcesForaged
+                    + "] patch=["
+                    + patch.getID()
+                    + "] agentCount=["
+                    + agentCount
+                    + "] remaining=["
+                    + patch.getRemainingResources()
+                    + "] patchArea=["
+                    + patchArea
+                    + "] foragingAreaEffective=["
+                    + foragingAreaEffective
+                    + "] resourcesForagedPerAgent=["
+                    + resourcesForagedPerAgent
+                    + "] density=["
+                    + resourceDensity
+                    + "] foragingAreaMax=["
+                    + foragingAreaMax
+                    + "] consumptionRateMax=["
+                    + consumptionRateMax
+                    + "]" );
         }
     }
 
