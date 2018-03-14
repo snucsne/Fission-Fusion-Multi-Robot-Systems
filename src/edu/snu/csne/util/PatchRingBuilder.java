@@ -99,10 +99,18 @@ public class PatchRingBuilder
     
     /** The maximum number of foragers for a patch */
     private int _maxForagerCount = 0;
+
+    /** The offset to apply to the x component of the position */
+    private float _xOffset = 0.0f;
+
+    /** The offset to apply to the y component of the position */
+    private float _yOffset = 0.0f;
     
     
     public PatchRingBuilder( int minPatchCount,
             int maxPatchCount,
+            float xOffset,
+            float yOffset,
             float minPatchSeparation,
             float minPatchDistance,
             float maxPatchDistance,
@@ -118,6 +126,8 @@ public class PatchRingBuilder
     {
         _minPatchCount = minPatchCount;
         _maxPatchCount = maxPatchCount;
+        _xOffset = xOffset;
+        _yOffset = yOffset;
         _minPatchSeparation = minPatchSeparation;
         _minPatchDistance = minPatchDistance;
         _maxPatchDistance = maxPatchDistance;
@@ -171,7 +181,7 @@ public class PatchRingBuilder
                 
                 // Create the position
                 NavigationalVector navPosition = new NavigationalVector( distance, angle, 0 );
-                Vector3f position = navPosition.toVector3f(); 
+                Vector3f position = navPosition.toVector3f();
 
                 // Get a random resource amount
                 float resources = _rng.nextFloat() * patchResourcesDiff
@@ -231,6 +241,12 @@ public class PatchRingBuilder
                 + "]" );
         writer.println( "# maxPatchCount=["
                 + _maxPatchCount
+                + "]" );
+        writer.println( "# xOffset=["
+                + _xOffset
+                + "]" );
+        writer.println( "# yOffset=["
+                + _yOffset
                 + "]" );
         writer.println( "# minPatchSeparation=["
                 + _minPatchSeparation
@@ -340,12 +356,16 @@ public class PatchRingBuilder
         float maxPredationProbability = Float.parseFloat( args[12] );
         int minForagerCount = Integer.parseInt( args[13] );
         int maxForagerCount = Integer.parseInt( args[14] );
+        float xOffset = Float.parseFloat( args[15] );
+        float yOffset = Float.parseFloat( args[16] );
         
         long randomSeed = 0;
         
         PatchRingBuilder builder = new PatchRingBuilder(
                 minPatchCount,
                 maxPatchCount,
+                xOffset,
+                yOffset,
                 minPatchSeparation,
                 minPatchDistance,
                 maxPatchDistance,
