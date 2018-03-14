@@ -19,9 +19,14 @@
  */
 package edu.snu.csne.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 // Imports
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -85,7 +90,7 @@ public class PropertiesFileManager
         Validate.notEmpty( propsFilename, "Property filename (key=["
                 + propsFileKey
                 + "] may not be empty" );
-        Properties props = getProperties( propsFilename );
+        Properties props = getPropertiesByFilename( propsFilename );
 
         _LOG.trace( "Leaving loadPropertiesByKey( propsFileKey )" );
 

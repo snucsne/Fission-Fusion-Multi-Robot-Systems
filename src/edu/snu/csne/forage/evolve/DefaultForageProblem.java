@@ -550,13 +550,13 @@ public class DefaultForageProblem extends Problem
                 state.random[threadnum] );
         
         // Get fold training properties
-        Properties[] foldAgentProperties = _foldProps.getProperties(
+        String[] foldAgentProperties = _foldProps.getProperties(
                 FoldType.TRAINING,
                 PropertyType.AGENT );
         _LOG.debug( "Training agent fold properties ["
                 + foldAgentProperties.length
                 + "]" );
-        Properties[] foldPatchProperties = _foldProps.getProperties(
+        String[] foldPatchProperties = _foldProps.getProperties(
                 FoldType.TRAINING,
                 PropertyType.PATCH );
         _LOG.debug( "Training patch fold properties ["
@@ -577,8 +577,10 @@ public class DefaultForageProblem extends Problem
 //            simProps.
             
             // Override the fold specific properties
-            simProps.putAll( foldAgentProperties[i] );
-            simProps.putAll( foldPatchProperties[i] );
+            simProps.setProperty( SimulationState._AGENT_PROPS_FILE_KEY,
+                    foldAgentProperties[i] );
+            simProps.setProperty( SimulationState._PATCH_PROPS_FILE_KEY,
+                    foldPatchProperties[i] );
             
             // Override the genome specific properties
             simProps.putAll( genomeProps );

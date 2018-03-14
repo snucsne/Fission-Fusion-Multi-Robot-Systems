@@ -70,10 +70,10 @@ public class SimulationState
     private static final String _DECISION_MAKER_CLASS_KEY = "decision-maker-class";
     
     /** Key for the agent properties file */
-    private static final String _AGENT_PROPS_FILE_KEY = "agent-properties-file";
+    public static final String _AGENT_PROPS_FILE_KEY = "agent-properties-file";
     
     /** Key for the patch properties file */
-    private static final String _PATCH_PROPS_FILE_KEY = "patch-properties-file";
+    public static final String _PATCH_PROPS_FILE_KEY = "patch-properties-file";
     
     
     /** Key for the number of agents */

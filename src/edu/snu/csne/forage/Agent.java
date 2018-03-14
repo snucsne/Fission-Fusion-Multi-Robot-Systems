@@ -443,7 +443,7 @@ public class Agent
         Validate.isTrue( resourcesForaged >= 0.0f, "Resources foraged must be non-negative: ["
                 + resourcesForaged
                 + "]" );
-        _resourceConsumptionRate += resourcesForaged;
+        _resourcesForaged += resourcesForaged;
     }
     
     /**

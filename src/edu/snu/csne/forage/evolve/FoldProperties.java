@@ -54,20 +54,20 @@ public class FoldProperties
     private static final Logger _LOG = LogManager.getLogger(
             FoldProperties.class.getName() );
     
-    private Map<FoldType, Map<PropertyType,Properties[]>> _props =
-            new EnumMap<FoldType, Map<PropertyType,Properties[]>>( FoldType.class );
+    private Map<FoldType, Map<PropertyType,String[]>> _props =
+            new EnumMap<FoldType, Map<PropertyType,String[]>>( FoldType.class );
     
     public FoldProperties()
     {
         for( FoldType foldType : FoldType.values() )
         {
             
-            Map<PropertyType,Properties[]> foldProps =
-                    new EnumMap<PropertyType,Properties[]>( PropertyType.class );
+            Map<PropertyType,String[]> foldProps =
+                    new EnumMap<PropertyType,String[]>( PropertyType.class );
             _props.put( foldType, foldProps );
             for( PropertyType propType : PropertyType.values() )
             {
-                foldProps.put( propType, new Properties[0] );
+                foldProps.put( propType, new String[0] );
             }
         }
     }
@@ -82,8 +82,8 @@ public class FoldProperties
         for( FoldType foldType : FoldType.values() )
         {
             
-            Map<PropertyType,Properties[]> foldProps =
-                    new EnumMap<PropertyType,Properties[]>( PropertyType.class );
+            Map<PropertyType,String[]> foldProps =
+                    new EnumMap<PropertyType,String[]>( PropertyType.class );
             _props.put( foldType, foldProps );
             for( PropertyType propType : PropertyType.values() )
             {
@@ -100,13 +100,7 @@ public class FoldProperties
                         + "] is required" );
                 String[] propFiles = propFilesStr.split( " " );
                 
-                Properties[] props = new Properties[ propFiles.length ];
-                for( int i = 0; i < propFiles.length; i++ )
-                {
-                    props[i] = MiscUtils.loadPropertiesFromFile( propFiles[i] );
-                }
-                
-                foldProps.put( propType, props );
+                foldProps.put( propType, propFiles );
                 
                 _LOG.debug( "Fold: key=["
                         + key
@@ -125,18 +119,18 @@ public class FoldProperties
         _LOG.trace( "Leaving initialize( propDefsFile )" );        
     }
     
-    public void setProperties( FoldType foldType,
-            PropertyType propType,
-            Properties[] props )
-    {
-        Map<PropertyType,Properties[]> foldProps = _props.get( foldType );
-        foldProps.put( propType, props );
-    }
+//    public void setProperties( FoldType foldType,
+//            PropertyType propType,
+//            String[] props )
+//    {
+//        Map<PropertyType,String[]> foldProps = _props.get( foldType );
+//        foldProps.put( propType, props );
+//    }
     
-    public Properties[] getProperties( FoldType foldType,
+    public String[] getProperties( FoldType foldType,
             PropertyType propType )
     {
-        Map<PropertyType,Properties[]> foldProps = _props.get( foldType );
+        Map<PropertyType,String[]> foldProps = _props.get( foldType );
         return foldProps.get( propType );
     }
 }

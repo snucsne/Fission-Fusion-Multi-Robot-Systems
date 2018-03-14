@@ -155,29 +155,29 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
             
             _totalResourcesForaged += totalResourcesForaged;
 
-            _LOG.warn( "Patch depletion: time=["
-                    + _simState.getCurrentSimulationStep()
-                    + "] resources=["
-                    + totalResourcesForaged
-                    + "] patch=["
-                    + patch.getID()
-                    + "] agentCount=["
-                    + agentCount
-                    + "] remaining=["
-                    + patch.getRemainingResources()
-                    + "] patchArea=["
-                    + patchArea
-                    + "] foragingAreaEffective=["
-                    + foragingAreaEffective
-                    + "] resourcesForagedPerAgent=["
-                    + resourcesForagedPerAgent
-                    + "] density=["
-                    + resourceDensity
-                    + "] foragingAreaMax=["
-                    + foragingAreaMax
-                    + "] consumptionRateMax=["
-                    + consumptionRateMax
-                    + "]" );
+//            _LOG.warn( "Patch depletion: time=["
+//                    + _simState.getCurrentSimulationStep()
+//                    + "] resources=["
+//                    + totalResourcesForaged
+//                    + "] patch=["
+//                    + patch.getID()
+//                    + "] agentCount=["
+//                    + agentCount
+//                    + "] remaining=["
+//                    + patch.getRemainingResources()
+//                    + "] patchArea=["
+//                    + patchArea
+//                    + "] foragingAreaEffective=["
+//                    + foragingAreaEffective
+//                    + "] resourcesForagedPerAgent=["
+//                    + resourcesForagedPerAgent
+//                    + "] density=["
+//                    + resourceDensity
+//                    + "] foragingAreaMax=["
+//                    + foragingAreaMax
+//                    + "] consumptionRateMax=["
+//                    + consumptionRateMax
+//                    + "]" );
         }
     }
 
