@@ -297,16 +297,16 @@ public class PatchRingBuilder
             Vector3f position = patches[i].getPosition();
             writer.println( prefix
                     + "position = "
-                    + String.format( "%06.2f", position.x )
+                    + String.format( "%03.2f", position.x )
                     + ","
-                    + String.format( "%06.2f", position.y )
+                    + String.format( "%03.2f", position.y )
                     + ",0.0");
             writer.println( prefix
                     + "resources = "
-                    + String.format( "%03.2f", patches[i].getRemainingResources() ) );
+                    + String.format( "%3.2f", patches[i].getRemainingResources() ) );
             writer.println( prefix
                     + "radius = "
-                    + (int) patches[i].getRadius() );
+                    + String.format( "%5.2f", patches[i].getRadius() ) );
             writer.println( prefix
                     + "predation-probability = "
                     + String.format( "%09.6f", patches[i].getPredationProbability() ) );
