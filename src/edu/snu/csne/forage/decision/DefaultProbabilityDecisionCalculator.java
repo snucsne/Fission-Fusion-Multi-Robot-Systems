@@ -76,16 +76,16 @@ public class DefaultProbabilityDecisionCalculator
     public static final String _FOLLOW_K_EXP_OFFSET_KEY = "follow-k-exp-offset";
     
     /** Property key for the follow MRV difference sigma */
-    public static final String _FOLLOW_MRV_DIFF_SIGMA_KEY = "follow-mrv-diff-sigma";
+//    public static final String _FOLLOW_MRV_DIFF_SIGMA_KEY = "follow-mrv-diff-sigma";
 
     /** Property key for the follow mean position relative distance sigma */
     public static final String _FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY = "follow-mean-pos-rel-dist-sigma";
 
     /** Property key for the follow MRV direction difference sigma */
-    protected static final String _FOLLOW_MRV_DIR_DIFF_SIGMA_KEY = "follow-mrv-dir-diff-sigma";
+    public static final String _FOLLOW_MRV_DIR_DIFF_SIGMA_KEY = "follow-mrv-dir-diff-sigma";
     
     /** Property key for the follow MRV magnitude difference sigma */
-    protected static final String _FOLLOW_MRV_MAG_DIFF_SIGMA_KEY = "follow-mrv-mag-diff-sigma";
+    public static final String _FOLLOW_MRV_MAG_DIFF_SIGMA_KEY = "follow-mrv-mag-diff-sigma";
 
     
     /** Property key for the forage rate base */
@@ -237,6 +237,22 @@ public class DefaultProbabilityDecisionCalculator
         _maxNavigateK = (1.0f/(1.0f + (float) Math.exp( _initiationKExpMultiplier
                 * (-_initiationKExpOffset))));
 
+//        _LOG.info( "Initiation values: _inititationRate=["
+//                +  _inititationRate
+//                + "] _initiationKExpMultiplier=["
+//                + _initiationKExpMultiplier
+//                + "] _initiationKExpOffset=["
+//                + _initiationKExpOffset
+//                + "] _navigateMRVSigma=["
+//                +  _navigateMRVSigma
+//                + "] _navigatePatchValueSigma=["
+//                + _navigatePatchValueSigma
+//                + "] _navigateDirDiffSigma=["
+//                + _navigateDirDiffSigma
+//                + "] _maxNavigateK=["
+//                + _maxNavigateK
+//                + "]" );
+        
         
         // Load the follow alpha constant
         _followAlpha = MiscUtils.loadNonEmptyFloatProperty( props,
@@ -248,6 +264,21 @@ public class DefaultProbabilityDecisionCalculator
                 _FOLLOW_BETA_KEY,
                 "Follow beta" );
         
+        // Load the follow k exponent multiplier
+        _followKExpMultiplier = MiscUtils.loadNonEmptyFloatProperty( props,
+                _FOLLOW_K_EXP_MULT_KEY,
+                "follow base rate" );
+
+        // Load the follow k exponent offset value
+        _followKExpOffset = MiscUtils.loadNonEmptyFloatProperty( props,
+                _FOLLOW_K_EXP_OFFSET_KEY,
+                "follow base rate" );
+
+        // Load the follow relative distance value
+        _followRelDistanceSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+                _FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
+                "follow mean position relative distance" );
+
         // Load the follow MRV direction difference sigma value
         _followMRVDirDiffSigma = MiscUtils.loadNonEmptyFloatProperty( props,
                 _FOLLOW_MRV_DIR_DIFF_SIGMA_KEY,
@@ -266,6 +297,20 @@ public class DefaultProbabilityDecisionCalculator
         _maxFollowK = (1.0f/(1.0f + (float) Math.exp( _followKExpMultiplier
                 * (-_followKExpOffset))));
 
+//        _LOG.info( "Follow values: _followAlpha=["
+//                + _followAlpha
+//                + "] _followBeta=["
+//                + _followBeta
+//                + "] _followMRVDirDiffSigma=["
+//                + _followMRVDirDiffSigma
+//                + "] _followMRVMagDiffSigma=["
+//                + _followMRVMagDiffSigma
+//                + "] _usePatchValueIndivdiual=["
+//                + _usePatchValueIndivdiual
+//                + "] _maxFollowK=["
+//                + _maxFollowK
+//                + "]" );
+        
         
         // Load the base forage rate
         _forageBaseRate = MiscUtils.loadNonEmptyFloatProperty( props,
@@ -290,6 +335,18 @@ public class DefaultProbabilityDecisionCalculator
         // Compute the max forage k value
         _maxForageK = (1.0f/(1.0f + (float) Math.exp( _forageKExpMultilier
                 * (-_forageKExpOffset))));
+
+//        _LOG.info( "Forage values: _forageBaseRate=["
+//                + _forageBaseRate
+//                + "] _forageKExpMultilier=["
+//                + _forageKExpMultilier
+//                + "] _forageKExpOffset=["
+//                + _forageKExpOffset
+//                + "] _foragePatchValueSigma=["
+//                + _foragePatchValueSigma
+//                + "] _maxForageK=["
+//                + _maxForageK
+//                + "]" );
 
         _LOG.trace( "Leaving initialize( simState )" );        
     }

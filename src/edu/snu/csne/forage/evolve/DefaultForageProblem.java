@@ -93,11 +93,18 @@ public class DefaultForageProblem extends Problem
     /** Parameter key for the follow K exponent offset */
     private static final String _P_FOLLOW_K_EXP_OFFSET = "follow-k-exp-offset.";
 
-    /** Parameter key for the follow MRV difference sigma */
-    private static final String _P_FOLLOW_MRV_DIFF_SIGMA = "follow-mrv-diff-sigma.";
+//    /** Parameter key for the follow MRV difference sigma */
+//    private static final String _P_FOLLOW_MRV_DIFF_SIGMA = "follow-mrv-diff-sigma.";
+//
+//    /** Parameter key for the follow mean position relative distance sigma */
+//    private static final String _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA = "follow-mean-pos-rel-dist-sigma.";
 
-    /** Parameter key for the follow mean position relative distance sigma */
-    private static final String _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA = "follow-mean-pos-rel-dist-sigma.";
+    /** Parameter key for the follow MRV direction difference sigma */
+    private static final String _P_FOLLOW_MRV_DIR_DIFF_SIGMA = "follow-mrv-dir-diff-sigma.";
+
+    /** Parameter key for the follow MRV magnitude difference sigma */
+    private static final String _P_FOLLOW_MRV_MAG_DIFF_SIGMA = "follow-mrv-mag-diff-sigma.";
+
 
     
     /** Parameter key for the forage base rate */
@@ -210,7 +217,19 @@ public class DefaultForageProblem extends Problem
     /** Follow relative distance in mean position: scaling */
     private float _followMeanPosRelDistSigmaScaling = 0.0f;
     
+    /** Follow MRV direction difference: codon size */
+    private int _followMRVDirDiffSigmaCodonSize = 0;
     
+    /** Follow MRV direction difference: scaling */
+    private float _followMRVDirDiffSigmaScaling = 0.0f;
+    
+    /** Follow MRV magnitude difference: codon size */
+    private int _followMRVMagDiffSigmaCodonSize = 0;
+    
+    /** Follow MRV magnitude difference: scaling */
+    private float _followMRVMagDiffSigmaScaling = 0.0f;
+    
+
     /** Forage base rate: codon size */
     private int _forageBaseRateCodonSize = 0;
     
@@ -391,30 +410,54 @@ public class DefaultForageProblem extends Problem
                 state,
                 base );
         
-         // Load the follow MRV difference sigma values
-        _followMRVDiffSigmaCodonSize= loadIntParameter(
-                _P_FOLLOW_MRV_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
-                "follow MRV difference sigma codon size",
-                state,
-                base );
-        _followMRVDiffSigmaScaling = loadFloatParameter(
-                _P_FOLLOW_MRV_DIFF_SIGMA + _SCALING_POSTFIX,
-                "follow MRV difference sigma scaling",
-                state,
-                base );
+//         // Load the follow MRV difference sigma values
+//        _followMRVDiffSigmaCodonSize= loadIntParameter(
+//                _P_FOLLOW_MRV_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
+//                "follow MRV difference sigma codon size",
+//                state,
+//                base );
+//        _followMRVDiffSigmaScaling = loadFloatParameter(
+//                _P_FOLLOW_MRV_DIFF_SIGMA + _SCALING_POSTFIX,
+//                "follow MRV difference sigma scaling",
+//                state,
+//                base );
+//        
+//        // Load the follow mean position relative distance sigma values
+//        _followMeanPosRelDistSigmaCodonSize = loadIntParameter(
+//                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _CODON_SIZE_POSTFIX,
+//                "follow mean position relative distance sigma codon size",
+//                state,
+//                base );
+//        _followMeanPosRelDistSigmaScaling = loadFloatParameter(
+//                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _SCALING_POSTFIX,
+//                "follow mean position relative distance sigma scaling",
+//                state,
+//                base );
         
-        // Load the follow mean position relative distance sigma values
-        _followMeanPosRelDistSigmaCodonSize = loadIntParameter(
-                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _CODON_SIZE_POSTFIX,
-                "follow mean position relative distance sigma codon size",
-                state,
-                base );
-        _followMeanPosRelDistSigmaScaling = loadFloatParameter(
-                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _SCALING_POSTFIX,
-                "follow mean position relative distance sigma scaling",
-                state,
-                base );
-        
+        // Load the follow MRV direction difference sigma values
+       _followMRVDirDiffSigmaCodonSize= loadIntParameter(
+               _P_FOLLOW_MRV_DIR_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
+               "follow MRV direction difference sigma codon size",
+               state,
+               base );
+       _followMRVDirDiffSigmaScaling = loadFloatParameter(
+               _P_FOLLOW_MRV_DIR_DIFF_SIGMA + _SCALING_POSTFIX,
+               "follow MRV direction difference sigma scaling",
+               state,
+               base );
+       
+       // Load the follow MRV magnitude difference sigma values
+       _followMRVMagDiffSigmaCodonSize = loadIntParameter(
+               _P_FOLLOW_MRV_MAG_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
+               "follow MRV magnitude difference sigma codon size",
+               state,
+               base );
+       _followMRVMagDiffSigmaScaling = loadFloatParameter(
+               _P_FOLLOW_MRV_MAG_DIFF_SIGMA + _SCALING_POSTFIX,
+               "follow MRV magnitude difference sigma scaling",
+               state,
+               base );
+
         // Load the forage base rate values
         _forageBaseRateCodonSize = loadIntParameter(
                 _P_FORAGE_BASE_RATE + _CODON_SIZE_POSTFIX,
@@ -540,26 +583,120 @@ public class DefaultForageProblem extends Problem
             state.output.fatal( "Individual is not the correct type" );
         }
 
-        _LOG.info( "Evaluating individual" );
+        evaluate( state, ind, FoldType.TRAINING );
         
+//        _LOG.info( "Evaluating individual" );
+        
+//        // Cast it to the proper type
+//        BitVectorIndividual bitInd = (BitVectorIndividual) ind;
+//
+//        // Decode the genome
+//        Properties genomeProps = decodeGenome( bitInd.genome );
+//        
+//        // Get fold training properties
+//        String[] foldAgentProperties = _foldProps.getProperties(
+//                FoldType.TRAINING,
+//                PropertyType.AGENT );
+//        _LOG.debug( "Training agent fold properties ["
+//                + foldAgentProperties.length
+//                + "]" );
+//        String[] foldPatchProperties = _foldProps.getProperties(
+//                FoldType.TRAINING,
+//                PropertyType.PATCH );
+//        _LOG.debug( "Training patch fold properties ["
+//                + foldPatchProperties.length
+//                + "]" );
+//
+//        // Iterate through all the training properties
+//        float totalResourcesForaged = 0.0f;
+//        float[] fitnessValues = new float[foldAgentProperties.length];
+//        for( int i = 0; i < foldAgentProperties.length; i++ )
+//        {
+////            _LOG.info( "Running sim [" + i + "]" );
+//            
+//            // Get the default properties
+//            Properties simProps = new Properties();
+//            simProps.putAll( _defaultSimProperties );
+//            // TODO
+////            simProps.
+//            
+//            // Override the fold specific properties
+//            simProps.setProperty( SimulationState._AGENT_PROPS_FILE_KEY,
+//                    foldAgentProperties[i] );
+//            simProps.setProperty( SimulationState._PATCH_PROPS_FILE_KEY,
+//                    foldPatchProperties[i] );
+//            
+//            // Override the genome specific properties
+//            simProps.putAll( genomeProps );
+//            
+//            // Create the simulator
+//            Simulator sim = new Simulator();
+//            sim.initialize( simProps );
+//            
+//            // Add our own patch depletion listener
+//            PatchDepletionListener patchListener = new PatchDepletionListener();
+//            SimulationState simState = sim.getSimState();
+//            simState.addEventListener( patchListener );
+//            
+//            // Run it
+//            sim.run();
+//            
+//            // Get the resources foraged
+//            float resourcesForaged = patchListener.getTotalResourcesForaged();
+//            totalResourcesForaged += resourcesForaged;
+//            fitnessValues[i] = resourcesForaged;
+//
+//            _LOG.debug( "Run ["
+//                    + i
+//                    + "] resourcesForaged=["
+//                    + resourcesForaged
+//                    + "]" );
+//        }
+//        
+//        // Compute the mean resources foraged
+//        float meanResourcesForaged = totalResourcesForaged / foldAgentProperties.length;
+//        _LOG.debug( "Fitness: totalResourcesForaged=["
+//                + totalResourcesForaged
+//                + "] foldAgentProperties.length=["
+//                + foldAgentProperties.length
+//                + "] meanResourcesForaged=["
+//                + meanResourcesForaged
+//                + "]" );
+//        
+//        // Save the fitness
+//        CrossValidationFitness cvFitness = (CrossValidationFitness) ind.fitness;
+//        cvFitness.setTrainingResults( fitnessValues );
+//        cvFitness.setFitness( state, cvFitness.getTrainingFitnessMean(), false );
+//        
+//        // Mark the individual as evaluated
+//        bitInd.evaluated = true;
+    }
+
+    public void evaluate( EvolutionState state,
+            Individual ind,
+            FoldType foldType )
+    {
         // Cast it to the proper type
         BitVectorIndividual bitInd = (BitVectorIndividual) ind;
 
         // Decode the genome
-        Properties genomeProps = decodeGenome( bitInd.genome,
-                state.random[threadnum] );
+        Properties genomeProps = decodeGenome( bitInd.genome );
         
         // Get fold training properties
         String[] foldAgentProperties = _foldProps.getProperties(
-                FoldType.TRAINING,
+                foldType,
                 PropertyType.AGENT );
-        _LOG.debug( "Training agent fold properties ["
+        _LOG.debug( "Agent fold properties: type=["
+                + foldType.name()
+                + "] count=["
                 + foldAgentProperties.length
                 + "]" );
         String[] foldPatchProperties = _foldProps.getProperties(
-                FoldType.TRAINING,
+                foldType,
                 PropertyType.PATCH );
-        _LOG.debug( "Training patch fold properties ["
+        _LOG.debug( "Patch fold properties: type=["
+                + foldType.name()
+                + "] count=["
                 + foldPatchProperties.length
                 + "]" );
 
@@ -573,8 +710,6 @@ public class DefaultForageProblem extends Problem
             // Get the default properties
             Properties simProps = new Properties();
             simProps.putAll( _defaultSimProperties );
-            // TODO
-//            simProps.
             
             // Override the fold specific properties
             simProps.setProperty( SimulationState._AGENT_PROPS_FILE_KEY,
@@ -602,16 +737,18 @@ public class DefaultForageProblem extends Problem
             totalResourcesForaged += resourcesForaged;
             fitnessValues[i] = resourcesForaged;
 
-            _LOG.debug( "Run ["
-                    + i
-                    + "] resourcesForaged=["
-                    + resourcesForaged
-                    + "]" );
+//            _LOG.debug( "Run ["
+//                    + i
+//                    + "] resourcesForaged=["
+//                    + resourcesForaged
+//                    + "]" );
         }
         
         // Compute the mean resources foraged
         float meanResourcesForaged = totalResourcesForaged / foldAgentProperties.length;
-        _LOG.debug( "Fitness: totalResourcesForaged=["
+        _LOG.debug( "Fitness ["
+                + foldType.name()
+                + "]: totalResourcesForaged=["
                 + totalResourcesForaged
                 + "] foldAgentProperties.length=["
                 + foldAgentProperties.length
@@ -621,13 +758,33 @@ public class DefaultForageProblem extends Problem
         
         // Save the fitness
         CrossValidationFitness cvFitness = (CrossValidationFitness) ind.fitness;
-        cvFitness.setTrainingResults( fitnessValues );
-        cvFitness.setFitness( state, cvFitness.getTrainingFitnessMean(), false );
+        if( FoldType.TRAINING.equals( foldType ) )
+        {
+            cvFitness.setTrainingResults( fitnessValues );
+            cvFitness.setFitness( state, cvFitness.getTrainingFitnessMean(), false );
+        }
+        else if( FoldType.TESTING.equals( foldType ) )
+        {
+            cvFitness.setTestingResults( fitnessValues );
+        }
+        else if( FoldType.VALIDATION.equals( foldType ) )
+        {
+            cvFitness.setValidationResults( fitnessValues );
+        }
+        else
+        {
+            _LOG.error( "Unknown fold type ["
+                    + foldType
+                    + "]" );
+            state.output.fatal( "Unknown fold type ["
+                    + foldType
+                    + "]" );
+        }
         
         // Mark the individual as evaluated
         bitInd.evaluated = true;
     }
-
+    
     /**
      * Returns a description of the specified individual using the specified
      * line prefix.
@@ -645,7 +802,7 @@ public class DefaultForageProblem extends Problem
         BitVectorIndividual bitInd = (BitVectorIndividual) ind;
 
         // Decode the genome
-        Properties genomeProps = decodeGenome( bitInd.genome, null );
+        Properties genomeProps = decodeGenome( bitInd.genome );
 
         StringBuilder builder = new StringBuilder();
         builder.append( prefix );
@@ -661,8 +818,9 @@ public class DefaultForageProblem extends Problem
                 DefaultProbabilityDecisionCalculator._FOLLOW_BETA_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_MULT_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_OFFSET_KEY,
-                DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIFF_SIGMA_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIR_DIFF_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_MRV_MAG_DIFF_SIGMA_KEY,
                 DefaultProbabilityDecisionCalculator._FORAGE_RATE_KEY,
                 DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_MULT_KEY,
                 DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_OFFSET_KEY,
@@ -692,6 +850,16 @@ public class DefaultForageProblem extends Problem
         return builder.toString();
     }
 
+    public Properties getGenomeProperties( Individual ind )
+    {
+        // Cast it to the proper type
+        BitVectorIndividual bitInd = (BitVectorIndividual) ind;
+
+        // Decode the genome
+        Properties genomeProps = decodeGenome( bitInd.genome );
+
+        return genomeProps;
+    }
     
 //    /**
 //     * TODO Method description
@@ -721,8 +889,7 @@ public class DefaultForageProblem extends Problem
      *
      * @param genome
      */
-    protected Properties decodeGenome( boolean[] genome,
-            MersenneTwisterFast random )
+    protected Properties decodeGenome( boolean[] genome )
     {
         // Build the properties object
         Properties props = new Properties();
@@ -827,16 +994,16 @@ public class DefaultForageProblem extends Problem
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_OFFSET_KEY,
                 Float.toString( followKExpOffset ) );
 
-        // Follow MRV difference sigma
-        float followMRVDiffSigma = decodeCodon( genome,
-                _followMRVDiffSigmaCodonSize,
-                _followMRVDiffSigmaScaling,
-                codonIdx )
-                + _minSigmaValue;
-        codonIdx += _followMRVDiffSigmaCodonSize;
-        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIFF_SIGMA_KEY,
-                Float.toString( followMRVDiffSigma ) );
-
+//        // Follow MRV difference sigma
+//        float followMRVDiffSigma = decodeCodon( genome,
+//                _followMRVDiffSigmaCodonSize,
+//                _followMRVDiffSigmaScaling,
+//                codonIdx )
+//                + _minSigmaValue;
+//        codonIdx += _followMRVDiffSigmaCodonSize;
+//        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIFF_SIGMA_KEY,
+//                Float.toString( followMRVDiffSigma ) );
+//
         // Follow mean position relative distance sigma
         float followMeanPosRelDistSigma = decodeCodon( genome,
                 _followMeanPosRelDistSigmaCodonSize,
@@ -846,6 +1013,26 @@ public class DefaultForageProblem extends Problem
         codonIdx += _followMeanPosRelDistSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
                 Float.toString( followMeanPosRelDistSigma ) );
+
+        // Follow MRV direction difference sigma
+        float followMRVDirDiffSigma = decodeCodon( genome,
+                _followMRVDirDiffSigmaCodonSize,
+                _followMRVDirDiffSigmaScaling,
+                codonIdx )
+                + _minSigmaValue;
+        codonIdx += _followMRVDirDiffSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIR_DIFF_SIGMA_KEY,
+                Float.toString( followMRVDirDiffSigma ) );
+
+        // Follow MRV magnitude difference sigma
+        float followMRVMagDiffSigma = decodeCodon( genome,
+                _followMRVMagDiffSigmaCodonSize,
+                _followMRVMagDiffSigmaScaling,
+                codonIdx )
+                + _minSigmaValue;
+        codonIdx += _followMRVMagDiffSigmaCodonSize;
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_MAG_DIFF_SIGMA_KEY,
+                Float.toString( followMRVMagDiffSigma ) );
 
         // Forage base rate
         float forageBaseRate = decodeCodon( genome,

@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ec.EvolutionState;
 import ec.Individual;
+import edu.snu.csne.forage.evolve.FoldProperties.FoldType;
 
 
 /**
@@ -56,6 +57,14 @@ public class CrossValidationStatistics extends ParseableStatistics
     {
         _LOG.trace( "Entering buildIndDescription( ind, state, useGen, indPrefix )" );
 
+        // Evaluate the individual to get testing and validation fitness
+        if( state.evaluator.p_problem instanceof DefaultForageProblem )
+        {
+            DefaultForageProblem problem = (DefaultForageProblem) state.evaluator.p_problem;
+            problem.evaluate( state, ind, FoldType.TESTING );
+            problem.evaluate( state, ind, FoldType.VALIDATION );
+        }
+        
         String description = super.buildIndDescription( ind,
                 state,
                 useGen,

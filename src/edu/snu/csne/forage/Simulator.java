@@ -144,30 +144,20 @@ public class Simulator
         Map<String,Agent> agentsMap = _simState.getAllAgents();
         Collection<Agent> agents = agentsMap.values();
         
-        // Execute the sensing
+        // Execute the agents
         Iterator<Agent> agentIter = agents.iterator();
         while( agentIter.hasNext() )
         {
             Agent current = agentIter.next();
-            current.sense();
-            current.plan();
-            current.act();
-//            agentIter.next().sense();
+            
+            // Only proceed if they are active
+            if( current.isActive() )
+            {
+                current.sense();
+                current.plan();
+                current.act();
+            }
         }
-        
-//        // Execute the planning
-//        agentIter = agents.iterator();
-//        while( agentIter.hasNext() )
-//        {
-//            agentIter.next().plan();
-//        }
-//        
-//        // Execute the acting
-//        agentIter = agents.iterator();
-//        while( agentIter.hasNext() )
-//        {
-//            agentIter.next().act();
-//        }
         
         _LOG.trace( "Leaving runSimStep()" );
     }

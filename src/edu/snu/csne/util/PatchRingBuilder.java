@@ -182,6 +182,7 @@ public class PatchRingBuilder
                 // Create the position
                 NavigationalVector navPosition = new NavigationalVector( distance, angle, 0 );
                 Vector3f position = navPosition.toVector3f();
+                position.addLocal( _xOffset, _yOffset, 0.0f );
 
                 // Get a random resource amount
                 float resources = _rng.nextFloat() * patchResourcesDiff

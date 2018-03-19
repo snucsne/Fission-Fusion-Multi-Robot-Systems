@@ -1,5 +1,5 @@
 # =========================================================
-# Built on 2018-03-16 14:37:782
+# Built on 2018-03-17 15:44:895
 # minPatchCount=[6]
 # maxPatchCount=[10]
 # xOffset=[0.0]
@@ -20,43 +20,43 @@
 
 patch-count = 7
 
-patch.00.position = 15.95,-45.38,0.0
+patch.00.position = 15.95,119.62,0.0
 patch.00.resources = 141.07
 patch.00.radius =  3.50
 patch.00.predation-probability = 00.001778
 patch.00.min-agent-forage-count = 8
 
-patch.01.position = -0.93,-0.16,0.0
+patch.01.position = -0.93,164.84,0.0
 patch.01.resources = 193.50
 patch.01.radius =  3.50
 patch.01.predation-probability = 00.001306
 patch.01.min-agent-forage-count = 5
 
-patch.02.position = 28.76,21.46,0.0
+patch.02.position = 28.76,186.46,0.0
 patch.02.resources = 158.83
 patch.02.radius =  3.50
 patch.02.predation-probability = 00.007159
 patch.02.min-agent-forage-count = 8
 
-patch.03.position = -41.75,-12.72,0.0
+patch.03.position = -41.75,152.28,0.0
 patch.03.resources = 157.70
 patch.03.radius =  3.50
 patch.03.predation-probability = 00.002824
 patch.03.min-agent-forage-count = 5
 
-patch.04.position = 62.14,-7.29,0.0
+patch.04.position = 62.14,157.71,0.0
 patch.04.resources = 153.54
 patch.04.radius =  3.50
 patch.04.predation-probability = 00.007638
 patch.04.min-agent-forage-count = 6
 
-patch.05.position = -13.00,27.15,0.0
+patch.05.position = -13.00,192.15,0.0
 patch.05.resources = 149.90
 patch.05.radius =  3.50
 patch.05.predation-probability = 00.009425
 patch.05.min-agent-forage-count = 8
 
-patch.06.position = -22.63,-47.07,0.0
+patch.06.position = -22.63,117.93,0.0
 patch.06.resources = 129.09
 patch.06.radius =  3.50
 patch.06.predation-probability = 00.007242

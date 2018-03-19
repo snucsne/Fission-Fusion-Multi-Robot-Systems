@@ -21,11 +21,13 @@ package edu.snu.csne.forage.evolve;
 
 //Imports
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -103,6 +105,9 @@ public class ParseableStatistics extends Statistics
 
     /** The directory of the stat file */
     protected String _statDir = null;
+    
+    /** The statistics file */
+    protected File _statFile = null;
 
     
     /**
@@ -121,45 +126,42 @@ public class ParseableStatistics extends Statistics
         super.setup( state, base );
 
         // Get our statistics file
-        File statFile = state.parameters.getFile( base.push( P_STATISTICS_FILE ),
+        _statFile = state.parameters.getFile( base.push( P_STATISTICS_FILE ),
                 null );
-        _LOG.info( "Using statFile=[" + statFile + "]" );
-        _statDir = statFile.getParent();
+        _LOG.info( "Using statFile=[" + _statFile + "]" );
+        _statDir = _statFile.getParent();
 
         // Add it as our log
-        if( null != statFile )
+        try
         {
-            try
-            {
-                // Do we compress?
-                boolean compress = state.parameters.getBoolean(
-                        base.push(P_COMPRESS),
-                        null,
-                        false );
+            // Do we compress?
+            boolean compress = state.parameters.getBoolean(
+                    base.push(P_COMPRESS),
+                    null,
+                    false );
 
-                if( compress )
-                {
-                    _statLog = state.output.addLog( statFile,
-                            false,
-                            compress );
-                }
-                else
-                {
-                    _statLog = state.output.addLog( statFile,
-                            false );
-                }
-            }
-            catch( IOException ioe )
+            if( compress )
             {
-                // Oops, something went foobar
-                state.output.fatal( "Error creating log["
-                        + statFile
-                        + "]: "
-                        + ioe );
+                _statLog = state.output.addLog( _statFile,
+                        false,
+                        compress );
             }
-            
-            _LOG.info( "Statistics: _statLog=[" + _statLog + "]" );
+            else
+            {
+                _statLog = state.output.addLog( _statFile,
+                        false );
+            }
         }
+        catch( IOException ioe )
+        {
+            // Oops, something went foobar
+            state.output.fatal( "Error creating log["
+                    + _statFile
+                    + "]: "
+                    + ioe );
+        }
+
+        _LOG.info( "Statistics: _statLog=[" + _statLog + "]" );
 
         _LOG.trace( "Leaving setup( state, base )" );
     }
@@ -289,14 +291,22 @@ public class ParseableStatistics extends Statistics
     public void postEvaluationStatistics( EvolutionState state )
     {
         // Before we do anything, get the time
+        println( "gen-finish-time = " + (new Date()), state );
         long evalTime = ( System.currentTimeMillis() - _evalStartTime );
         println( "eval-time = "
                 + evalTime,
                 state );
+//        println( "eval-time-human = "
+//                + TimeUnit.MILLISECONDS.toMinutes( evalTime )
+//                + "m "
+//                + TimeUnit.MILLISECONDS.toSeconds( evalTime )
+//                + "s",
+//                state );
+        long seconds = (evalTime / 1000) % 60;
         println( "eval-time-human = "
-                + TimeUnit.MILLISECONDS.toMinutes( evalTime )
+                + ((evalTime/1000)-seconds)/60
                 + "m "
-                + TimeUnit.MILLISECONDS.toSeconds( evalTime )
+                + seconds
                 + "s",
                 state );
         _evalTotalTime += evalTime;
@@ -422,7 +432,12 @@ public class ParseableStatistics extends Statistics
         // Display the end time
         println( "end-time = " + (new Date()), state, false );
 
-        // Print out the best individuals and the generation they occured in
+        // Build the file prefix for the best of run individuals
+        String statFileName = _statFile.getAbsolutePath();
+        int fileExtIndex = statFileName.lastIndexOf( '.' );
+        String filePrefix = statFileName.substring( 0, fileExtIndex );
+        
+        // Print out the best individuals and the generation they occurred in
         for( int i = 0; i < _bestFound.length; i++ )
         {
             if( null != _bestFound[i] )
@@ -440,6 +455,53 @@ public class ParseableStatistics extends Statistics
                                 + _2_DIGIT_FORMATTER.format( i )
                                 + "].best-individual-found."),
                         state );
+                
+                // Save the genome
+                if( state.evaluator.p_problem instanceof DefaultForageProblem )
+                {
+                    DefaultForageProblem problem = (DefaultForageProblem) state.evaluator.p_problem;
+                    Properties genomeProps = problem.getGenomeProperties( _bestFound[i] );
+                    
+                    // Build the filename
+                    String bestFileName = filePrefix
+                            + "-best-found-"
+                            + _2_DIGIT_FORMATTER.format( i )
+                            + ".properties";
+                    
+                    StringBuilder builder = new StringBuilder( "# Best of run individual: subpopulation=[" );
+                    builder.append( _2_DIGIT_FORMATTER.format( i ) );
+                    builder.append( "]" );
+                    builder.append( NEWLINE );
+                    builder.append( "# Output filename: " );
+                    builder.append( bestFileName );
+                    builder.append( NEWLINE );
+                    builder.append( "# =========================================================" );
+                    builder.append( NEWLINE );
+                    builder.append( " Evolution parameters:" );
+                    builder.append( NEWLINE );
+                    StringWriter writer = new StringWriter();
+                    state.parameters.list( new PrintWriter( writer) );
+                    builder.append( writer.toString().replaceAll("\n", "\n# ") );
+                    builder.append( "# =========================================================" );
+
+                    // Save the file
+                    try
+                    {
+                        genomeProps.store( new FileWriter( bestFileName ),
+                                builder.toString() );
+                    }
+                    catch( Exception e )
+                    {
+                        _LOG.error( "Unable to save genome properties to file ["
+                                + bestFileName
+                                + "]",
+                                e );
+                        state.output.fatal( "Unable to save genome properties to file ["
+                                + bestFileName
+                                + "]: "
+                                + e );
+                    }
+                }
             }
         }
         state.output.flush();

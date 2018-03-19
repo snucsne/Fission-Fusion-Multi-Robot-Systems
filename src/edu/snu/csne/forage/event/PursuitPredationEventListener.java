@@ -107,6 +107,7 @@ public class PursuitPredationEventListener extends AbstractSimulationEventListen
                 // At this point randomly choose one, regardless of position
                 int preyIdx = _simState.getRNG().nextInt( teamSize );
                 Agent prey = teamMembers.get( preyIdx );
+                prey.terminate();
                 
                 _LOG.info( "Agent ["
                         + prey.getID()

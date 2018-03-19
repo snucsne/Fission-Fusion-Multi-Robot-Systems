@@ -1,5 +1,5 @@
 # =========================================================
-# Built on 2018-03-16 14:37:810
+# Built on 2018-03-17 15:44:913
 # minPatchCount=[6]
 # maxPatchCount=[10]
 # xOffset=[0.0]
@@ -20,55 +20,55 @@
 
 patch-count = 9
 
-patch.00.position = 32.06,17.41,0.0
+patch.00.position = 32.06,182.41,0.0
 patch.00.resources = 130.00
 patch.00.radius =  3.50
 patch.00.predation-probability = 00.002478
 patch.00.min-agent-forage-count = 4
 
-patch.01.position = 30.60,-40.53,0.0
+patch.01.position = 30.60,124.47,0.0
 patch.01.resources = 160.88
 patch.01.radius =  3.50
 patch.01.predation-probability = 00.001193
 patch.01.min-agent-forage-count = 7
 
-patch.02.position = 4.44,-55.30,0.0
+patch.02.position = 4.44,109.70,0.0
 patch.02.resources = 196.43
 patch.02.radius =  3.50
 patch.02.predation-probability = 00.008421
 patch.02.min-agent-forage-count = 8
 
-patch.03.position = -5.74,-11.13,0.0
+patch.03.position = -5.74,153.87,0.0
 patch.03.resources = 197.66
 patch.03.radius =  3.50
 patch.03.predation-probability = 00.008735
 patch.03.min-agent-forage-count = 8
 
-patch.04.position = -40.62,35.51,0.0
+patch.04.position = -40.62,200.51,0.0
 patch.04.resources = 164.99
 patch.04.radius =  3.50
 patch.04.predation-probability = 00.004644
 patch.04.min-agent-forage-count = 5
 
-patch.05.position = 63.54,12.73,0.0
+patch.05.position = 63.54,177.73,0.0
 patch.05.resources = 146.61
 patch.05.radius =  3.50
 patch.05.predation-probability = 00.006527
 patch.05.min-agent-forage-count = 4
 
-patch.06.position = -14.58,48.14,0.0
+patch.06.position = -14.58,213.14,0.0
 patch.06.resources = 131.95
 patch.06.radius =  3.50
 patch.06.predation-probability = 00.009171
 patch.06.min-agent-forage-count = 5
 
-patch.07.position = 36.25,50.40,0.0
+patch.07.position = 36.25,215.40,0.0
 patch.07.resources = 125.85
 patch.07.radius =  3.50
 patch.07.predation-probability = 00.008339
 patch.07.min-agent-forage-count = 4
 
-patch.08.position = -64.22,1.70,0.0
+patch.08.position = -64.22,166.70,0.0
 patch.08.resources = 162.67
 patch.08.radius =  3.50
 patch.08.predation-probability = 00.004596

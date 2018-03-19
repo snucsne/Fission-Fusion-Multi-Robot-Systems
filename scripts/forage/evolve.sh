@@ -16,7 +16,7 @@ fi
 # Default values
 #LOG_CONFIG=log/log4j-config-debug.xml
 LOG_CONFIG=log/log4j-config.xml
-# LOG_CONFIG=log/log4j-oscer-config.xml
+# LOG_CONFIG=log/log4j-config-oscer.xml
 MEMORYSIZE=1024M
 SEED=42
 COMPRESSSTATS=false
