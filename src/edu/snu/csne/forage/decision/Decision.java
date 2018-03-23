@@ -21,6 +21,8 @@ package edu.snu.csne.forage.decision;
 
 //Imports
 import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.jme3.math.Vector3f;
 
@@ -37,6 +39,10 @@ import edu.snu.csne.forage.SimulationState;
  */
 public class Decision
 {
+    /** Our logger */
+    private static final Logger _LOG = LogManager.getLogger(
+            Decision.class.getName() );
+    
     /** The type of decision */
     private DecisionType _type = null;
 
@@ -123,6 +129,7 @@ public class Decision
         if( null == _team )
         {
             _team = simState.createNewTeam();
+            _LOG.debug( "Creating new team" );
         }
     }
     
@@ -166,6 +173,15 @@ public class Decision
         return _leader;
     }
 
+    public void replaceLeader( Agent leader )
+    {
+        if( DecisionType.FOLLOW.equals( _type ) )
+        {
+            Validate.notNull( leader, "Replacement leader may not be null" );
+            _leader = leader;
+        }
+    }
+    
     /**
      * Returns the patch (if any) associated with this decision
      *

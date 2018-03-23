@@ -19,12 +19,17 @@
  */
 package edu.snu.csne.forage;
 
+// Imports
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import edu.snu.csne.forage.decision.Decision;
+import edu.snu.csne.forage.decision.DecisionType;
 
 /**
  * TODO Class description
@@ -33,11 +38,18 @@ import org.apache.commons.lang3.Validate;
  */
 public class AgentTeam
 {
+    /** Our logger */
+    private static final Logger _LOG = LogManager.getLogger(
+            AgentTeam.class.getName() );
+    
     /** This team's unique ID */
     private String _id = null;
     
     /** The members of this team */
-    private Map<String,Agent> _members = new HashMap<String,Agent>();
+    private List<Agent> _members = new ArrayList<Agent>();
+    
+    /** Flag denoting whether or not this team can be removed when empty */
+    private boolean _removeable = false;
     
     /**
      * Builds this AgentTeam object
@@ -46,12 +58,19 @@ public class AgentTeam
      */
     public AgentTeam( String id )
     {
-        // Validate and store
+        this( id, true );
+    }
+    
+    public AgentTeam( String id, boolean removeable )
+    {
+        // Validate and store the id
         Validate.notEmpty( id,
                 "Agent team ID may not be null or empty ["
                 + id
                 + "]" );
         _id = id;
+        
+        _removeable = removeable;
     }
     
     /**
@@ -85,7 +104,13 @@ public class AgentTeam
     public void join( Agent agent )
     {
         Validate.notNull( agent, "Joining agent may not be null" );
-        _members.put( agent.getID(), agent );
+//        _members.put( agent.getID(), agent );
+        _members.add( agent );
+//        _LOG.warn( "Agent joined team: agent=["
+//                + agent.getID()
+//                + "] team=["
+//                + getID()
+//                + "]" );
     }
     
     /**
@@ -96,12 +121,82 @@ public class AgentTeam
     public void leave( Agent agent )
     {
         Validate.notNull( agent, "Leaving agent may not be null" );
-        Agent leaver = _members.remove( agent.getID() );
-        Validate.notNull( leaver, "Leaving agent ["
+        boolean success = _members.remove( agent );
+        Validate.isTrue( success, "Leaving agent ["
                 + agent.getID()
                 + "] was not a member of team ["
                 + getID()
                 + "]" );
+    }
+    
+    public void memberWasPrey( Agent prey )
+    {
+        // If the prey is the only member of the group, no bookkeeping is necessary
+        if( 1 == _members.size() )
+        {
+            return;
+        }
+        
+        // Get the index of the prey agent
+        int preyIdx = _members.indexOf( prey );
+        Validate.isTrue( preyIdx >= 0, "Prey agent is not a member of this team" );
+
+        // Get the prey's decision
+        Decision preyDecision = prey.getDecision();
+
+        // Are they the leader and is there more than one??
+        if( 0 == preyIdx )
+        {
+            /* Yup, make the next in line the leader.  This is HACKEY and not
+             * accurate, but it is simple */
+            Decision leaderDecision = prey.getDecision();
+            Agent replacement = _members.get( 1 );
+            replacement.replaceDecision( leaderDecision );
+            
+            // Iterate through the team members
+            Iterator<Agent> memberIter = _members.iterator();
+            while( memberIter.hasNext() )
+            {
+                Agent current = memberIter.next();
+                
+                // Are they following the leader?
+                if( prey.equals( current.getDecision().getLeader() ) )
+                {
+                    // Yup
+                    current.getDecision().replaceLeader( replacement );
+                }
+            }
+
+        }
+        
+        // If it isn't foraging, there are leaders
+        else if( !DecisionType.FORAGE.equals( preyDecision.getType() ) )
+        {
+            /* Nope.  Tell all the prey's followers to instead follow the
+             * prey's leader.  This is HACKEY and not accurate, but it is simple */
+            Agent preysLeader = preyDecision.getLeader();
+            Validate.notNull( preysLeader, "Nonleader agent had no leader: teamSize=["
+                    + _members.size()
+                    + "] decision=["
+                    + prey.getDecision().getType()
+                    + "] team=["
+                    + getID()
+                    + "]" );
+            
+            // Iterate through the team members
+            Iterator<Agent> memberIter = _members.iterator();
+            while( memberIter.hasNext() )
+            {
+                Agent current = memberIter.next();
+                
+                // Are they following the prey?
+                if( prey.equals( current.getDecision().getLeader() ) )
+                {
+                    // Yup
+                    current.getDecision().replaceLeader( preysLeader );
+                }
+            }
+        }
     }
     
     /**
@@ -121,7 +216,7 @@ public class AgentTeam
      */
     public List<Agent> getMembers()
     {
-        return new ArrayList<Agent>( _members.values() );
+        return new ArrayList<Agent>( _members );
     }
     
     /**
@@ -133,5 +228,10 @@ public class AgentTeam
     public boolean isActive()
     {
         return (_members.size() > 0);
+    }
+    
+    public boolean isRemoveable()
+    {
+        return _removeable;
     }
 }

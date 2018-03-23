@@ -19,6 +19,7 @@
  */
 package edu.snu.csne.forage;
 
+import java.util.Collection;
 // Imports
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +39,7 @@ import edu.snu.csne.forage.event.DecisionEvent;
 import edu.snu.csne.forage.event.SimulationEventListener;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
-import edu.snu.csne.forage.util.PatchValueCalculator;
+import edu.snu.csne.forage.util.PatchDepletionCalculator;
 import edu.snu.csne.util.MiscUtils;
 
 
@@ -177,6 +180,10 @@ public class SimulationState
 
     /** Number of new teams created */
     private int _newTeamCount = 0;
+    
+    /** The patch depletion calculator */
+    private PatchDepletionCalculator _patchDepletionCalculator =
+            new PatchDepletionCalculator();
 
 
     /** All the agents in the simulation */
@@ -235,6 +242,9 @@ public class SimulationState
                 + _simulationRunStepCount
                 + "]" );
 
+        // Initialize the patch depletion calculator
+        _patchDepletionCalculator.initialize( this );
+        
         /* Create the food patches first so agent decision makers can have
          * access to them if needed */
         createPatches();
@@ -424,6 +434,11 @@ public class SimulationState
         
         // Build the team
         AgentTeam team = new AgentTeam( id );
+        _teams.put( id, team );
+        
+        _LOG.debug( "Created new team with ID=["
+                + id
+                + "]" );
         
         return team;
     }
@@ -522,6 +537,21 @@ public class SimulationState
         {
             // Send the signal
             iter.next().simStepTearDown();
+        }
+        
+        // Remove any inactive and removable teams
+        List<AgentTeam> teams = new LinkedList<AgentTeam>( _teams.values() );
+        Iterator<AgentTeam> teamIter = teams.iterator();
+        while( teamIter.hasNext() )
+        {
+            AgentTeam team = teamIter.next();
+            if( !team.isActive() && team.isRemoveable() )
+            {
+                _teams.remove( team.getID() );
+//                _LOG.debug( "Cleaned up empty team ["
+//                        + team.getID()
+//                        + "]" );
+            }
         }
     }
 
@@ -648,6 +678,11 @@ public class SimulationState
         return _random;
     }
     
+    public PatchDepletionCalculator getPatchDepletionCalculator()
+    {
+        return _patchDepletionCalculator;
+    }
+    
     /**
      * Create all the agents used in the simulation
      */
@@ -746,9 +781,6 @@ public class SimulationState
                 + agentPropertiesFile
                 + "]" );
         
-        PatchValueCalculator patchValueCalc = new PatchValueCalculator();
-        patchValueCalc.initialize( this );
-        
         // Load the properties
         Properties agentProps = MiscUtils.loadPropertiesFromFile( agentPropertiesFile );
         
@@ -805,7 +837,7 @@ public class SimulationState
                     agentSensor,
                     patchSensor,
                     decisionMaker,
-                    patchValueCalc,
+                    _patchDepletionCalculator,
                     this );
             
             // Add it to the map
@@ -881,13 +913,19 @@ public class SimulationState
                     prefix + _MIN_AGENT_FORAGE_COUNT_KEY,
                     "Patch [" + formattedIdx + "] min agent forage count " );
 
+            // Create the team for foraging in the patch
+            AgentTeam foragingTeam = new AgentTeam( "Foraging" + formattedIdx, false );
+            _teams.put( foragingTeam.getID(), foragingTeam );
+            _LOG.debug( "Created foraging team [" + foragingTeam.getID() + "]" );
+            
             // Create the patch and store it
             Patch patch = new Patch( id,
                     position,
                     radius,
                     resources,
                     predationProbability,
-                    minAgentForageCount );
+                    minAgentForageCount,
+                    foragingTeam );
             _patches.put( id, patch );
             
             _LOG.debug( "Created patch [" + id + "]" );

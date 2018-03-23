@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.AgentTeam;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.forage.decision.DecisionType;
 import edu.snu.csne.util.MiscUtils;
 
 
@@ -48,8 +49,11 @@ public class PursuitPredationEventListener extends AbstractSimulationEventListen
     private static final String _PURSUIT_PREDATION_PROBABILITY = "pursuit-predation-probability";
     
     
-    /** Base predation probability per team per timestep */
+    /** Base predation probability per timestep */
     private float _probability = 0.0f;
+    
+    /** The number of agents in the simulation (which is also the max group size */
+    private float _agentCount = 0;
     
     
     /**
@@ -70,9 +74,12 @@ public class PursuitPredationEventListener extends AbstractSimulationEventListen
         _probability = MiscUtils.loadNonEmptyFloatProperty( simState.getProps(),
                 _PURSUIT_PREDATION_PROBABILITY,
                 "Base pursuit predation probability" );
-        _LOG.debug( "_probability=["
+        _LOG.debug( "Base pursuit predation probability=["
                 + _probability
                 + "]" );
+
+        // Get the number of agents in the simulation
+        _agentCount = simState.getAllAgents().size();
         
         _LOG.trace( "Leaving initialize( simState )" );
     }
@@ -89,6 +96,7 @@ public class PursuitPredationEventListener extends AbstractSimulationEventListen
 
         // Iterate through all the active teams
         Map<String,AgentTeam> teams = _simState.getAllActiveTeams();
+//        _LOG.debug( "Testing predation on [" + teams.size() + "] teams" );
         Iterator<AgentTeam> teamIter = teams.values().iterator();
         while( teamIter.hasNext() )
         {
@@ -96,33 +104,59 @@ public class PursuitPredationEventListener extends AbstractSimulationEventListen
             
             // Get the size of the team
             int teamSize = current.getSize();
+            if( 0 == teamSize )
+            {
+                _LOG.debug( "Team [" + current.getID() + "] has no members" );
+                continue;
+            }
+            
+            // If it is the initial team where the agents rest, ignore it
+            Agent leader = current.getMembers().get( 0 );
+            if( DecisionType.REST.equals( leader.getDecision().getType() ) )
+            {
+//                _LOG.debug( "Team [" + current.getID() + "] is resting" );
+                continue;
+            }
+            
+            // Compute the probability of this team encountering a predator
+            float probability = _probability
+                    * (float) Math.sqrt( teamSize / _agentCount );
+//            _LOG.debug( "Predation probability=["
+//                    + probability
+//                    + "] for team size ["
+//                    + teamSize
+//                    + "] agentCount=["
+//                    + _agentCount
+//                    + "] with base probability=["
+//                    + _probability
+//                    + "]" );
             
             // Did predation occur?
             float predationValue = _simState.getRNG().nextFloat(); 
-            if( _probability > predationValue )
+            if( probability > predationValue )
             {
                 // Yup, determine which agent was the prey
                 List<Agent> teamMembers = current.getMembers();
                 
-                // At this point randomly choose one, regardless of position
+                // At this point randomly choose one, regardless of spatial position
                 int preyIdx = _simState.getRNG().nextInt( teamSize );
                 Agent prey = teamMembers.get( preyIdx );
+                
+                current.memberWasPrey( prey );
                 prey.terminate();
                 
-                _LOG.info( "Agent ["
-                        + prey.getID()
-                        + "] of team ["
-                        + current.getID()
-                        + "] became prey of a pursuit predator ["
-                        + _probability
-                        + " > "
-                        + predationValue
-                        + "]" );
+//                _LOG.debug( "Agent ["
+//                        + prey.getID()
+//                        + "] of team ["
+//                        + current.getID()
+//                        + "] became prey of a pursuit predator ["
+//                        + _probability
+//                        + " > "
+//                        + predationValue
+//                        + "]" );
             }
         }
         
         _LOG.trace( "Leaving simStepTearDown()" );
     }
-    
-    
 }

@@ -19,7 +19,7 @@
  */
 package edu.snu.csne.forage.util;
 
-import edu.snu.csne.forage.util.PatchValueCalculator.PatchDepletionData;
+import edu.snu.csne.forage.util.PatchDepletionCalculator.PatchDepletionData;
 
 /**
  * TODO Class description
@@ -147,4 +147,31 @@ public class PatchValue
     {
         return _allDepletionData;
     }
+
+    /**
+     * TODO Method description
+     *
+     * @return
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append( "PatchValue: giveUpTimeInd=[" );
+        builder.append( _giveUpTimeInd );
+        builder.append( "] _giveUpSlopeInd=[" );
+        builder.append( _giveUpSlopeInd );
+        builder.append( "] _giveUpTimeGroup=[" );
+        builder.append( _giveUpTimeGroup );
+        builder.append( "] _giveUpSlopeGroup=[" );
+        builder.append( _giveUpSlopeGroup );
+        builder.append( "] _indResources=[" );
+        builder.append(_indResources  );
+        builder.append( "]" );
+        
+        return builder.toString();
+    }
+    
+    
 }

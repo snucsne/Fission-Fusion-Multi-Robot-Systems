@@ -52,5 +52,6 @@ for( my $i = 0; $i < $foldFileCount; $i++ )
         # Increment the random seed
         $seed++;
     }
+    print "\n";
 }
 

@@ -274,7 +274,7 @@ public class GraphicalPositionPanel extends JPanel
             
             // For now, just use green for the patch
             // Later the patch color will depend on the resources
-            g2d.setColor( new Color( 0.0f, 0.8f, 0.0f, 0.5f ) );
+            g2d.setColor( new Color( 0.0f, 0.8f, 0.0f, 1.0f ) );
             
             // Get the converted position
             Vector3f patchPosition = current.getPosition();
@@ -297,6 +297,11 @@ public class GraphicalPositionPanel extends JPanel
             g2d.transform( patchTransform );
             
             // Draw the patch
+            g2d.draw( patchShape );
+            
+            // Change the transparency to reflect patch density
+            float alpha = Math.min( 1.0f, current.getRemainingResources() / 150.0f );
+            g2d.setColor( new Color( 0.0f, 0.8f, 0.0f, alpha * 0.75f ) );
             g2d.fill( patchShape );
             
             // Restore the original transform
@@ -353,8 +358,7 @@ public class GraphicalPositionPanel extends JPanel
             g2d.setColor( _agentColor );
             Agent current = agentIter.next();
             Vector3f converted = convert( current.getPosition() );
-            drawAgent( g2d, converted, current.getVelocity() );
-            
+            drawAgent( g2d, converted, current.getVelocity(), current.isActive() );
         }
     }
     
@@ -368,7 +372,8 @@ public class GraphicalPositionPanel extends JPanel
      */
     private void drawAgent( Graphics2D g2d,
             Vector3f position,
-            Vector3f velocity )
+            Vector3f velocity,
+            boolean active )
     {
         // Get the original transformation
         AffineTransform original = g2d.getTransform();
@@ -379,7 +384,15 @@ public class GraphicalPositionPanel extends JPanel
         agentTransform.translate( position.x, position.y );
         agentTransform.rotate( Math.PI / -2.0f - spherical.theta );
         g2d.transform( agentTransform );
-        g2d.fill( _agentPoly );
+        if( active )
+        {
+            g2d.fill( _agentPoly );
+        }
+        else
+        {
+            g2d.setColor( Color.RED );
+            g2d.draw( _agentPoly );
+        }
         
         // Restore the original
         g2d.setTransform( original );

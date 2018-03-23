@@ -1,5 +1,21 @@
 /*
- * COPYRIGHT
+ *  The Fission-Fusion in Multi-Robot Systems Toolkit is open-source
+ *  software for for investigating fission-fusion processes in
+ *  multi-robot systems.
+ *  Copyright (C) 2017 Southern Nazarene University
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package edu.snu.csne.forage.event;
 
@@ -17,6 +33,9 @@ import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
 import edu.snu.csne.forage.decision.DecisionType;
+import edu.snu.csne.forage.util.PatchDepletion;
+import edu.snu.csne.forage.util.PatchDepletionCalculator;
+import edu.snu.csne.forage.util.PatchDepletionCalculator.PatchDepletionData;
 
 /**
  * TODO Class description
@@ -50,6 +69,8 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
     
     protected float _totalResourcesForaged = 0.0f;
     
+    protected PatchDepletionCalculator _patchDepletionCalc = null;
+    
     /** History of depletion events */
     protected List<DepletionEvent> _depletonEvents =
             new LinkedList<PatchDepletionListener.DepletionEvent>();
@@ -73,6 +94,9 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
         
         // Add a zero depletion event to help with later calculations
         _depletonEvents.add( new DepletionEvent( -1l, 0.0f, null ) );
+        
+        // Get the patch depletion calculator
+        _patchDepletionCalc = simState.getPatchDepletionCalculator();
     }
 
     /**
@@ -127,19 +151,39 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
                     / patchArea;
             
             // Compute how many resources are foraged
-            float foragingAreaEffective = (float) Math.min( consumptionRateMax,
+            float foragingAreaEffective = (float) Math.min( foragingAreaMax,
                     patchArea / agentCount );
             float resourcesForagedPerAgent = (float) Math.min( consumptionRateMax,
                     foragingAreaEffective * resourceDensity );
             float totalResourcesForaged = resourcesForagedPerAgent * agentCount;
             
-            // Tell the patch how much was foraged
-            float actualResourcesForaged = patch.setResourcesForaged( totalResourcesForaged );
+            
+            // ************
+            PatchDepletion depletionData = _patchDepletionCalc.calculatePatchDepletion(
+                    patch.getArea(),
+                    patch.getRemainingResources(),
+                    agentCount,
+                    0,
+                    agent.getMaxForagingArea(),
+                    agent.getResourceConsumptionRate() );
+            resourcesForagedPerAgent = depletionData.getPerAgentResources();
+            totalResourcesForaged = depletionData.getTotalResources();
+            // ************
+            
+            // Determine how much was actually foraged
+//            float totalResourcesForaged = depletionData.resourcesGatheredGroup;
+//            float resourcesForagedPerAgent = depletionData.resourcesGatheredAgent;
+            float actualResourcesForaged = patch.setResourcesForaged(
+                    totalResourcesForaged );
+//            if( actualResourcesForaged < depletionData.resourcesGatheredGroup )
+//            {
+//                resourcesForagedPerAgent = actualResourcesForaged / agentCount;
+//            }
             if( actualResourcesForaged < totalResourcesForaged )
             {
                 resourcesForagedPerAgent = actualResourcesForaged / agentCount;
             }
-            
+
             // Notify each agent how much it foraged
             Iterator<Agent> agentIter = patchForagingAgents.iterator();
             while( agentIter.hasNext() )

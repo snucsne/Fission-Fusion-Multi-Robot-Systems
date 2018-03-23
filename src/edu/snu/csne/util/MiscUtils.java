@@ -307,6 +307,32 @@ public class MiscUtils
     }
 
     /**
+     * Loads an optional boolean value from properties
+     *
+     * @param props All the properties
+     * @param key The key of the value
+     * @param defaultValue The default value to use if the property doesn't exist
+     * @return The boolean value
+     */
+    public static boolean loadOptionalBooleanProperty( Properties props,
+            String key,
+            boolean defaultValue )
+    {
+        // Use the default
+        boolean value = defaultValue;
+        
+        // Was the value specified?
+        String valueStr = props.getProperty( key );
+        if( null != valueStr )
+        {
+            value = Boolean.parseBoolean( valueStr );
+        }
+        
+        return value;
+    }
+
+
+    /**
      * Loads a non-empty Vector3f value from properties
      *
      * @param props All the properties

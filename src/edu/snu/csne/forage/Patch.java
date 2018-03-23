@@ -37,6 +37,9 @@ public class Patch
     private static final Logger _LOG = LogManager.getLogger(
             Patch.class.getName() );
     
+    /** PI as a float */
+    protected static final float _PI = (float) Math.PI;
+
     /** This patch's unique ID */
     private String _id = null;
     
@@ -58,6 +61,9 @@ public class Patch
     /** The minimum number of agents required for foraging to succeed */
     private int _minAgentForageCount = 0;
     
+    /** The agent team for foragers at this patch */
+    private AgentTeam _foragingTeam = null;
+    
     
     /**
      * Builds this Patch object
@@ -75,6 +81,28 @@ public class Patch
             float initialResources,
             float predationProbability,
             int minAgentForageCount )
+    {
+        this( id, position, radius, initialResources, predationProbability, minAgentForageCount, null );
+    }
+
+    /**
+     * Builds this Patch object
+     *
+     * @param id
+     * @param position
+     * @param radius
+     * @param initialResources
+     * @param predationProbability
+     * @param minAgentForageCount
+     * @param foragingTeam
+     */
+    public Patch( String id,
+            Vector3f position,
+            float radius,
+            float initialResources,
+            float predationProbability,
+            int minAgentForageCount,
+            AgentTeam foragingTeam )
     {
         // Validate and store
         Validate.notEmpty( id, "Patch ID may not be null or empty" );
@@ -96,8 +124,11 @@ public class Patch
         _remainingResources = initialResources;
         _predationProbability = predationProbability;
         _minAgentForageCount = minAgentForageCount;
+        
+        // Foraging team is optional
+        _foragingTeam = foragingTeam;
     }
-    
+
     /**
      * Determins if the specified agent is in this patch
      * 
@@ -138,6 +169,11 @@ public class Patch
     public float getRadius()
     {
         return _radius;
+    }
+    
+    public float getArea()
+    {
+        return _radius * _radius * _PI;
     }
     
     /**
@@ -192,6 +228,11 @@ public class Patch
         return _minAgentForageCount;
     }
 
+    public AgentTeam getForagingTeam()
+    {
+        return _foragingTeam;
+    }
+    
     /**
      * TODO Method description
      *

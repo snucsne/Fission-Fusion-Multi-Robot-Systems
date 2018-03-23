@@ -44,6 +44,10 @@ public class DefaultProbabilityDecisionCalculator
     private static final Logger _LOG = LogManager.getLogger(
             DefaultProbabilityDecisionCalculator.class.getName() );
     
+    /** Property key for the calculator properties file */
+    public static final String _PROB_DECISION_CALC_PROPS_FILE_KEY = "decision-calc-props-file";
+    
+    
     /** Property key for the initiation rate base */
     public static final String _INITIATE_RATE_KEY = "initiate-rate";
     
@@ -56,13 +60,22 @@ public class DefaultProbabilityDecisionCalculator
     /** Property key for the initiation MRV sigma */
     public static final String _INITIATE_MRV_SIGMA_KEY = "initiate-mrv-sigma";
     
+    /** Property key for the initiation MRV flag */
+    public static final String _INITIATE_MRV_FLAG_KEY = "initiate-mrv-flag";
+    
     /** Property key for the initiation patch value sigma */
     public static final String _INITIATE_PATCH_VALUE_SIGMA_KEY = "initiate-patch-value-sigma";
+    
+    /** Property key for the initiation patch value flag */
+    public static final String _INITIATE_PATCH_VALUE_FLAG_KEY = "initiate-patch-value-flag";
     
     /** Property key for the initiation direction difference sigma */
     public static final String _INITIATE_DIR_DIFF_SIGMA_KEY = "initiate-dir-diff-sigma";
     
+    /** Property key for the initiation direction difference flag */
+    public static final String _INITIATE_DIR_DIFF_FLAG_KEY = "initiate-dir-diff-flag";
     
+
     /** Property key for the follow alpha */
     public static final String _FOLLOW_ALPHA_KEY = "follow-alpha";
     
@@ -81,11 +94,20 @@ public class DefaultProbabilityDecisionCalculator
     /** Property key for the follow mean position relative distance sigma */
     public static final String _FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY = "follow-mean-pos-rel-dist-sigma";
 
+    /** Property key for the follow mean position relative distance flag */
+    public static final String _FOLLOW_MEAN_POS_REL_DIST_FLAG_KEY = "follow-mean-pos-rel-dist-flag";
+
     /** Property key for the follow MRV direction difference sigma */
     public static final String _FOLLOW_MRV_DIR_DIFF_SIGMA_KEY = "follow-mrv-dir-diff-sigma";
     
+    /** Property key for the follow MRV direction difference flag */
+    public static final String _FOLLOW_MRV_DIR_DIFF_FLAG_KEY = "follow-mrv-dir-diff-flag";
+    
     /** Property key for the follow MRV magnitude difference sigma */
     public static final String _FOLLOW_MRV_MAG_DIFF_SIGMA_KEY = "follow-mrv-mag-diff-sigma";
+
+    /** Property key for the follow MRV magnitude difference flag */
+    public static final String _FOLLOW_MRV_MAG_DIFF_FLAG_KEY = "follow-mrv-mag-diff-flag";
 
     
     /** Property key for the forage rate base */
@@ -99,6 +121,9 @@ public class DefaultProbabilityDecisionCalculator
     
     /** Property key for the forage patch value sigma */
     public static final String _FORAGE_PATCH_VALUE_SIGMA_KEY = "forage-patch-value-sigma";
+
+    /** Property key for the forage patch value flag */
+    public static final String _FORAGE_PATCH_VALUE_FLAG_KEY = "forage-patch-value-flag";
 
     
     
@@ -133,11 +158,20 @@ public class DefaultProbabilityDecisionCalculator
     /** Initiation MRV sigma */
     private float _navigateMRVSigma = 0.0f;
     
+    /** Initiation MRV flag */
+    private boolean _navigateMRVFlag = false;
+    
     /** Initiation patch value sigma */
     private float _navigatePatchValueSigma = 0.0f;
     
+    /** Initiation patch value flag */
+    private boolean _navigatePatchValueFlag = false;
+    
     /** Initiation direction difference sigma */
     private float _navigateDirDiffSigma = 0.0f;
+    
+    /** Initiation direction difference flag */
+    private boolean _navigateDirDiffFlag = false;
     
     /** Maximum navigation k value */
     private float _maxNavigateK = 0.0f;
@@ -158,11 +192,20 @@ public class DefaultProbabilityDecisionCalculator
     /** Follow MRV direction difference sigma */
     private float _followMRVDirDiffSigma = 0.0f;
     
+    /** Follow MRV direction difference flag */
+    private boolean _followMRVDirDiffFlag = false;
+    
     /** Follow MRV magnitude difference sigma */
     private float _followMRVMagDiffSigma = 0.0f;
     
+    /** Follow MRV magnitude difference flag */
+    private boolean _followMRVMagDiffFlag = false;
+    
     /** Follow relative distance sigma */
     private float _followRelDistanceSigma = 0.0f;
+    
+    /** Follow relative distance flag */
+    private boolean _followRelDistanceFlag = false;
     
     /** Maximum follow k value */
     private float _maxFollowK = 0.0f;
@@ -180,8 +223,12 @@ public class DefaultProbabilityDecisionCalculator
     /** Forage patch value sigma */
     private float _foragePatchValueSigma = 0.0f;
     
+    /** Forage patch value flag */
+    private boolean _foragePatchValueFlag = false;
+    
     /** Maximum forage k value */
     private float _maxForageK = 0.0f;
+    
     
     /** Flag denoting individual patch values should be used */
     private boolean _usePatchValueIndivdiual = false;
@@ -202,37 +249,59 @@ public class DefaultProbabilityDecisionCalculator
         // Get the system properties
         Properties props = simState.getProps();
 
+        _usePatchValueIndivdiual = MiscUtils.loadNonEmptyBooleanProperty( props,
+                _USE_PATCH_VALUE_INDIVIDUAL_KEY,
+                "Use patch value individual" );
+
         // Get the random number generator
         _rng = simState.getRNG();
         
+        // If there is a separate props file for calculations, use it
+        Properties calcProps = props;
+        String calcPropsFilename = System.getProperty( _PROB_DECISION_CALC_PROPS_FILE_KEY );
+        if( null != calcPropsFilename )
+        {
+            calcProps = MiscUtils.loadPropertiesFromFile( calcPropsFilename );
+            _LOG.info( "Using decision calculator properties file" );
+        }
+        
         // Load the initiation rate
-        _inititationRate = MiscUtils.loadNonEmptyFloatProperty( props,
+        _inititationRate = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _INITIATE_RATE_KEY,
                 "Initiation rate" );
         
-        _initiationKExpMultiplier = MiscUtils.loadNonEmptyFloatProperty( props,
+        _initiationKExpMultiplier = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _INITIATE_K_EXP_MULT_KEY,
                 "Initiation rate" );
         
-        _initiationKExpOffset = MiscUtils.loadNonEmptyFloatProperty( props,
+        _initiationKExpOffset = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _INITIATE_K_EXP_OFFSET_KEY,
                 "Initiation rate" );
         
-        // Load the navigate MRV sigma value
-        _navigateMRVSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+        // Load the navigate MRV values
+        _navigateMRVSigma = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _INITIATE_MRV_SIGMA_KEY,
                 "Navigate MRV sigma" );
+        _navigateMRVFlag = MiscUtils.loadNonEmptyBooleanProperty( calcProps,
+                _INITIATE_MRV_FLAG_KEY,
+                "Navigate MRV flag" );
         
-        // Load the navigate patch value sigma value
-        _navigatePatchValueSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+        // Load the navigate patch value values
+        _navigatePatchValueSigma = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _INITIATE_PATCH_VALUE_SIGMA_KEY,
                 "Navigate patch value sigma" );
-        
-        // Load the navigate direction difference sigma value
-        _navigateDirDiffSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+        _navigatePatchValueFlag = MiscUtils.loadNonEmptyBooleanProperty( calcProps,
+                _INITIATE_PATCH_VALUE_FLAG_KEY,
+                "Navigate patch value flag" );
+
+        // Load the navigate direction difference values
+        _navigateDirDiffSigma = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _INITIATE_DIR_DIFF_SIGMA_KEY,
                 "Navigate direction difference sigma" );
-        
+        _navigateDirDiffFlag = MiscUtils.loadNonEmptyBooleanProperty( calcProps,
+                _INITIATE_DIR_DIFF_FLAG_KEY,
+                "Navigate direction difference flag" );
+
         /** Compute the max navigation k value */
         _maxNavigateK = (1.0f/(1.0f + (float) Math.exp( _initiationKExpMultiplier
                 * (-_initiationKExpOffset))));
@@ -255,43 +324,48 @@ public class DefaultProbabilityDecisionCalculator
         
         
         // Load the follow alpha constant
-        _followAlpha = MiscUtils.loadNonEmptyFloatProperty( props,
+        _followAlpha = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FOLLOW_ALPHA_KEY,
                 "Follow alpha" );
 
         // Load the follow beta constant
-        _followBeta = MiscUtils.loadNonEmptyFloatProperty( props,
+        _followBeta = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FOLLOW_BETA_KEY,
                 "Follow beta" );
         
         // Load the follow k exponent multiplier
-        _followKExpMultiplier = MiscUtils.loadNonEmptyFloatProperty( props,
+        _followKExpMultiplier = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FOLLOW_K_EXP_MULT_KEY,
                 "follow base rate" );
 
         // Load the follow k exponent offset value
-        _followKExpOffset = MiscUtils.loadNonEmptyFloatProperty( props,
+        _followKExpOffset = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FOLLOW_K_EXP_OFFSET_KEY,
                 "follow base rate" );
 
-        // Load the follow relative distance value
-        _followRelDistanceSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+        // Load the follow relative distance values
+        _followRelDistanceSigma = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
-                "follow mean position relative distance" );
+                "follow mean position relative distance sigma" );
+        _followRelDistanceFlag = MiscUtils.loadNonEmptyBooleanProperty( calcProps,
+                _FOLLOW_MEAN_POS_REL_DIST_FLAG_KEY,
+                "follow mean position relative distance flag" );
 
-        // Load the follow MRV direction difference sigma value
-        _followMRVDirDiffSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+        // Load the follow MRV direction difference values
+        _followMRVDirDiffSigma = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FOLLOW_MRV_DIR_DIFF_SIGMA_KEY,
-                "Follow MRV direction difference sigma" );
+                "follow MRV direction difference sigma" );
+        _followMRVDirDiffFlag = MiscUtils.loadNonEmptyBooleanProperty( calcProps,
+                _FOLLOW_MRV_DIR_DIFF_FLAG_KEY,
+                "follow MRV direction difference flag" );
         
-        // Load the follow MRV magnitude difference sigma value
-        _followMRVMagDiffSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+        // Load the follow MRV magnitude difference values
+        _followMRVMagDiffSigma = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FOLLOW_MRV_MAG_DIFF_SIGMA_KEY,
-                "Follow MRV magnitude difference sigma" );
-
-        _usePatchValueIndivdiual = MiscUtils.loadNonEmptyBooleanProperty( props,
-                _USE_PATCH_VALUE_INDIVIDUAL_KEY,
-                "Use patch value individual" );
+                "follow MRV magnitude difference sigma" );
+        _followMRVMagDiffFlag = MiscUtils.loadNonEmptyBooleanProperty( calcProps,
+                _FOLLOW_MRV_MAG_DIFF_FLAG_KEY,
+                "follow MRV magnitude difference flag" );
 
         // Compute the max follow k value
         _maxFollowK = (1.0f/(1.0f + (float) Math.exp( _followKExpMultiplier
@@ -313,24 +387,27 @@ public class DefaultProbabilityDecisionCalculator
         
         
         // Load the base forage rate
-        _forageBaseRate = MiscUtils.loadNonEmptyFloatProperty( props,
+        _forageBaseRate = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FORAGE_RATE_KEY,
                 "Forage base rate" );
 
         // Load the forage k exponent multiplier
-        _forageKExpMultilier = MiscUtils.loadNonEmptyFloatProperty( props,
+        _forageKExpMultilier = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FORAGE_K_EXP_MULT_KEY,
                 "Forage base rate" );
 
         // Load the forage k exponent offset value
-        _forageKExpOffset = MiscUtils.loadNonEmptyFloatProperty( props,
+        _forageKExpOffset = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FORAGE_K_EXP_OFFSET_KEY,
                 "Forage base rate" );
 
-        // Load the forage patch value sigma value
-        _foragePatchValueSigma = MiscUtils.loadNonEmptyFloatProperty( props,
+        // Load the forage patch value values
+        _foragePatchValueSigma = MiscUtils.loadNonEmptyFloatProperty( calcProps,
                 _FORAGE_PATCH_VALUE_SIGMA_KEY,
-                "Forage base rate" );
+                "forage patch value sigma" );
+        _foragePatchValueFlag = MiscUtils.loadNonEmptyBooleanProperty( calcProps,
+                _FORAGE_PATCH_VALUE_FLAG_KEY,
+                "forage patch value flag" );
 
         // Compute the max forage k value
         _maxForageK = (1.0f/(1.0f + (float) Math.exp( _forageKExpMultilier
@@ -365,17 +442,23 @@ public class DefaultProbabilityDecisionCalculator
         // Get the mean resultant vector of the agent w.r.t. sesnsed teammates
         NavigationalVector mrv = agent.getMRVForTeam( agent.getTeam().getID() );
         float mrvComponent = 0.0f;
-        if( _navigateMRVSigma > 0.0f )
+        float mrvR = mrv.r;
+        if( 1 == agent.getTeam().getSize() )
+        {
+            mrvR = 1.0f;
+//            _LOG.warn( "Using single size team" );
+        }
+        if( _navigateMRVFlag && _navigateMRVSigma > 0.0f )
         {
             mrvComponent = (1.0f - mrv.r) * (1.0f - mrv.r)
                 / (_navigateMRVSigma * _navigateMRVSigma);
         }
-        _LOG.debug( "mrv.r=[" + mrv.r + "]" );
+//        _LOG.debug( "mrv.r=[" + mrv.r + "]" );
         
         // Get the value of the patch
         float patchValue = getPatchValue( patch, agent );
         float patchValueComponent = 0.0f;
-        if( _navigatePatchValueSigma > 0.0f )
+        if( _navigatePatchValueFlag && _navigatePatchValueSigma > 0.0f )
         {
             patchValueComponent = (1.0f - patchValue) * (1.0f - patchValue)
                 / (_navigatePatchValueSigma * _navigatePatchValueSigma);
@@ -385,6 +468,10 @@ public class DefaultProbabilityDecisionCalculator
         NavigationalVector toPatch = new NavigationalVector(
                 patch.getPosition().subtract( agent.getPosition() ) );
         float dirDiff = toPatch.theta - mrv.theta;
+        if( 1 == agent.getTeam().getSize() )
+        {
+            dirDiff = 0.0f;
+        }
         if( dirDiff < -_PI )
         {
             dirDiff += _TWO_PI;
@@ -395,7 +482,7 @@ public class DefaultProbabilityDecisionCalculator
         }
         dirDiff = Math.abs( dirDiff / _PI );
         float dirComponent = 0.0f;
-        if( _navigateDirDiffSigma > 0.0f )
+        if( _navigateDirDiffFlag && _navigateDirDiffSigma > 0.0f )
         {
             dirComponent = (dirDiff * dirDiff)
                     / (_navigateDirDiffSigma * _navigateDirDiffSigma);
@@ -423,7 +510,13 @@ public class DefaultProbabilityDecisionCalculator
 
         if( _LOG.isDebugEnabled() )
         {
-            _LOG.debug( "Navigate: mrvComponent=["
+            _LOG.debug( "Navigate: patch=["
+                    + patch.getID()
+                    + "] patchValue=["
+                    + patchValue
+                    + "] mrvR=["
+                    + mrvR
+                    + "] mrvComponent=["
                     + mrvComponent
                     + "] patchValueComponent=["
                     + patchValueComponent
@@ -471,7 +564,7 @@ public class DefaultProbabilityDecisionCalculator
         _LOG.debug( "Final: mrvDirDiff=[" + mrvDirDiff + "]" );
         
         float mrvDirDiffComponent = 0.0f;
-        if( _followMRVDirDiffSigma > 0.0f )
+        if( _followMRVDirDiffFlag && _followMRVDirDiffSigma > 0.0f )
         {
             mrvDirDiffComponent = (1.0f - mrvDirDiff) * (1.0f - mrvDirDiff)
                 / (_followMRVDirDiffSigma * _followMRVDirDiffSigma);
@@ -487,7 +580,7 @@ public class DefaultProbabilityDecisionCalculator
         }
         
         float mrvMagDiffComponent = 0.0f;
-        if( _followMRVMagDiffSigma > 0.0f )
+        if( _followMRVMagDiffFlag && _followMRVMagDiffSigma > 0.0f )
         {
             mrvMagDiffComponent = (1.0f - currentMRV.r) * (1.0f - currentMRV.r)
                 / (_followMRVMagDiffSigma * _followMRVMagDiffSigma);
@@ -506,7 +599,7 @@ public class DefaultProbabilityDecisionCalculator
         
         float relDistance = leaderTeamRelPosition.lengthSquared() / currentTeamRelPosition.lengthSquared();
         float relDistanceComponent = 0.0f;
-        if( _followRelDistanceSigma > 0.0f )
+        if( _followRelDistanceFlag && _followRelDistanceSigma > 0.0f )
         {
             relDistanceComponent = (relDistance) * (relDistance)
                     / (_followRelDistanceSigma * _followRelDistanceSigma);
@@ -629,8 +722,13 @@ public class DefaultProbabilityDecisionCalculator
                     + k
                     + "] probability=["
                     + String.format( "%10.8f", probability )
+                    + "] resources=["
+                    + patch.getRemainingResources()
+                    + "] distance=["
+                    + patch.getPosition().distance( agent.getPosition() )
                     + "]" );
         }
+
         return probability;
     }
 
@@ -701,6 +799,12 @@ public class DefaultProbabilityDecisionCalculator
             patchValue = patchValueData.getGiveUpSlopeInd() / patchValueIndMax;
         }
         
+//        _LOG.warn( "Max patch value=["
+//                + patchValueIndMax
+//                + "] patchValue=["
+//                + patchValue
+//                + "] - "
+//                + patchValueData );
 //        _LOG.debug( "patchValueIndMax=["
 //                + patchValueIndMax
 //                + "] patchValueGroupMax=["

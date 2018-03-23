@@ -35,7 +35,7 @@ import edu.snu.csne.forage.event.DecisionEvent;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
 import edu.snu.csne.forage.util.PatchValue;
-import edu.snu.csne.forage.util.PatchValueCalculator;
+import edu.snu.csne.forage.util.PatchDepletionCalculator;
 import edu.snu.csne.mates.math.NavigationalVector;
 
 
@@ -69,7 +69,7 @@ public class Agent
     private AgentDecisionMaker _decisionMaker = null;
     
     /** Patch value calculator */
-    private PatchValueCalculator _patchValueCalc = null;
+    private PatchDepletionCalculator _patchValueCalc = null;
 
     /** This agent's position */
     private Vector3f _position = new Vector3f();
@@ -182,7 +182,7 @@ public class Agent
             AgentSensor agentSensor,
             PatchSensor patchSensor,
             AgentDecisionMaker decisionMaker,
-            PatchValueCalculator patchValueCalc,
+            PatchDepletionCalculator patchValueCalc,
             SimulationState simState )
     {
         // Validate the parameters
@@ -356,7 +356,9 @@ public class Agent
                 + " vel="
                 + _velocity
                 + " position="
-                + _position );
+                + _position
+                + " speed="
+                + _velocity.length() );
 
         _LOG.trace( "Leaving act()" );
     }
@@ -465,6 +467,12 @@ public class Agent
     public Decision getDecision()
     {
         return _decision;
+    }
+    
+    public void replaceDecision( Decision decision )
+    {
+        Validate.notNull( decision, "Replacement decision may not be null" );
+        _decision = decision;
     }
     
     /**
@@ -796,6 +804,11 @@ public class Agent
             {
                 Agent currentAgent = currentTeamMemberIter.next();
                 
+                if( currentAgent.getID().equals( getID() ) )
+                {
+                    continue;
+                }
+                
                 // Get the vector from the agent to the teammate
                 Vector3f toAgent = currentAgent.getPosition().subtract( _position );
 
@@ -811,7 +824,7 @@ public class Agent
             
             // Scale it by the number of agents
             Vector3f mrv = new Vector3f( teamSum );
-            if( teamMembers.size() > 0 )
+            if( 0 < teamMembers.size() )
             {
                 mrv.multLocal( 1.0f / teamMembers.size() );
             }
@@ -865,6 +878,15 @@ public class Agent
             PatchValue value = _patchValueCalc.calculatePatchValue( patch, this );
             float giveUpSlopeInd = value.getGiveUpSlopeInd();
             float giveUpSlopeGroup = value.getGiveUpSlopeGroup();
+            
+//            if( patch.getRemainingResources() < 5 )
+//            {
+//                _LOG.warn( "Low patch: giveUpSlopeInd=["
+//                        + giveUpSlopeInd
+//                        + "] giveUpSlopeGroup=["
+//                        + giveUpSlopeGroup
+//                        + "]" );
+//            }
             
             // Save it
             _patchValues.put( patch.getID(), value );

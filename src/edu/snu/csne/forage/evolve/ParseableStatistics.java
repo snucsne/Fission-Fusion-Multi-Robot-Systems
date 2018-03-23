@@ -325,6 +325,11 @@ public class ParseableStatistics extends Statistics
         // Get the statistics objects
         DescriptiveStatistics fitnessStats = new DescriptiveStatistics();
 
+        // Build the file prefix for the best of gen individuals
+        String statFileName = _statFile.getAbsolutePath();
+        int fileExtIndex = statFileName.lastIndexOf( '.' );
+        String filePrefix = statFileName.substring( 0, fileExtIndex );
+        
         // Iterate over the sub-populations
         for( int i = 0; i < state.population.subpops.length; i++ )
         {
@@ -377,6 +382,20 @@ public class ParseableStatistics extends Statistics
                     true,
                     prefix + "best-individual."),
                     state );
+            
+            // Save the genome
+            String bestFileName = filePrefix
+                    + "-best-found-gen-"
+                    + _2_DIGIT_FORMATTER.format( state.generation )
+                    + "-"
+                    + _2_DIGIT_FORMATTER.format( i )
+                    + ".properties";
+            String comment = "Best of generation individual: generation=["
+                    + _2_DIGIT_FORMATTER.format( state.generation )
+                    + "] subpopulation=["
+                    + _2_DIGIT_FORMATTER.format( i )
+                    + "]";
+            exportGenomeProps( state, i, bestFileName, bestOfGenInd, comment );
 
             println( prefix + "best-individual-found-so-far.fitness = "
                     + ((SimpleFitness) _bestFound[i].fitness).fitness(),
@@ -384,6 +403,7 @@ public class ParseableStatistics extends Statistics
             println( prefix + "best-individual-found-so-far.generation = "
                     + _bestFoundGen[i],
                     state );
+            
         }
 
         state.output.flush();
@@ -457,51 +477,60 @@ public class ParseableStatistics extends Statistics
                         state );
                 
                 // Save the genome
-                if( state.evaluator.p_problem instanceof DefaultForageProblem )
-                {
-                    DefaultForageProblem problem = (DefaultForageProblem) state.evaluator.p_problem;
-                    Properties genomeProps = problem.getGenomeProperties( _bestFound[i] );
-                    
-                    // Build the filename
-                    String bestFileName = filePrefix
-                            + "-best-found-"
-                            + _2_DIGIT_FORMATTER.format( i )
-                            + ".properties";
-                    
-                    StringBuilder builder = new StringBuilder( "# Best of run individual: subpopulation=[" );
-                    builder.append( _2_DIGIT_FORMATTER.format( i ) );
-                    builder.append( "]" );
-                    builder.append( NEWLINE );
-                    builder.append( "# Output filename: " );
-                    builder.append( bestFileName );
-                    builder.append( NEWLINE );
-                    builder.append( "# =========================================================" );
-                    builder.append( NEWLINE );
-                    builder.append( " Evolution parameters:" );
-                    builder.append( NEWLINE );
-                    StringWriter writer = new StringWriter();
-                    state.parameters.list( new PrintWriter( writer) );
-                    builder.append( writer.toString().replaceAll("\n", "\n# ") );
-                    builder.append( "# =========================================================" );
+                String bestFileName = filePrefix
+                        + "-best-found-"
+                        + _2_DIGIT_FORMATTER.format( i )
+                        + ".properties";
+                String comment = "Best of run individual: subpopulation=["
+                        + _2_DIGIT_FORMATTER.format( i )
+                        + "]";
+                exportGenomeProps( state, i, bestFileName, _bestFound[i], comment );
 
-                    // Save the file
-                    try
-                    {
-                        genomeProps.store( new FileWriter( bestFileName ),
-                                builder.toString() );
-                    }
-                    catch( Exception e )
-                    {
-                        _LOG.error( "Unable to save genome properties to file ["
-                                + bestFileName
-                                + "]",
-                                e );
-                        state.output.fatal( "Unable to save genome properties to file ["
-                                + bestFileName
-                                + "]: "
-                                + e );
-                    }
-                }
+//                if( state.evaluator.p_problem instanceof DefaultForageProblem )
+//                {
+//                    DefaultForageProblem problem = (DefaultForageProblem) state.evaluator.p_problem;
+//                    Properties genomeProps = problem.getGenomeProperties( _bestFound[i] );
+//                    
+//                    // Build the filename
+//                    String bestFileName = filePrefix
+//                            + "-best-found-"
+//                            + _2_DIGIT_FORMATTER.format( i )
+//                            + ".properties";
+//                    
+//                    StringBuilder builder = new StringBuilder( "# Best of run individual: subpopulation=[" );
+//                    builder.append( _2_DIGIT_FORMATTER.format( i ) );
+//                    builder.append( "]" );
+//                    builder.append( NEWLINE );
+//                    builder.append( "# Output filename: " );
+//                    builder.append( bestFileName );
+//                    builder.append( NEWLINE );
+//                    builder.append( "# =========================================================" );
+//                    builder.append( NEWLINE );
+//                    builder.append( " Evolution parameters:" );
+//                    builder.append( NEWLINE );
+//                    StringWriter writer = new StringWriter();
+//                    state.parameters.list( new PrintWriter( writer) );
+//                    builder.append( writer.toString().replaceAll("\n", "\n# ") );
+//                    builder.append( "# =========================================================" );
+//
+//                    // Save the file
+//                    try
+//                    {
+//                        genomeProps.store( new FileWriter( bestFileName ),
+//                                builder.toString() );
+//                    }
+//                    catch( Exception e )
+//                    {
+//                        _LOG.error( "Unable to save genome properties to file ["
+//                                + bestFileName
+//                                + "]",
+//                                e );
+//                        state.output.fatal( "Unable to save genome properties to file ["
+//                                + bestFileName
+//                                + "]: "
+//                                + e );
+//                    }
+//                }
             }
         }
         state.output.flush();
@@ -545,6 +574,53 @@ public class ParseableStatistics extends Statistics
         }
 
         return builder.toString();
+    }
+    
+    protected void exportGenomeProps( EvolutionState state,
+            int subpop,
+            String filename,
+            Individual ind,
+            String comment )
+    {
+        // Save the genome
+        if( state.evaluator.p_problem instanceof DefaultForageProblem )
+        {
+            DefaultForageProblem problem = (DefaultForageProblem) state.evaluator.p_problem;
+            Properties genomeProps = problem.getGenomeProperties( _bestFound[subpop] );
+            
+            StringBuilder builder = new StringBuilder( "# " );
+            builder.append( comment );
+            builder.append( NEWLINE );
+            builder.append( "# Output filename: " );
+            builder.append( filename );
+            builder.append( NEWLINE );
+            builder.append( "# =========================================================" );
+            builder.append( NEWLINE );
+            builder.append( " Evolution parameters:" );
+            builder.append( NEWLINE );
+            StringWriter writer = new StringWriter();
+            state.parameters.list( new PrintWriter( writer) );
+            builder.append( writer.toString().replaceAll("\n", "\n# ") );
+            builder.append( "# =========================================================" );
+
+            // Save the file
+            try
+            {
+                genomeProps.store( new FileWriter( filename ),
+                        builder.toString() );
+            }
+            catch( Exception e )
+            {
+                _LOG.error( "Unable to save genome properties to file ["
+                        + filename
+                        + "]",
+                        e );
+                state.output.fatal( "Unable to save genome properties to file ["
+                        + filename
+                        + "]: "
+                        + e );
+            }
+        }
     }
 
     /**

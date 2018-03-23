@@ -176,8 +176,12 @@ public class PatchRingBuilder
                         + _minPatchDistance;
                 
                 // Get a random radius
-                float radius = _rng.nextInt( (int) Math.ceil( patchRadiusDiff ) )
-                        + _minPatchRadius;
+                float radius = _minPatchRadius;
+                if( patchRadiusDiff > 0.0f )
+                {
+                    radius = _rng.nextInt( (int) Math.ceil( patchRadiusDiff ) )
+                            + _minPatchRadius;
+                }
                 
                 // Create the position
                 NavigationalVector navPosition = new NavigationalVector( distance, angle, 0 );
@@ -213,7 +217,7 @@ public class PatchRingBuilder
         return patches;
     }
 
-    public void sentToFile( String filename, Patch[] patches )
+    public void sentToFile( String filename, Patch[] patches, String comment )
     {
         // Create the writer
         PrintWriter writer = null;
@@ -237,6 +241,7 @@ public class PatchRingBuilder
         Date today = Calendar.getInstance().getTime();
         writer.println( "# Built on " + DateFormatUtils.format( today,
                 "yyyy-MM-dd HH:mm:SS") );
+        writer.println( "# " + comment );
         writer.println( "# minPatchCount=["
                 + _minPatchCount
                 + "]" );
@@ -296,6 +301,8 @@ public class PatchRingBuilder
         {
             String prefix = String.format( "patch.%02d.", i );
             Vector3f position = patches[i].getPosition();
+            float distance = position.length();
+            writer.println( "# Distance from origin [" + distance + "]" );
             writer.println( prefix
                     + "position = "
                     + String.format( "%03.2f", position.x )
@@ -314,6 +321,8 @@ public class PatchRingBuilder
             writer.println( prefix
                     + "min-agent-forage-count = "
                     + patches[i].getMinAgentForageCount());
+            
+            // Calculate the distance from the origin
             writer.println( "" );
         }
         
@@ -341,6 +350,9 @@ public class PatchRingBuilder
     
     public static void main( String[] args )
     {
+        // Build a string describing the command line
+        String argStr = String.join( " ", args );
+        
         // Get the arguments
         String filePrefix = args[0];
         int fileCount = Integer.parseInt( args[1] );
@@ -383,6 +395,8 @@ public class PatchRingBuilder
         // Build the specified number of files
         for( int i = 0; i < fileCount; i++, randomSeed++ )
         {
+            System.out.println( "Building file [" + (i + 1) + "]" );
+            
             // Reseed the RNG
             builder.reseedRNG( randomSeed );
 
@@ -395,7 +409,7 @@ public class PatchRingBuilder
             Patch[] patches = builder.buildPatches();
             
             // Send them to a file
-            builder.sentToFile( fileName, patches );
+            builder.sentToFile( fileName, patches, argStr );
         }
     }
 }

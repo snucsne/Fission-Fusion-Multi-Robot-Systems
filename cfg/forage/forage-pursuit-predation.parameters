@@ -6,13 +6,11 @@ simulation-step-count = 10000
 agent-properties-file = cfg/forage/temp-forage-agents-050-seed-000.parameters
 #agent-properties-file = cfg/forage/agent-parameters/forage-agents-050-seed-000.parameters
 patch-properties-file = cfg/forage/forage-patch-example.parameters
-event-listener-count = 4
+event-listener-count = 3
 event-listener.00.class = edu.snu.csne.forage.event.PatchDepletionListener
-event-listener.01.class = edu.snu.csne.forage.event.PositionEventListener
-position-history-file = test-position-history.data
-event-listener.02.class = edu.snu.csne.forage.event.DecisionEventListener
-decision-history-file = test-decision-history.data
-event-listener.03.class = edu.snu.csne.forage.event.GraphicalPositionEventListener
+event-listener.01.class = edu.snu.csne.forage.event.PursuitPredationEventListener
+pursuit-predation-probability = 0.005
+event-listener.02.class = edu.snu.csne.forage.event.GraphicalPositionEventListener
 
 display.width = 1024
 display.height = 768
@@ -21,8 +19,8 @@ display.grid-color = 0.7,0.7,0.7,1.0
 display.agent-color = 0.0,0.0,0.8,1.0
 display.leader-line-color = 0.75,0.75,1.0,0.5
 display.grid-step = 10
-display.scale = 20
-display.agent-size = 4
+display.scale = 4
+display.agent-size = 3
 
 
 

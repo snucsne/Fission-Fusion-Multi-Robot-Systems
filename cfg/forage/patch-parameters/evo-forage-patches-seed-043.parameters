@@ -1,82 +1,149 @@
 # =========================================================
-# Built on 2018-03-17 15:44:926
-# minPatchCount=[6]
-# maxPatchCount=[10]
+# Built on 2018-03-22 10:47:285
+# data/patches/evo-forage-patches-seed- 50 14 18 20 0 80 10 120 4 4 0.001 0.01 5 12 0 125
+# minPatchCount=[14]
+# maxPatchCount=[18]
 # xOffset=[0.0]
-# yOffset=[165.0]
+# yOffset=[125.0]
 # minPatchSeparation=[20.0]
 # minPatchDistance=[0.0]
-# maxPatchDistance=[65.0]
-# minPatchResources=[120.0]
-# maxPatchResources=[200.0]
-# minPatchRadius=[3.5]
-# maxPatchRadius=[4.5]
+# maxPatchDistance=[80.0]
+# minPatchResources=[10.0]
+# maxPatchResources=[120.0]
+# minPatchRadius=[4.0]
+# maxPatchRadius=[4.0]
 # minPredationProbability=[0.001]
 # maxPredationProbability=[0.01]
-# minForagerCount=[4]
-# maxForagerCount=[8]
+# minForagerCount=[5]
+# maxForagerCount=[12]
 # randomSeed=[43]
 # =========================================================
 
-patch-count = 10
+patch-count = 18
 
-patch.00.position = 0.78,125.42,0.0
-patch.00.resources = 130.67
-patch.00.radius =  3.50
-patch.00.predation-probability = 00.002339
-patch.00.min-agent-forage-count = 4
+# Distance from origin [76.29021]
+patch.00.position = 0.96,76.28,0.0
+patch.00.resources = 21.32
+patch.00.radius =  4.00
+patch.00.predation-probability = 00.002201
+patch.00.min-agent-forage-count = 6
 
-patch.01.position = 18.77,174.99,0.0
-patch.01.resources = 188.73
-patch.01.radius =  3.50
-patch.01.predation-probability = 00.001673
-patch.01.min-agent-forage-count = 6
+# Distance from origin [126.56249]
+patch.01.position = 13.75,125.81,0.0
+patch.01.resources = 45.99
+patch.01.radius =  4.00
+patch.01.predation-probability = 00.008299
+patch.01.min-agent-forage-count = 11
 
-patch.02.position = -21.27,149.49,0.0
-patch.02.resources = 145.29
-patch.02.radius =  3.50
-patch.02.predation-probability = 00.002520
-patch.02.min-agent-forage-count = 4
+# Distance from origin [174.19574]
+patch.02.position = 24.11,172.52,0.0
+patch.02.resources = 14.96
+patch.02.radius =  4.00
+patch.02.predation-probability = 00.005870
+patch.02.min-agent-forage-count = 9
 
-patch.03.position = 27.64,117.67,0.0
-patch.03.resources = 187.92
-patch.03.radius =  3.50
-patch.03.predation-probability = 00.006585
-patch.03.min-agent-forage-count = 7
+# Distance from origin [171.41748]
+patch.03.position = 51.28,163.57,0.0
+patch.03.resources = 11.24
+patch.03.radius =  4.00
+patch.03.predation-probability = 00.003290
+patch.03.min-agent-forage-count = 8
 
-patch.04.position = 54.25,198.17,0.0
-patch.04.resources = 192.69
-patch.04.radius =  3.50
-patch.04.predation-probability = 00.008869
-patch.04.min-agent-forage-count = 4
+# Distance from origin [109.09773]
+patch.04.position = -26.18,105.91,0.0
+patch.04.resources = 73.90
+patch.04.radius =  4.00
+patch.04.predation-probability = 00.003845
+patch.04.min-agent-forage-count = 6
 
-patch.05.position = -7.78,198.24,0.0
-patch.05.resources = 128.32
-patch.05.radius =  3.50
-patch.05.predation-probability = 00.002066
-patch.05.min-agent-forage-count = 8
+# Distance from origin [86.88769]
+patch.05.position = -53.40,68.54,0.0
+patch.05.resources = 54.41
+patch.05.radius =  4.00
+patch.05.predation-probability = 00.004468
+patch.05.min-agent-forage-count = 11
 
-patch.06.position = -23.69,222.24,0.0
-patch.06.resources = 152.96
-patch.06.radius =  3.50
-patch.06.predation-probability = 00.005256
-patch.06.min-agent-forage-count = 7
+# Distance from origin [168.06935]
+patch.06.position = -12.53,167.60,0.0
+patch.06.resources = 59.03
+patch.06.radius =  4.00
+patch.06.predation-probability = 00.004860
+patch.06.min-agent-forage-count = 10
 
-patch.07.position = -39.10,171.41,0.0
-patch.07.resources = 163.20
-patch.07.radius =  3.50
-patch.07.predation-probability = 00.008417
-patch.07.min-agent-forage-count = 6
+# Distance from origin [122.31736]
+patch.07.position = 61.00,106.02,0.0
+patch.07.resources = 38.85
+patch.07.radius =  4.00
+patch.07.predation-probability = 00.003991
+patch.07.min-agent-forage-count = 5
 
-patch.08.position = 57.24,142.96,0.0
-patch.08.resources = 160.27
-patch.08.radius =  3.50
-patch.08.predation-probability = 00.009453
-patch.08.min-agent-forage-count = 5
+# Distance from origin [183.68892]
+patch.08.position = -51.71,176.26,0.0
+patch.08.resources = 115.98
+patch.08.radius =  4.00
+patch.08.predation-probability = 00.005727
+patch.08.min-agent-forage-count = 11
 
-patch.09.position = -45.58,203.96,0.0
-patch.09.resources = 186.32
-patch.09.radius =  3.50
-patch.09.predation-probability = 00.005133
-patch.09.min-agent-forage-count = 5
+# Distance from origin [76.66347]
+patch.09.position = 41.45,64.49,0.0
+patch.09.resources = 119.29
+patch.09.radius =  4.00
+patch.09.predation-probability = 00.005792
+patch.09.min-agent-forage-count = 10
+
+# Distance from origin [132.16104]
+patch.10.position = -70.88,111.55,0.0
+patch.10.resources = 86.48
+patch.10.radius =  4.00
+patch.10.predation-probability = 00.009370
+patch.10.min-agent-forage-count = 5
+
+# Distance from origin [199.16301]
+patch.11.position = 11.30,198.84,0.0
+patch.11.resources = 62.94
+patch.11.radius =  4.00
+patch.11.predation-probability = 00.009057
+patch.11.min-agent-forage-count = 7
+
+# Distance from origin [159.9393]
+patch.12.position = -67.85,144.84,0.0
+patch.12.resources = 19.49
+patch.12.radius =  4.00
+patch.12.predation-probability = 00.009589
+patch.12.min-agent-forage-count = 11
+
+# Distance from origin [146.1031]
+patch.13.position = -32.31,142.49,0.0
+patch.13.resources = 53.36
+patch.13.radius =  4.00
+patch.13.predation-probability = 00.007015
+patch.13.min-agent-forage-count = 9
+
+# Distance from origin [48.110527]
+patch.14.position = 6.21,47.71,0.0
+patch.14.resources = 73.33
+patch.14.radius =  4.00
+patch.14.predation-probability = 00.007309
+patch.14.min-agent-forage-count = 8
+
+# Distance from origin [158.76454]
+patch.15.position = 78.65,137.91,0.0
+patch.15.resources = 113.06
+patch.15.radius =  4.00
+patch.15.predation-probability = 00.008296
+patch.15.min-agent-forage-count = 11
+
+# Distance from origin [106.31808]
+patch.16.position = 31.28,101.61,0.0
+patch.16.resources = 18.62
+patch.16.radius =  4.00
+patch.16.predation-probability = 00.006753
+patch.16.min-agent-forage-count = 5
+
+# Distance from origin [59.392017]
+patch.17.position = -24.64,54.04,0.0
+patch.17.resources = 39.58
+patch.17.radius =  4.00
+patch.17.predation-probability = 00.008147
+patch.17.min-agent-forage-count = 6
 

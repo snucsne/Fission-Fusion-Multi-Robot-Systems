@@ -174,7 +174,7 @@ public class DecisionBuilder
 
         // Build the decision
         Decision decision = Decision.buildForageDecision( _simState.getCurrentSimulationStep(),
-                agent.getTeam(),
+                patch.getForagingTeam(),
                 null,
                 patch,
                 forageWeights.get( GroupBehavior.SEPARATION ).floatValue(),

@@ -74,11 +74,20 @@ public class DefaultForageProblem extends Problem
     /** Parameter key for the initiation MRV length sigma */
     private static final String _P_INITIATE_MRV_LEN_SIGMA = "initiate-mrv-len-sigma.";
     
+    /** Parameter key for the initiation MRV length flag */
+    private static final String _P_INITIATE_MRV_LEN_FLAG = "initiate-mrv-len-flag.";
+    
     /** Parameter key for the initiation patch value sigma */
     private static final String _P_INITIATE_PATCH_VALUE_SIGMA = "initiate-patch-value-sigma.";
     
+    /** Parameter key for the initiation patch value flag */
+    private static final String _P_INITIATE_PATCH_VALUE_FLAG = "initiate-patch-value-flag.";
+    
     /** Parameter key for the initiation direction difference sigma */
     private static final String _P_INITIATE_DIR_DIFF_SIGMA = "initiate-dir-diff-sigma.";
+
+    /** Parameter key for the initiation direction difference flag */
+    private static final String _P_INITIATE_DIR_DIFF_FLAG = "initiate-dir-diff-flag.";
 
     
     /** Parameter key for the follow alpha */
@@ -95,16 +104,24 @@ public class DefaultForageProblem extends Problem
 
 //    /** Parameter key for the follow MRV difference sigma */
 //    private static final String _P_FOLLOW_MRV_DIFF_SIGMA = "follow-mrv-diff-sigma.";
-//
-//    /** Parameter key for the follow mean position relative distance sigma */
-//    private static final String _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA = "follow-mean-pos-rel-dist-sigma.";
+
+    /** Parameter key for the follow mean position relative distance sigma */
+    private static final String _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA = "follow-mean-pos-rel-dist-sigma.";
+
+    /** Parameter key for the follow mean position relative distance flag */
+    private static final String _P_FOLLOW_MEAN_POS_REL_DIST_FLAG = "follow-mean-pos-rel-dist-flag.";
 
     /** Parameter key for the follow MRV direction difference sigma */
     private static final String _P_FOLLOW_MRV_DIR_DIFF_SIGMA = "follow-mrv-dir-diff-sigma.";
 
+    /** Parameter key for the follow MRV direction difference flag */
+    private static final String _P_FOLLOW_MRV_DIR_DIFF_FLAG = "follow-mrv-dir-diff-flag.";
+
     /** Parameter key for the follow MRV magnitude difference sigma */
     private static final String _P_FOLLOW_MRV_MAG_DIFF_SIGMA = "follow-mrv-mag-diff-sigma.";
 
+    /** Parameter key for the follow MRV magnitude difference flag */
+    private static final String _P_FOLLOW_MRV_MAG_DIFF_FLAG = "follow-mrv-mag-diff-flag.";
 
     
     /** Parameter key for the forage base rate */
@@ -116,8 +133,11 @@ public class DefaultForageProblem extends Problem
     /** Parameter key for the forage K exponent offset */
     private static final String _P_FORAGE_K_EXP_OFFSET = "forage-k-exp-offset.";
 
-    /** Parameter key for the forage patch value sigma*/
-    private static final String _P_FORAGE_PATCH_VALUE_SIGM = "forage-patch-value-sigma.";
+    /** Parameter key for the forage patch value sigma */
+    private static final String _P_FORAGE_PATCH_VALUE_SIGMA = "forage-patch-value-sigma.";
+
+    /** Parameter key for the forage patch value flag */
+    private static final String _P_FORAGE_PATCH_VALUE_FLAG = "forage-patch-value-flag.";
 
 
     /** Parameter key postfix for scaling factors */
@@ -167,11 +187,17 @@ public class DefaultForageProblem extends Problem
     /** Initiation MRV length sigma: scaling */
     private float _initiateMRVLenSigmaScaling = 0.0f;
     
+    /** Initiation MRV length flag: codon size */
+    private int _initiateMRVLenFlagCodonSize = 0;
+    
     /** Initiation patch value sigma: codon size */
     private int _initiatePatchValueSigmaCodonSize = 0;
     
     /** Initiation patch value sigma: scaling */
     private float _initiatePatchValueSigmaScaling = 0.0f;
+    
+    /** Initiation patch value flag: codon size */
+    private int _initiatePatchValueFlagCodonSize = 0;
     
     /** Initiation direction difference sigma: codon size */
     private int _initiateDirDiffSigmaCodonSize = 0;
@@ -179,6 +205,9 @@ public class DefaultForageProblem extends Problem
     /** Initiation direction difference sigma: scaling */
     private float _initiateDirDiffSigmaScaling = 0.0f;
 
+    /** Initiation direction difference flag: codon size */
+    private int _initiateDirDiffFlagCodonSize = 0;
+    
     
     
     /** Follow alpha: codon size */
@@ -205,29 +234,38 @@ public class DefaultForageProblem extends Problem
     /** Follow k exponent offset: scaling */
     private float _followKExpOffsetScaling = 0.0f;
     
-    /** Follow MRV difference sigma: codon size */
-    private int _followMRVDiffSigmaCodonSize = 0;
+//    /** Follow MRV difference sigma: codon size */
+//    private int _followMRVDiffSigmaCodonSize = 0;
+//    
+//    /** Follow MRV difference sigma: scaling */
+//    private float _followMRVDiffSigmaScaling = 0.0f;
     
-    /** Follow MRV difference sigma: scaling */
-    private float _followMRVDiffSigmaScaling = 0.0f;
-    
-    /** Follow relative distance in mean position: codon size */
+    /** Follow relative distance in mean position sigma: codon size */
     private int _followMeanPosRelDistSigmaCodonSize = 0;
     
-    /** Follow relative distance in mean position: scaling */
+    /** Follow relative distance in mean position sigma: scaling */
     private float _followMeanPosRelDistSigmaScaling = 0.0f;
     
-    /** Follow MRV direction difference: codon size */
+    /** Follow relative distance in mean position flag: codon size */
+    private int _followMeanPosRelDistFlagCodonSize = 0;
+    
+    /** Follow MRV direction difference sigma: codon size */
     private int _followMRVDirDiffSigmaCodonSize = 0;
     
-    /** Follow MRV direction difference: scaling */
+    /** Follow MRV direction difference sigma : scaling */
     private float _followMRVDirDiffSigmaScaling = 0.0f;
     
-    /** Follow MRV magnitude difference: codon size */
+    /** Follow MRV direction difference flag: codon size */
+    private int _followMRVDirDiffFlagCodonSize = 0;
+    
+    /** Follow MRV magnitude difference sigma: codon size */
     private int _followMRVMagDiffSigmaCodonSize = 0;
     
-    /** Follow MRV magnitude difference: scaling */
+    /** Follow MRV magnitude difference sigma: scaling */
     private float _followMRVMagDiffSigmaScaling = 0.0f;
+    
+    /** Follow MRV magnitude difference flag: codon size */
+    private int _followMRVMagDiffFlagCodonSize = 0;
     
 
     /** Forage base rate: codon size */
@@ -254,7 +292,10 @@ public class DefaultForageProblem extends Problem
     /** Forage patch value sigma: scaling */
     private float _foragePatchValueSigmaScaling = 0.0f;
     
+    /** Forage patch value flag: codon size */
+    private int _foragePatchValueFlagCodonSize = 0;
     
+
     /** Default simulator properties */
     private Properties _defaultSimProperties = null;
     
@@ -337,7 +378,12 @@ public class DefaultForageProblem extends Problem
                 "initiation MRV length sigma scaling",
                 state,
                 base );
-        
+        _initiateMRVLenFlagCodonSize = loadIntParameter(
+                _P_INITIATE_MRV_LEN_FLAG + _CODON_SIZE_POSTFIX,
+                "initiation MRV length flag codon size",
+                state,
+                base );
+
         // Load the initiation patch value values
         _initiatePatchValueSigmaCodonSize = loadIntParameter(
                 _P_INITIATE_PATCH_VALUE_SIGMA + _CODON_SIZE_POSTFIX,
@@ -349,7 +395,12 @@ public class DefaultForageProblem extends Problem
                 "initiation patch value scaling",
                 state,
                 base );
-        
+        _initiatePatchValueFlagCodonSize = loadIntParameter(
+                _P_INITIATE_PATCH_VALUE_FLAG + _CODON_SIZE_POSTFIX,
+                "initiation patch value flag codon size",
+                state,
+                base );
+
         // Load the initiation direction difference values
         _initiateDirDiffSigmaCodonSize = loadIntParameter(
                 _P_INITIATE_DIR_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
@@ -361,6 +412,12 @@ public class DefaultForageProblem extends Problem
                 "initiation direction difference scaling",
                 state,
                 base );
+        _initiateDirDiffFlagCodonSize = loadIntParameter(
+                _P_INITIATE_DIR_DIFF_FLAG + _CODON_SIZE_POSTFIX,
+                "initiation direction difference flag codon size",
+                state,
+                base );
+
         
         // Load the follow alpha values
         _followAlphaCodonSize = loadIntParameter(
@@ -422,18 +479,23 @@ public class DefaultForageProblem extends Problem
 //                state,
 //                base );
 //        
-//        // Load the follow mean position relative distance sigma values
-//        _followMeanPosRelDistSigmaCodonSize = loadIntParameter(
-//                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _CODON_SIZE_POSTFIX,
-//                "follow mean position relative distance sigma codon size",
-//                state,
-//                base );
-//        _followMeanPosRelDistSigmaScaling = loadFloatParameter(
-//                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _SCALING_POSTFIX,
-//                "follow mean position relative distance sigma scaling",
-//                state,
-//                base );
-        
+        // Load the follow mean position relative distance sigma values
+        _followMeanPosRelDistSigmaCodonSize = loadIntParameter(
+                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _CODON_SIZE_POSTFIX,
+                "follow mean position relative distance sigma codon size",
+                state,
+                base );
+        _followMeanPosRelDistSigmaScaling = loadFloatParameter(
+                _P_FOLLOW_MEAN_POS_REL_DIST_SIGMA + _SCALING_POSTFIX,
+                "follow mean position relative distance sigma scaling",
+                state,
+                base );
+        _followMeanPosRelDistFlagCodonSize = loadIntParameter(
+                _P_FOLLOW_MEAN_POS_REL_DIST_FLAG + _CODON_SIZE_POSTFIX,
+                "follow mean position relative distance flag codon size",
+                state,
+                base );
+
         // Load the follow MRV direction difference sigma values
        _followMRVDirDiffSigmaCodonSize= loadIntParameter(
                _P_FOLLOW_MRV_DIR_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
@@ -445,7 +507,12 @@ public class DefaultForageProblem extends Problem
                "follow MRV direction difference sigma scaling",
                state,
                base );
-       
+       _followMRVDirDiffFlagCodonSize= loadIntParameter(
+               _P_FOLLOW_MRV_DIR_DIFF_FLAG + _CODON_SIZE_POSTFIX,
+               "follow MRV direction difference flag codon size",
+               state,
+               base );
+
        // Load the follow MRV magnitude difference sigma values
        _followMRVMagDiffSigmaCodonSize = loadIntParameter(
                _P_FOLLOW_MRV_MAG_DIFF_SIGMA + _CODON_SIZE_POSTFIX,
@@ -455,6 +522,11 @@ public class DefaultForageProblem extends Problem
        _followMRVMagDiffSigmaScaling = loadFloatParameter(
                _P_FOLLOW_MRV_MAG_DIFF_SIGMA + _SCALING_POSTFIX,
                "follow MRV magnitude difference sigma scaling",
+               state,
+               base );
+       _followMRVMagDiffFlagCodonSize = loadIntParameter(
+               _P_FOLLOW_MRV_MAG_DIFF_FLAG + _CODON_SIZE_POSTFIX,
+               "follow MRV magnitude difference flag codon size",
                state,
                base );
 
@@ -496,13 +568,18 @@ public class DefaultForageProblem extends Problem
         
         // Load the forage patch value sigma values
         _foragePatchValueSigmaCodonSize = loadIntParameter(
-                _P_FORAGE_PATCH_VALUE_SIGM + _CODON_SIZE_POSTFIX,
+                _P_FORAGE_PATCH_VALUE_SIGMA + _CODON_SIZE_POSTFIX,
                 "forage patch value sigma codon size",
                 state,
                 base );
         _foragePatchValueSigmaScaling = loadFloatParameter(
-                _P_FORAGE_PATCH_VALUE_SIGM + _SCALING_POSTFIX,
+                _P_FORAGE_PATCH_VALUE_SIGMA + _SCALING_POSTFIX,
                 "forage patch value sigma scaling",
+                state,
+                base );
+        _foragePatchValueFlagCodonSize = loadIntParameter(
+                _P_FORAGE_PATCH_VALUE_FLAG + _CODON_SIZE_POSTFIX,
+                "forage patch value flag codon size",
                 state,
                 base );
 
@@ -584,92 +661,6 @@ public class DefaultForageProblem extends Problem
         }
 
         evaluate( state, ind, FoldType.TRAINING );
-        
-//        _LOG.info( "Evaluating individual" );
-        
-//        // Cast it to the proper type
-//        BitVectorIndividual bitInd = (BitVectorIndividual) ind;
-//
-//        // Decode the genome
-//        Properties genomeProps = decodeGenome( bitInd.genome );
-//        
-//        // Get fold training properties
-//        String[] foldAgentProperties = _foldProps.getProperties(
-//                FoldType.TRAINING,
-//                PropertyType.AGENT );
-//        _LOG.debug( "Training agent fold properties ["
-//                + foldAgentProperties.length
-//                + "]" );
-//        String[] foldPatchProperties = _foldProps.getProperties(
-//                FoldType.TRAINING,
-//                PropertyType.PATCH );
-//        _LOG.debug( "Training patch fold properties ["
-//                + foldPatchProperties.length
-//                + "]" );
-//
-//        // Iterate through all the training properties
-//        float totalResourcesForaged = 0.0f;
-//        float[] fitnessValues = new float[foldAgentProperties.length];
-//        for( int i = 0; i < foldAgentProperties.length; i++ )
-//        {
-////            _LOG.info( "Running sim [" + i + "]" );
-//            
-//            // Get the default properties
-//            Properties simProps = new Properties();
-//            simProps.putAll( _defaultSimProperties );
-//            // TODO
-////            simProps.
-//            
-//            // Override the fold specific properties
-//            simProps.setProperty( SimulationState._AGENT_PROPS_FILE_KEY,
-//                    foldAgentProperties[i] );
-//            simProps.setProperty( SimulationState._PATCH_PROPS_FILE_KEY,
-//                    foldPatchProperties[i] );
-//            
-//            // Override the genome specific properties
-//            simProps.putAll( genomeProps );
-//            
-//            // Create the simulator
-//            Simulator sim = new Simulator();
-//            sim.initialize( simProps );
-//            
-//            // Add our own patch depletion listener
-//            PatchDepletionListener patchListener = new PatchDepletionListener();
-//            SimulationState simState = sim.getSimState();
-//            simState.addEventListener( patchListener );
-//            
-//            // Run it
-//            sim.run();
-//            
-//            // Get the resources foraged
-//            float resourcesForaged = patchListener.getTotalResourcesForaged();
-//            totalResourcesForaged += resourcesForaged;
-//            fitnessValues[i] = resourcesForaged;
-//
-//            _LOG.debug( "Run ["
-//                    + i
-//                    + "] resourcesForaged=["
-//                    + resourcesForaged
-//                    + "]" );
-//        }
-//        
-//        // Compute the mean resources foraged
-//        float meanResourcesForaged = totalResourcesForaged / foldAgentProperties.length;
-//        _LOG.debug( "Fitness: totalResourcesForaged=["
-//                + totalResourcesForaged
-//                + "] foldAgentProperties.length=["
-//                + foldAgentProperties.length
-//                + "] meanResourcesForaged=["
-//                + meanResourcesForaged
-//                + "]" );
-//        
-//        // Save the fitness
-//        CrossValidationFitness cvFitness = (CrossValidationFitness) ind.fitness;
-//        cvFitness.setTrainingResults( fitnessValues );
-//        cvFitness.setFitness( state, cvFitness.getTrainingFitnessMean(), false );
-//        
-//        // Mark the individual as evaluated
-//        bitInd.evaluated = true;
     }
 
     public void evaluate( EvolutionState state,
@@ -794,7 +785,6 @@ public class DefaultForageProblem extends Problem
      * @return A description of the individual
      * @see edu.snu.csne.forage.evolve.IndividualDescriber#describe(ec.Individual, java.lang.String)
      */
-    @SuppressWarnings( "unchecked" )
     @Override
     public String describe( Individual ind, String prefix )
     {
@@ -812,19 +802,26 @@ public class DefaultForageProblem extends Problem
                 DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_MULT_KEY,
                 DefaultProbabilityDecisionCalculator._INITIATE_K_EXP_OFFSET_KEY,
                 DefaultProbabilityDecisionCalculator._INITIATE_MRV_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_MRV_FLAG_KEY,
                 DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_FLAG_KEY,
                 DefaultProbabilityDecisionCalculator._INITIATE_DIR_DIFF_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._INITIATE_DIR_DIFF_FLAG_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_ALPHA_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_BETA_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_MULT_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_K_EXP_OFFSET_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_FLAG_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIR_DIFF_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIR_DIFF_FLAG_KEY,
                 DefaultProbabilityDecisionCalculator._FOLLOW_MRV_MAG_DIFF_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FOLLOW_MRV_MAG_DIFF_FLAG_KEY,
                 DefaultProbabilityDecisionCalculator._FORAGE_RATE_KEY,
                 DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_MULT_KEY,
                 DefaultProbabilityDecisionCalculator._FORAGE_K_EXP_OFFSET_KEY,
-                DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_SIGMA_KEY };
+                DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_SIGMA_KEY,
+                DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_FLAG_KEY };
         
         for( int i = 0; i < genomeKeys.length; i++ )
         {
@@ -898,7 +895,7 @@ public class DefaultForageProblem extends Problem
 
         /* Decode each codon in the genome, starting with the base
          * initiation rate */
-        float initiateBaseRate = decodeCodon( genome,
+        float initiateBaseRate = decodeFloatCodon( genome,
                 _initiateBaseRateCodonSize,
                 _initiateBaseRateScaling,
                 codonIdx );
@@ -907,7 +904,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( initiateBaseRate ) );
 
         // Initiation K exponent multiplier
-        float initiateKExpMult = decodeCodon( genome,
+        float initiateKExpMult = decodeFloatCodon( genome,
                 _initiateKExpMultCodonSize,
                 _initiateKExpMultScaling,
                 codonIdx )
@@ -917,7 +914,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( initiateKExpMult ) );
 
         // Initiation K exponent offset
-        float initiateKExpOffset = decodeCodon( genome,
+        float initiateKExpOffset = decodeFloatCodon( genome,
                 _initiateKExpOffsetCodonSize,
                 _initiateKExpOffsetScaling,
                 codonIdx )
@@ -927,7 +924,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( initiateKExpOffset ) );
 
         // Initiation MRV length sigma
-        float initiateMRVLenSigma = decodeCodon( genome,
+        float initiateMRVLenSigma = decodeFloatCodon( genome,
                 _initiateMRVLenSigmaCodonSize,
                 _initiateMRVLenSigmaScaling,
                 codonIdx )
@@ -935,9 +932,12 @@ public class DefaultForageProblem extends Problem
         codonIdx += _initiateMRVLenSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_MRV_SIGMA_KEY,
                 Float.toString( initiateMRVLenSigma ) );
+        boolean initiateMRVFlag = genome[ codonIdx++ ];
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_MRV_FLAG_KEY,
+                Boolean.toString( initiateMRVFlag ) );
 
         // Initiation patch value sigma
-        float initiatePatchValueSigma = decodeCodon( genome,
+        float initiatePatchValueSigma = decodeFloatCodon( genome,
                 _initiatePatchValueSigmaCodonSize,
                 _initiatePatchValueSigmaScaling,
                 codonIdx )
@@ -945,9 +945,12 @@ public class DefaultForageProblem extends Problem
         codonIdx += _initiatePatchValueSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_SIGMA_KEY,
                 Float.toString( initiatePatchValueSigma ) );
+        boolean initiatePatchValueFlag = genome[ codonIdx++ ];
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_PATCH_VALUE_FLAG_KEY,
+                Boolean.toString( initiatePatchValueFlag ) );
 
         // Initiation direction difference sigma
-        float initiateDirDiffSigma = decodeCodon( genome,
+        float initiateDirDiffSigma = decodeFloatCodon( genome,
                 _initiateDirDiffSigmaCodonSize,
                 _initiateDirDiffSigmaScaling,
                 codonIdx )
@@ -955,9 +958,12 @@ public class DefaultForageProblem extends Problem
         codonIdx += _initiateDirDiffSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_DIR_DIFF_SIGMA_KEY,
                 Float.toString( initiateDirDiffSigma ) );
+        boolean initiateDirDiffFlag = genome[ codonIdx++ ];
+        props.setProperty( DefaultProbabilityDecisionCalculator._INITIATE_DIR_DIFF_FLAG_KEY,
+                Boolean.toString( initiateDirDiffFlag ) );
 
         // Follow alpha
-        float followAlpha = decodeCodon( genome,
+        float followAlpha = decodeFloatCodon( genome,
                 _followAlphaCodonSize,
                 _followAlphaScaling,
                 codonIdx );
@@ -966,7 +972,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( followAlpha ) );
 
         // Follow beta
-        float followBeta = decodeCodon( genome,
+        float followBeta = decodeFloatCodon( genome,
                 _followBetaCodonSize,
                 _followBetaScaling,
                 codonIdx );
@@ -975,7 +981,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( followBeta ) );
 
         // Follow k exponent multiplier
-        float followkExpMult = decodeCodon( genome,
+        float followkExpMult = decodeFloatCodon( genome,
                 _followKExpMultCodonSize,
                 _followKExpMultScaling,
                 codonIdx )
@@ -985,7 +991,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( followkExpMult ) );
 
         // Follow k exponent offset
-        float followKExpOffset = decodeCodon( genome,
+        float followKExpOffset = decodeFloatCodon( genome,
                 _followKExpOffsetCodonSize,
                 _followKExpOffsetScaling,
                 codonIdx )
@@ -1005,7 +1011,7 @@ public class DefaultForageProblem extends Problem
 //                Float.toString( followMRVDiffSigma ) );
 //
         // Follow mean position relative distance sigma
-        float followMeanPosRelDistSigma = decodeCodon( genome,
+        float followMeanPosRelDistSigma = decodeFloatCodon( genome,
                 _followMeanPosRelDistSigmaCodonSize,
                 _followMeanPosRelDistSigmaScaling,
                 codonIdx )
@@ -1013,9 +1019,12 @@ public class DefaultForageProblem extends Problem
         codonIdx += _followMeanPosRelDistSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_SIGMA_KEY,
                 Float.toString( followMeanPosRelDistSigma ) );
+        boolean followMeanPosRelDistFlag = genome[ codonIdx++ ];
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MEAN_POS_REL_DIST_FLAG_KEY,
+                Boolean.toString( followMeanPosRelDistFlag ) );
 
         // Follow MRV direction difference sigma
-        float followMRVDirDiffSigma = decodeCodon( genome,
+        float followMRVDirDiffSigma = decodeFloatCodon( genome,
                 _followMRVDirDiffSigmaCodonSize,
                 _followMRVDirDiffSigmaScaling,
                 codonIdx )
@@ -1023,9 +1032,12 @@ public class DefaultForageProblem extends Problem
         codonIdx += _followMRVDirDiffSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIR_DIFF_SIGMA_KEY,
                 Float.toString( followMRVDirDiffSigma ) );
+        boolean followMRVDirDiffFlag = genome[ codonIdx++ ];
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_DIR_DIFF_FLAG_KEY,
+                Boolean.toString( followMRVDirDiffFlag ) );
 
         // Follow MRV magnitude difference sigma
-        float followMRVMagDiffSigma = decodeCodon( genome,
+        float followMRVMagDiffSigma = decodeFloatCodon( genome,
                 _followMRVMagDiffSigmaCodonSize,
                 _followMRVMagDiffSigmaScaling,
                 codonIdx )
@@ -1033,9 +1045,12 @@ public class DefaultForageProblem extends Problem
         codonIdx += _followMRVMagDiffSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_MAG_DIFF_SIGMA_KEY,
                 Float.toString( followMRVMagDiffSigma ) );
+        boolean followMRVMagDiffFlag = genome[ codonIdx++ ];
+        props.setProperty( DefaultProbabilityDecisionCalculator._FOLLOW_MRV_MAG_DIFF_FLAG_KEY,
+                Boolean.toString( followMRVMagDiffFlag ) );
 
         // Forage base rate
-        float forageBaseRate = decodeCodon( genome,
+        float forageBaseRate = decodeFloatCodon( genome,
                 _forageBaseRateCodonSize,
                 _forageBaseRateScaling,
                 codonIdx );
@@ -1044,7 +1059,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( forageBaseRate ) );
 
         // Forage k exponent multiplier
-        float forageKExpMult = decodeCodon( genome,
+        float forageKExpMult = decodeFloatCodon( genome,
                 _forageKExpMultCodonSize,
                 _forageKExpMultScaling,
                 codonIdx )
@@ -1054,7 +1069,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( forageKExpMult ) );
 
         // Forage k exponent offset
-        float forageKExpOffset = decodeCodon( genome,
+        float forageKExpOffset = decodeFloatCodon( genome,
                 _forageKExpOffsetCodonSize,
                 _forageKExpOffsetScaling,
                 codonIdx )
@@ -1064,7 +1079,7 @@ public class DefaultForageProblem extends Problem
                 Float.toString( forageKExpOffset ) );
 
         // Forage patch value sigma
-        float foragePatchValueSigma = decodeCodon( genome,
+        float foragePatchValueSigma = decodeFloatCodon( genome,
                 _foragePatchValueSigmaCodonSize,
                 _foragePatchValueSigmaScaling,
                 codonIdx )
@@ -1072,6 +1087,9 @@ public class DefaultForageProblem extends Problem
         codonIdx += _foragePatchValueSigmaCodonSize;
         props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_SIGMA_KEY,
                 Float.toString( foragePatchValueSigma ) );
+        boolean foragePatchValueFlag = genome[ codonIdx++ ];
+        props.setProperty( DefaultProbabilityDecisionCalculator._FORAGE_PATCH_VALUE_FLAG_KEY,
+                Boolean.toString( foragePatchValueFlag ) );
 
 //        // 
 //        float  = decodeCodon( genome,
@@ -1177,7 +1195,7 @@ public class DefaultForageProblem extends Problem
         return floatValue;
     }
 
-    protected float decodeCodon( boolean[] genome,
+    protected float decodeFloatCodon( boolean[] genome,
             int codonSize,
             float scaling,
             int startIdx )

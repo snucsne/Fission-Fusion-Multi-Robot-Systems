@@ -187,6 +187,8 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
      */
     private List<Decision> buildAllNavigateDecisions( Agent agent )
     {
+//        _LOG.warn( "Building navigate decisions for agent [" + agent.getID() + "]" );
+      
         List<Decision> navDecisions = new LinkedList<Decision>();
 
         // See if the agent is already currently moving toward a patch
@@ -295,6 +297,8 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
      */
     private List<Decision> buildAllForageDecisions( Agent agent )
     {
+//        _LOG.warn( "Building foraging decisions for agent [" + agent.getID() + "]" );
+        
         List<Decision> forageDecisions = new LinkedList<Decision>();
         
         // Get the probabilities
