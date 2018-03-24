@@ -142,43 +142,19 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
             /* For now, assume all agents have the same max foraging area
              * and consumption rate */
             Agent agent = patchForagingAgents.get( 0 );
-            float foragingAreaMax = agent.getMaxForagingArea();
-            float consumptionRateMax = agent.getResourceConsumptionRate();
-            
-            // Compute patch specific values
-            float patchArea = patch.getRadius() * patch.getRadius() * _PI;
-            float resourceDensity = patch.getRemainingResources()
-                    / patchArea;
-            
-            // Compute how many resources are foraged
-            float foragingAreaEffective = (float) Math.min( foragingAreaMax,
-                    patchArea / agentCount );
-            float resourcesForagedPerAgent = (float) Math.min( consumptionRateMax,
-                    foragingAreaEffective * resourceDensity );
-            float totalResourcesForaged = resourcesForagedPerAgent * agentCount;
-            
-            
-            // ************
             PatchDepletion depletionData = _patchDepletionCalc.calculatePatchDepletion(
                     patch.getArea(),
                     patch.getRemainingResources(),
                     agentCount,
-                    0,
+                    patch.getMinAgentForageCount(),
                     agent.getMaxForagingArea(),
                     agent.getResourceConsumptionRate() );
-            resourcesForagedPerAgent = depletionData.getPerAgentResources();
-            totalResourcesForaged = depletionData.getTotalResources();
-            // ************
+            float resourcesForagedPerAgent = depletionData.getPerAgentResources();
+            float totalResourcesForaged = depletionData.getTotalResources();
             
             // Determine how much was actually foraged
-//            float totalResourcesForaged = depletionData.resourcesGatheredGroup;
-//            float resourcesForagedPerAgent = depletionData.resourcesGatheredAgent;
             float actualResourcesForaged = patch.setResourcesForaged(
                     totalResourcesForaged );
-//            if( actualResourcesForaged < depletionData.resourcesGatheredGroup )
-//            {
-//                resourcesForagedPerAgent = actualResourcesForaged / agentCount;
-//            }
             if( actualResourcesForaged < totalResourcesForaged )
             {
                 resourcesForagedPerAgent = actualResourcesForaged / agentCount;

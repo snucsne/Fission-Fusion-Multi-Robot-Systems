@@ -207,38 +207,6 @@ public class PatchDepletionCalculator
             totalResourcesForaged += tempData.getTotalResources();
             indResources += tempData.getPerAgentResources();
             groupResources += tempData.getTotalResources();
-//
-//            // Store the data
-//            depletionData[i] = new PatchDepletionData( tempData.resourcesGatheredAgent,
-//                    indResources,
-//                    tempData.resourcesGatheredGroup,
-//                    groupResources,
-//                    i,
-//                    agentCounts[i] );
-
-//            // Compute the density of the remaining resources in the patch
-//            float resourceDensity = remainingResources / patchArea;
-//            
-//            // Compute the effective foraging area for each individual agent
-//            float foragingAreaEffective = (float) Math.min( foragingAreaMax,
-//                    patchArea / agentCounts[i] );
-//            
-//            // Compute the amount of resources foraged per agent
-//            float resourcesForagedPerAgent = 0.0f;
-//            if( 0 < agentCounts[i] )
-//            {
-//                resourcesForagedPerAgent = (float) Math.min( consumptionRateMax,
-//                    foragingAreaEffective * resourceDensity );
-//            }
-//            
-//            // Compute the total amount of resources foraged this timestep
-//            float resourcesForaged = resourcesForagedPerAgent * agentCounts[i];
-//            
-//            // Update the totals
-//            remainingResources -= resourcesForaged;
-//            totalResourcesForaged += resourcesForaged;
-//            indResources += resourcesForagedPerAgent;
-//            groupResources += resourcesForaged;
             
             // Compute the slope, but only if we are past the first timestep
             if( i > 0 )
@@ -305,24 +273,6 @@ public class PatchDepletionCalculator
                     foragingAreaEffective * resourceDensity );
             totalResourcesForaged = resourcesForagedPerAgent * currentAgentCount;
         }
-//        else
-//        {
-//            _LOG.warn( "No resources foraged: patchArea=["
-//                    + patchArea
-//                    + "] resources=["
-//                    + resources
-//                    + "] currentAgentCount=["
-//                    + currentAgentCount
-//                    + "] minAgentCount=["
-//                    + minAgentCount
-//                    + "] foragingAreaMax=["
-//                    + foragingAreaMax
-//                    + "] consumptionRateMax=["
-//                    + consumptionRateMax
-//                    + "] _enforcePatchMinimumAgents=["
-//                    + _enforcePatchMinimumAgents
-//                    + "]" );
-//        }
         
         return new PatchDepletion( resourcesForagedPerAgent,
                 totalResourcesForaged,

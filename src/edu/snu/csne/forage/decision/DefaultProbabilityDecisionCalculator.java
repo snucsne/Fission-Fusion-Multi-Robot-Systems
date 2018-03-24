@@ -45,7 +45,7 @@ public class DefaultProbabilityDecisionCalculator
             DefaultProbabilityDecisionCalculator.class.getName() );
     
     /** Property key for the calculator properties file */
-    public static final String _PROB_DECISION_CALC_PROPS_FILE_KEY = "decision-calc-props-file";
+    public static final String PROB_DECISION_CALC_PROPS_FILE_KEY = "decision-calc-props-file";
     
     
     /** Property key for the initiation rate base */
@@ -258,7 +258,7 @@ public class DefaultProbabilityDecisionCalculator
         
         // If there is a separate props file for calculations, use it
         Properties calcProps = props;
-        String calcPropsFilename = System.getProperty( _PROB_DECISION_CALC_PROPS_FILE_KEY );
+        String calcPropsFilename = System.getProperty( PROB_DECISION_CALC_PROPS_FILE_KEY );
         if( null != calcPropsFilename )
         {
             calcProps = MiscUtils.loadPropertiesFromFile( calcPropsFilename );

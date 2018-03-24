@@ -663,6 +663,13 @@ public class DefaultForageProblem extends Problem
         evaluate( state, ind, FoldType.TRAINING );
     }
 
+    /**
+     * Evaluates an individual in all the environments of a particular fold type
+     *
+     * @param state The current state of evolution
+     * @param ind The individual to evaluate
+     * @param foldType The type of fold
+     */
     public void evaluate( EvolutionState state,
             Individual ind,
             FoldType foldType )

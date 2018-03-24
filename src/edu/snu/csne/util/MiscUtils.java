@@ -186,6 +186,29 @@ public class MiscUtils
     }
 
     /**
+     * Loads a non-empty String value from properties
+     *
+     * @param props All the properties
+     * @param key The key of the value
+     * @param description A description of the error to generate if the value
+     * is not found
+     * @return The String value
+     */
+    public static String loadNonEmptyStringProperty( Properties props,
+            String key,
+            String description )
+    {
+        String value = props.getProperty( key );
+        Validate.notEmpty( value,
+                description
+                + "(key="
+                + key
+                + ") may not be empty" );
+        
+        return value;
+    }
+
+    /**
      * Loads a non-empty float value from properties
      *
      * @param props All the properties
@@ -199,7 +222,7 @@ public class MiscUtils
             String description )
     {
         String valueStr = props.getProperty( key );
-        org.apache.commons.lang3.Validate.notEmpty( valueStr,
+        Validate.notEmpty( valueStr,
                 description
                 + "(key="
                 + key
