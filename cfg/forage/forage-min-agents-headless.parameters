@@ -1,0 +1,114 @@
+# Simulation parameters
+random-seed = 42
+simulation-count = 1
+simulation-step-count = 500
+#agent-properties-file = cfg/forage/forage-agents-example.parameters
+agent-properties-file = cfg/forage/temp-forage-agents-050-seed-000.parameters
+#agent-properties-file = cfg/forage/agent-parameters/forage-agents-050-seed-000.parameters
+patch-properties-file = cfg/forage/forage-patch-example.parameters
+event-listener-count = 0
+#event-listener.00.class = edu.snu.csne.forage.event.PatchDepletionListener
+#event-listener.00.class = edu.snu.csne.forage.event.PursuitPredationEventListener
+#ursuit-predation-probability = 0.001
+
+display.width = 1024
+display.height = 768
+display.bg-color = 1.0,1.0,1.0,1.0
+display.grid-color = 0.7,0.7,0.7,1.0
+display.agent-color = 0.0,0.0,0.8,1.0
+display.leader-line-color = 0.75,0.75,1.0,0.5
+display.grid-step = 10
+display.scale = 4
+display.agent-size = 3
+
+
+
+# Sensing parameters
+agent-sensor-class = edu.snu.csne.forage.sensor.MetricAgentSensor
+agent-sensing-distance = 30
+patch-sensor-class = edu.snu.csne.forage.sensor.MetricPatchSensor
+patch-sensing-distance = 500
+
+
+# Decision-maker parameters
+#decision-maker-class = edu.snu.csne.forage.decision.FlockingDecisionMaker
+#decision-maker-class = edu.snu.csne.forage.decision.GoalSeekFlockingDecisionMaker
+decision-maker-class = edu.snu.csne.forage.decision.ForagingDecisionMaker
+
+#initiation-rate = 1290.0
+#follow-alpha = 162.3
+#follow-beta = 75.4
+#initiate-rate = 20.0
+#follow-alpha = 2.5
+#follow-beta = 1.5
+#navigate-mrv-sigma = 0.5
+#navigate-patch-value-sigma = 0.375
+#navigate-dir-diff-sigma = 0.66
+#follow-mrv-dir-diff-sigma = 0.75
+#follow-mrv-mag-diff-sigma = 1.0
+
+initiate-rate=0.78125
+initiate-k-exp-multiplier=8.0
+initiate-k-exp-offset=1.078125
+initiate-mrv-sigma=0.375
+initiate-mrv-flag=true
+initiate-dir-diff-sigma=0.375
+initiate-dir-diff-flag=false
+initiate-patch-value-sigma=1.359375
+initiate-patch-value-flag=false
+
+follow-alpha=44.921875
+follow-beta=48.4375
+follow-k-exp-multiplier=7.0
+follow-k-exp-offset=0.09375
+follow-mrv-dir-diff-sigma=1.078125
+follow-mrv-dir-diff-flag=true
+follow-mrv-mag-diff-sigma=0.5625
+follow-mrv-mag-diff-flag=true
+follow-mean-pos-rel-dist-sigma=0.020312501
+follow-mean-pos-rel-dist-flag=true
+
+forage-rate=8.59375
+forage-k-exp-multiplier=4.0
+forage-k-exp-offset=0.375
+forage-patch-value-sigma=0.703125
+forage-patch-value-flag=true
+
+use-patch-value-individual = true
+
+
+# Decision builder parameters
+default-separation-weight = 1.5
+default-cohesion-weight = 1.0
+default-alignment-weight = 1.0
+default-goal-seek-weight = 1.5
+navigate-separation-weight = 1.5
+navigate-cohesion-weight = 1.0
+navigate-alignment-weight = 1.0
+navigate-goal-seek-weight = 1.5
+follow-separation-weight = 2.0
+follow-cohesion-weight = 1.0
+follow-alignment-weight = 1.0
+follow-goal-seek-weight = 1.25
+forage-separation-weight = 0.75
+forage-cohesion-weight = 0
+forage-alignment-weight = 0
+forage-goal-seek-weight = 1.5
+rest-separation-weight = 0
+rest-cohesion-weight = 0
+rest-alignment-weight = 0
+rest-goal-seek-weight = 0
+
+# Agent parameters
+max-speed = 0.5
+max-force = 0.025
+min-separation = 1
+desired-separation = 2
+resource-consumption-rate = 1
+resource-consumption-max = 1000
+max-foraging-area = 3
+arrival-scale-distance = 10
+
+max-depletion-timesteps = 500
+allow-initial-velocity = false
+enforce-patch-minimum-agents = false

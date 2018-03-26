@@ -252,6 +252,9 @@ public class DefaultProbabilityDecisionCalculator
         _usePatchValueIndivdiual = MiscUtils.loadNonEmptyBooleanProperty( props,
                 _USE_PATCH_VALUE_INDIVIDUAL_KEY,
                 "Use patch value individual" );
+        _LOG.debug( "Using patch value for individuals=["
+                + _usePatchValueIndivdiual
+                + "]" );
 
         // Get the random number generator
         _rng = simState.getRNG();

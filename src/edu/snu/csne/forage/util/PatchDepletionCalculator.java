@@ -131,7 +131,7 @@ public class PatchDepletionCalculator
         _enforcePatchMinimumAgents = MiscUtils.loadOptionalBooleanProperty( props,
                 _ENFORCE_PATCH_MIN_AGENTS_KEY,
                 false );
-        _LOG.warn( "Enforcing patch minimum agent count ["
+        _LOG.debug( "Enforcing patch minimum agent count ["
                 + _enforcePatchMinimumAgents
                 + "]" );
     }
