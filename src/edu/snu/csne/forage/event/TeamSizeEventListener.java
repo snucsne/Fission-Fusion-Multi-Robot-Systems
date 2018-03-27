@@ -38,6 +38,10 @@ public class TeamSizeEventListener extends AbstractSimulationEventListener
 {
     /** History of all the active team sizes */
     private List<int[]> _teamSizeHistory = new LinkedList<int[]>();
+
+    /** History of all the active number of agents */
+    private List<Integer> _activeAgentHistory = new LinkedList<Integer>();
+
     
     /**
      * Initializes this event listener
@@ -63,6 +67,7 @@ public class TeamSizeEventListener extends AbstractSimulationEventListener
     {
         // Clear out the old team size history values
         _teamSizeHistory = new LinkedList<int[]>();
+        _activeAgentHistory = new LinkedList<Integer>();
     }
 
 
@@ -96,6 +101,20 @@ public class TeamSizeEventListener extends AbstractSimulationEventListener
             teamSizes[i] = tmpTeamSizes.get(i).intValue();
         }
         _teamSizeHistory.add( teamSizes );
+
+        // Calculate the number of active agents
+        int activeAgentCount = 0;
+        Collection<Agent> allAgents = _simState.getAllAgents().values();
+        Iterator<Agent> agentIter = allAgents.iterator();
+        while( agentIter.hasNext() )
+        {
+            Agent agent = agentIter.next();
+            if( agent.isActive() )
+            {
+                activeAgentCount++;
+            }
+        }
+        _activeAgentHistory.add( Integer.valueOf( activeAgentCount ) );
     }
 
     /**
@@ -106,5 +125,15 @@ public class TeamSizeEventListener extends AbstractSimulationEventListener
     public List<int[]> getTeamSizeHistory()
     {
         return _teamSizeHistory;
+    }
+
+    /**
+     * Returns the history of the active agent counts
+     *
+     * @return The history of all the active agent counts
+     */
+    public List<Integer> getActiveAgentCountHistory()
+    {
+        return _activeAgentHistory;
     }
 }
