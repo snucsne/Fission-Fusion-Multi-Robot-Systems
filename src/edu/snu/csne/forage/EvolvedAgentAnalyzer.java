@@ -31,9 +31,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringJoiner;
-import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -87,8 +87,21 @@ public class EvolvedAgentAnalyzer
     /** Histories of all the team sizes in each simulation */
     private List<List<int[]>> _teamSizeHistories = new LinkedList<List<int[]>>();
     
-    /** Histories of all the decsion counts in each simulation */
+    /** Histories of all the decision counts in each simulation */
     private List<List<int[]>> _decisionCountHistories = new LinkedList<List<int[]>>();
+    
+    /** Histories of all the active agent counts in each simulation */
+    private List<List<Integer>> _activeAgentHistories = new LinkedList<List<Integer>>();
+    
+    /** Histories of all the numbers of agents attempting to forage at a patch  in each simulation */
+    private List<List<int[]>> _forageAttemptHistories = new LinkedList<List<int[]>>();
+
+    /** Histories of all the numbers of agents successfully foraging at a patch in each simulation */
+    private List<List<int[]>> _forageSuccessHistories = new LinkedList<List<int[]>>();
+    
+    /** Histories of all the minimum agent differentials at a patch in each simulation */
+    private List<List<int[]>> _minAgentDifferentialHistories = new LinkedList<List<int[]>>();
+
     
     
     /**
@@ -189,8 +202,12 @@ public class EvolvedAgentAnalyzer
             // Get the results
             float resourcesForaged = patchListener.getTotalResourcesForaged();
             _resourceHistory.add( Float.valueOf( resourcesForaged ) );
+            _forageAttemptHistories.add( patchListener.getForageAttemptHistory() );
+            _forageSuccessHistories.add( patchListener.getForageSuccessHistory() );
+            _minAgentDifferentialHistories.add( patchListener.getMinAgentDifferentialHistory() );
             List<int[]> teamSizeHistory = teamSizeListener.getTeamSizeHistory();
             _teamSizeHistories.add( teamSizeHistory );
+            _activeAgentHistories.add( teamSizeListener.getActiveAgentCountHistory() );
             List<int[]> decisionCountHistory = decisionListener.getDecisionCountHistory();
             _decisionCountHistories.add( decisionCountHistory );
         }
@@ -250,30 +267,87 @@ public class EvolvedAgentAnalyzer
             String foldID = String.format( "%02d", i );
             
             Float resources = _resourceHistory.get( i );
+            List<int[]> forageAttempts = _forageAttemptHistories.get( i );
+            List<int[]> forageSuccesses = _forageSuccessHistories.get( i );
+            List<int[]> minAgentDifferentials = _minAgentDifferentialHistories.get( i );
             List<int[]> teamSizes = _teamSizeHistories.get( i );
+            List<Integer> activeAgentCountHistory = _activeAgentHistories.get( i );
             List<int[]> decisionCounts = _decisionCountHistories.get( i );
             
             // Output the resources
             writer.println( "resources." + foldID + " = " + resources );
             
+            // Output the foraging attempts, successes, and min agent differentials
+            StringBuilder forageAttmptBuilder = new StringBuilder();
+            Iterator<int[]> forageAttemptIter = forageAttempts.iterator();
+            while( forageAttemptIter.hasNext() )
+            {
+                int[] currentForageAttempts = forageAttemptIter.next();
+                forageAttmptBuilder.append( StringUtils.join( ArrayUtils.toObject(currentForageAttempts), "," ) );
+                if( forageAttemptIter.hasNext() )
+                {
+                    forageAttmptBuilder.append( "  " );
+                }
+            }
+            writer.println( "forage-attempts."
+                    + foldID
+                    + " = "
+                    + forageAttmptBuilder.toString() );
+            
+            StringBuilder forageSuccessBuilder = new StringBuilder();
+            Iterator<int[]> forageSuccessesIter = forageSuccesses.iterator();
+            while( forageSuccessesIter.hasNext() )
+            {
+                int[] currentForageSuccesses = forageSuccessesIter.next();
+                forageSuccessBuilder.append( StringUtils.join( ArrayUtils.toObject(currentForageSuccesses), "," ) );
+                if( forageSuccessesIter.hasNext() )
+                {
+                    forageSuccessBuilder.append( "  " );
+                }
+            }
+            writer.println( "forage-successes."
+                    + foldID
+                    + " = "
+                    + forageSuccessBuilder.toString() );
+            
+            StringBuilder minAgentDifferentialBuilder = new StringBuilder();
+            Iterator<int[]> minAgentDiffIter = minAgentDifferentials.iterator();
+            while( minAgentDiffIter.hasNext() )
+            {
+                int[] currentMinAgentDifferentials = minAgentDiffIter.next();
+                minAgentDifferentialBuilder.append( StringUtils.join( ArrayUtils.toObject(currentMinAgentDifferentials), "," ) );
+                if( minAgentDiffIter.hasNext() )
+                {
+                    minAgentDifferentialBuilder.append( "  " );
+                }
+            }
+            writer.println( "min-agent-differential."
+                    + foldID
+                    + " = "
+                    + minAgentDifferentialBuilder.toString() );
+
             // Output the team sizes
             StringBuilder teamSizeBuilder = new StringBuilder();
             Iterator<int[]> teamSizeIter = teamSizes.iterator();
             while( teamSizeIter.hasNext() )
             {
                 int[] currentTeamSizes = teamSizeIter.next();
-                StringJoiner joiner = new StringJoiner( "," );
-                IntStream.of( currentTeamSizes ).forEach( x -> joiner.add( String.valueOf( x ) ) );
-                teamSizeBuilder.append( joiner.toString() );
+                teamSizeBuilder.append( StringUtils.join( ArrayUtils.toObject(currentTeamSizes), "," ) );
                 if( teamSizeIter.hasNext() )
                 {
-                    teamSizeBuilder.append( " " );
+                    teamSizeBuilder.append( "  " );
                 }
             }
             writer.println( "team-sizes."
                     + foldID
                     + " = "
                     + teamSizeBuilder.toString() );
+            
+            // Output the active agent counts
+            writer.println( "active-agent-count."
+                    + foldID
+                    + " = "
+                    + StringUtils.join( activeAgentCountHistory, "  " ) );
             
             // Output the decision counts
             int decisionCountsSize = decisionCounts.size();
@@ -292,7 +366,7 @@ public class EvolvedAgentAnalyzer
                     decisionCountsBuilders[k].append( String.format( "%2d", counts[k] ) );
                     if( j < (decisionCountsSize - 1) )
                     {
-                        decisionCountsBuilders[k].append( " " );
+                        decisionCountsBuilders[k].append( "  " );
                     }
                 }
             }

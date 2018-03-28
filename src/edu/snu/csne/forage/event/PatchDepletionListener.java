@@ -19,8 +19,10 @@
  */
 package edu.snu.csne.forage.event;
 
-import java.util.HashMap;
+import java.util.Collection;
+// Imports
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,7 @@ import edu.snu.csne.forage.SimulationState;
 import edu.snu.csne.forage.decision.DecisionType;
 import edu.snu.csne.forage.util.PatchDepletion;
 import edu.snu.csne.forage.util.PatchDepletionCalculator;
-import edu.snu.csne.forage.util.PatchDepletionCalculator.PatchDepletionData;
+
 
 /**
  * TODO Class description
@@ -77,8 +79,19 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
     
     /** Mapping of patches to the agents foraging in them */
     private Map<Patch, List<Agent>> _foragingAgents =
-            new HashMap<Patch, List<Agent>>();
+            new LinkedHashMap<Patch, List<Agent>>();
     
+    /** History of all the agents attempting to forage at patches */
+    private List<int[]> _forageAttemptHistory = new LinkedList<int[]>();
+
+    /** History of all the agents actually foraging at patches */
+    private List<int[]> _forageSuccessHistory = new LinkedList<int[]>();
+
+    /** History of all the min agent differential at patches */
+    private List<int[]> _minAgentDifferentialHistory = new LinkedList<int[]>();
+
+    /** The total number of patches */
+    private int _patchCount = 0;
     
     /**
      * Initializes this event listener
@@ -97,6 +110,31 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
         
         // Get the patch depletion calculator
         _patchDepletionCalc = simState.getPatchDepletionCalculator();
+        
+        // Create lists for each patch
+        Collection<Patch> allPatches = simState.getAllPatches().values();
+        _patchCount = allPatches.size();
+        Iterator<Patch> patchIter = allPatches.iterator();
+        while( patchIter.hasNext() )
+        {
+            Patch patch = patchIter.next();
+            List<Agent> patchForagingAgents = new LinkedList<Agent>();
+            _foragingAgents.put( patch, patchForagingAgents );
+        }
+    }
+
+    /**
+     * Prepares a simulation run for execution
+     *
+     * @see edu.snu.csne.forage.event.AbstractSimulationEventListener#simRunSetup()
+     */
+    @Override
+    public void simRunSetup()
+    {
+        // Clear out the old history values
+        _forageAttemptHistory.clear();
+        _forageSuccessHistory.clear();
+        _minAgentDifferentialHistory.clear();
     }
 
     /**
@@ -124,16 +162,30 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
     @Override
     public void simStepTearDown()
     {
+        // Create some handy variables
+        int[] forageAttempts = new int[_patchCount];
+        _forageAttemptHistory.add( forageAttempts );
+        int[] forageSuccesses = new int[_patchCount];
+        _forageSuccessHistory.add( forageSuccesses );
+        int[] minAgentDifferential = new int[_patchCount];
+        _minAgentDifferentialHistory.add( minAgentDifferential );
+        
         // Iterate through each patch with foraging agents
+        int i = -1;
         Iterator<Patch> patchIter = _foragingAgents.keySet().iterator();
         while( patchIter.hasNext() )
         {
             // Get the patch and the agents foraging in it
+            ++i;
             Patch patch = patchIter.next();
             List<Agent> patchForagingAgents = _foragingAgents.get( patch );
-            
-            // If there are no agents, move on to the next patch
             int agentCount = patchForagingAgents.size();
+            
+            // Save some values
+            forageAttempts[i] = agentCount;
+            minAgentDifferential[i] = agentCount - patch.getMinAgentForageCount();
+
+            // If there are no agents, move on to the next patch
             if( 0 >= agentCount )
             {
                 continue;
@@ -151,6 +203,13 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
                     agent.getResourceConsumptionRate() );
             float resourcesForagedPerAgent = depletionData.getPerAgentResources();
             float totalResourcesForaged = depletionData.getTotalResources();
+            
+            // Were they successful?
+            if( 0 < totalResourcesForaged )
+            {
+                // Yup
+                forageSuccesses[i] = agentCount;
+            }
             
             // Determine how much was actually foraged
             float actualResourcesForaged = patch.setResourcesForaged(
@@ -232,11 +291,6 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
             
             // Get the list of foraging agents for the patch
             List<Agent> patchForagingAgents = _foragingAgents.get( patch );
-            if( null == patchForagingAgents )
-            {
-                patchForagingAgents = new LinkedList<Agent>();
-                _foragingAgents.put( patch, patchForagingAgents );
-            }
             
             // Add the agent to the list
             patchForagingAgents.add( agent );
@@ -251,6 +305,21 @@ public class PatchDepletionListener extends AbstractSimulationEventListener
     public float getTotalResourcesForaged()
     {
         return _totalResourcesForaged;
+    }
+
+    public List<int[]> getForageAttemptHistory()
+    {
+        return _forageAttemptHistory;
+    }
+    
+    public List<int[]> getForageSuccessHistory()
+    {
+        return _forageSuccessHistory;
+    }
+    
+    public List<int[]> getMinAgentDifferentialHistory()
+    {
+        return _minAgentDifferentialHistory;
     }
 
 }

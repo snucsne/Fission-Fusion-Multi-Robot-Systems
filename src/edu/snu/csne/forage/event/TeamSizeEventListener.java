@@ -26,8 +26,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.snu.csne.forage.Agent;
 import edu.snu.csne.forage.AgentTeam;
 import edu.snu.csne.forage.SimulationState;
+import edu.snu.csne.forage.decision.DecisionType;
 
 /**
  * TODO Class description
@@ -90,7 +92,12 @@ public class TeamSizeEventListener extends AbstractSimulationEventListener
             // Ensure there are agents in the team
             if( team.isActive() )
             {
-                tmpTeamSizes.add( Integer.valueOf( team.getSize() ) );
+                // Ensure that the team isn't resting
+                Agent leader = team.getMembers().get( 0 );
+                if( !DecisionType.REST.equals( leader.getDecision().getType() ) )
+                {
+                    tmpTeamSizes.add( Integer.valueOf( team.getSize() ) );
+                }
             }
         }
         

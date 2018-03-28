@@ -258,10 +258,26 @@ public class PatchDepletionCalculator
         float resourcesForagedPerAgent = 0.0f;
         float totalResourcesForaged = 0.0f;
         
+//        // Check to ensure that we have sufficient agents
+//        if( (0 < currentAgentCount)
+//                && (!_enforcePatchMinimumAgents
+//                        || (currentAgentCount >= minAgentCount)) )
+//        {
+//            // Compute the resource density and effective area per agent
+//            float resourceDensity = resources / patchArea;
+//            float foragingAreaEffective = (float) Math.min( foragingAreaMax,
+//                    patchArea / currentAgentCount );
+//
+//            // Compute how many resources are foraged
+//            resourcesForagedPerAgent = (float) Math.min( consumptionRateMax,
+//                    foragingAreaEffective * resourceDensity );
+//            totalResourcesForaged = resourcesForagedPerAgent * currentAgentCount;
+//        }
+
         // Check to ensure that we have sufficient agents
-        if( (0 < currentAgentCount)
-                && (!_enforcePatchMinimumAgents
-                        || (currentAgentCount >= minAgentCount)) )
+        if( 0 < currentAgentCount )
+//                && (!_enforcePatchMinimumAgents
+//                        || (currentAgentCount >= minAgentCount)) )
         {
             // Compute the resource density and effective area per agent
             float resourceDensity = resources / patchArea;
@@ -272,6 +288,14 @@ public class PatchDepletionCalculator
             resourcesForagedPerAgent = (float) Math.min( consumptionRateMax,
                     foragingAreaEffective * resourceDensity );
             totalResourcesForaged = resourcesForagedPerAgent * currentAgentCount;
+            
+            // If we don't have the minimum, reduce it
+            if( _enforcePatchMinimumAgents && (currentAgentCount < minAgentCount) )
+            {
+                float minFraction = currentAgentCount / (float) minAgentCount;
+                resourcesForagedPerAgent *= minFraction;
+                totalResourcesForaged *= minFraction;
+            }
         }
         
         return new PatchDepletion( resourcesForagedPerAgent,

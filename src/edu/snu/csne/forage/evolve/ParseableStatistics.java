@@ -27,7 +27,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -188,9 +191,33 @@ public class ParseableStatistics extends Statistics
         paramBuilder.append( newline );
         paramBuilder.append( "# " );
         StringWriter writer = new StringWriter();
-        state.parameters.list( new PrintWriter( writer) );
+//        PrintWriter printWriter = new PrintWriter( writer );
+        state.parameters.list( new PrintWriter( writer ) );
         String paramStr = writer.toString();
         paramBuilder.append( paramStr.replaceAll("\n", "\n# ") );
+
+        if( state.evaluator.p_problem instanceof DefaultForageProblem )
+        {
+            paramBuilder.append( newline );
+            paramBuilder.append( "# =========================================================" );
+            paramBuilder.append( newline );
+            paramBuilder.append( "# Simulator properties" );
+            paramBuilder.append( newline );
+            paramBuilder.append( newline );
+            Properties simProps = ((DefaultForageProblem) state.evaluator.p_problem).getDefaultSimProperties();
+            SortedMap simPropsMap = new TreeMap( simProps );
+            Iterator iter = simPropsMap.keySet().iterator();
+            while( iter.hasNext() )
+            {
+                String key = (String) iter.next();
+                String value = simProps.getProperty( key );
+                paramBuilder.append( "# " );
+                paramBuilder.append( key );
+                paramBuilder.append( " = " );
+                paramBuilder.append( value );
+                paramBuilder.append( newline );
+            }
+        }
         paramBuilder.append( newline );
         paramBuilder.append( "# =========================================================" );
         paramBuilder.append( newline );

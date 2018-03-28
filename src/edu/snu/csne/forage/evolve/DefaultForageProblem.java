@@ -59,7 +59,7 @@ public class DefaultForageProblem extends Problem
     private static final long serialVersionUID = 1L;
     
     /** Our logger */
-    private static final Logger _LOG = LogManager.getLogger(
+    protected static final Logger _LOG = LogManager.getLogger(
             DefaultForageProblem.class.getName() );
 
     /** Parameter key for the initiation base rate */
@@ -297,10 +297,10 @@ public class DefaultForageProblem extends Problem
     
 
     /** Default simulator properties */
-    private Properties _defaultSimProperties = null;
+    protected Properties _defaultSimProperties = null;
     
     /** Fold property files */
-    private FoldProperties _foldProps = new FoldProperties();
+    protected FoldProperties _foldProps = new FoldProperties();
     
     /** Flag indicating that individuals should be re-evaluated every generation */
     private boolean _forceReevaluation = false;
@@ -1234,6 +1234,11 @@ public class DefaultForageProblem extends Problem
         int binary = MiscUtils.convertGrayCodeToBinary( grayCode );
 
         return binary;
+    }
+    
+    public Properties getDefaultSimProperties()
+    {
+        return _defaultSimProperties;
     }
 
 }
