@@ -1,0 +1,112 @@
+# ==============================================================
+# Parent parameters
+# ==============================================================
+parent.0 = ./neat-default.parameters
+
+# ==============================================================
+# Problem parameters
+# ==============================================================
+eval.problem = edu.snu.csne.forage.evolve.DefaultNeatForageProblem
+eval.problem.force-reevaluation = true
+
+quit-on-run-complete = true
+
+# ==============================================================
+# Population parameters
+# ==============================================================
+
+# Population size
+pop.subpop.0.size = 50
+
+pop.subpop.0.species.fitness = edu.snu.csne.forage.evolve.CrossValidationFitness
+
+# Number of generations
+generations = 51
+
+# ==============================================================
+# Individual parameters
+# ==============================================================
+
+# Number of hard-coded network nodes in the initial population
+neat.individual.nodes.count = 12
+
+# Bias node information
+neat.individual.nodes.0.name = Bias
+neat.individual.nodes.0.type = bias
+neat.individual.nodes.0.drawing-position = 0
+neat.individual.nodes.0.random-activation-function = false
+
+# Initiation node information
+neat.individual.nodes.1.name = InitiationActive
+neat.individual.nodes.1.type = input
+neat.individual.nodes.1.drawing-position = 0
+neat.individual.nodes.1.random-activation-function = false
+
+neat.individual.nodes.2.name = InitiationRelativePosition
+neat.individual.nodes.2.type = input
+neat.individual.nodes.2.drawing-position = 0
+neat.individual.nodes.2.random-activation-function = false
+
+neat.individual.nodes.3.name = InitiationPatchRelativeDirDiff
+neat.individual.nodes.3.type = input
+neat.individual.nodes.3.drawing-position = 0
+neat.individual.nodes.3.random-activation-function = false
+
+neat.individual.nodes.4.name = InitiationPatchValue
+neat.individual.nodes.4.type = input
+neat.individual.nodes.4.drawing-position = 0
+neat.individual.nodes.4.random-activation-function = false
+
+
+# Following node information
+neat.individual.nodes.5.name = FollowActive
+neat.individual.nodes.5.type = input
+neat.individual.nodes.5.drawing-position = 0
+neat.individual.nodes.5.random-activation-function = false
+
+neat.individual.nodes.6.name = FollowLeaderRelativeDirDiff
+neat.individual.nodes.6.type = input
+neat.individual.nodes.6.drawing-position = 0
+neat.individual.nodes.6.random-activation-function = false
+
+neat.individual.nodes.7.name = FollowPatchContribution
+neat.individual.nodes.7.type = input
+neat.individual.nodes.7.drawing-position = 0
+neat.individual.nodes.7.random-activation-function = false
+
+neat.individual.nodes.8.name = FollowSizeRequirementMet
+neat.individual.nodes.8.type = input
+neat.individual.nodes.8.drawing-position = 0
+neat.individual.nodes.8.random-activation-function = false
+
+# Foraging node information
+neat.individual.nodes.9.name = ForageActive
+neat.individual.nodes.9.type = input
+neat.individual.nodes.9.drawing-position = 0
+neat.individual.nodes.9.random-activation-function = false
+
+neat.individual.nodes.10.name = ForagePatchValue
+neat.individual.nodes.10.type = input
+neat.individual.nodes.10.drawing-position = 0
+neat.individual.nodes.10.random-activation-function = false
+
+# Output node information
+neat.individual.nodes.11.name = Output
+neat.individual.nodes.11.type = output
+neat.individual.nodes.11.drawing-position = 1
+neat.individual.nodes.11.random-activation-function = false
+neat.individual.nodes.11.activation-function = steepened-sigmoid
+
+
+# Number of hard-coded network links in the initial population
+neat.individual.links.count = 0
+
+# Flag indicating that the topology should be created
+neat.individual.create-topology = true
+
+# Edge density of created topology
+neat.individual.edge-density = 1.0
+
+# Available activation functions
+neat.individual.activation-functions = steepened-sigmoid
+

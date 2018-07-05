@@ -196,7 +196,7 @@ public class ParseableStatistics extends Statistics
         String paramStr = writer.toString();
         paramBuilder.append( paramStr.replaceAll("\n", "\n# ") );
 
-        if( state.evaluator.p_problem instanceof DefaultForageProblem )
+        if( state.evaluator.p_problem instanceof DefaultGAForageProblem )
         {
             paramBuilder.append( newline );
             paramBuilder.append( "# =========================================================" );
@@ -204,7 +204,7 @@ public class ParseableStatistics extends Statistics
             paramBuilder.append( "# Simulator properties" );
             paramBuilder.append( newline );
             paramBuilder.append( newline );
-            Properties simProps = ((DefaultForageProblem) state.evaluator.p_problem).getDefaultSimProperties();
+            Properties simProps = ((DefaultGAForageProblem) state.evaluator.p_problem).getDefaultSimProperties();
             SortedMap simPropsMap = new TreeMap( simProps );
             Iterator iter = simPropsMap.keySet().iterator();
             while( iter.hasNext() )
@@ -610,9 +610,9 @@ public class ParseableStatistics extends Statistics
             String comment )
     {
         // Save the genome
-        if( state.evaluator.p_problem instanceof DefaultForageProblem )
+        if( state.evaluator.p_problem instanceof DefaultGAForageProblem )
         {
-            DefaultForageProblem problem = (DefaultForageProblem) state.evaluator.p_problem;
+            DefaultGAForageProblem problem = (DefaultGAForageProblem) state.evaluator.p_problem;
             Properties genomeProps = problem.getGenomeProperties( _bestFound[subpop] );
             
             StringBuilder builder = new StringBuilder( "# " );

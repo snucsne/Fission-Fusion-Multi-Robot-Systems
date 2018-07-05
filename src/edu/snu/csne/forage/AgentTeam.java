@@ -22,6 +22,7 @@ package edu.snu.csne.forage;
 // Imports
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -50,6 +51,14 @@ public class AgentTeam
     
     /** Flag denoting whether or not this team can be removed when empty */
     private boolean _removeable = false;
+    
+    /** First member of the group (typically the leader) */
+    private Agent _firstMember = null;
+    
+    private Decision _firstMemberDecision = null;
+    
+    private List<String> _leftMemberIDs = new LinkedList<String>();
+    
     
     /**
      * Builds this AgentTeam object
@@ -104,6 +113,13 @@ public class AgentTeam
     public void join( Agent agent )
     {
         Validate.notNull( agent, "Joining agent may not be null" );
+        
+        if( null == _firstMember )
+        {
+            _firstMember = agent;
+            _firstMemberDecision = agent.getDecision();
+        }
+        
 //        _members.put( agent.getID(), agent );
         _members.add( agent );
 //        _LOG.warn( "Agent joined team: agent=["
@@ -122,6 +138,10 @@ public class AgentTeam
     {
         Validate.notNull( agent, "Leaving agent may not be null" );
         boolean success = _members.remove( agent );
+        if( success )
+        {
+            _leftMemberIDs.add( agent.getID() );
+        }
         Validate.isTrue( success, "Leaving agent ["
                 + agent.getID()
                 + "] was not a member of team ["
@@ -233,5 +253,20 @@ public class AgentTeam
     public boolean isRemoveable()
     {
         return _removeable;
+    }
+    
+    public Agent getFirstMember()
+    {
+        return _firstMember;
+    }
+    
+    public Decision getFirstMemberDecision()
+    {
+        return _firstMemberDecision;
+    }
+    
+    public List<String> getLeftMemberIDs()
+    {
+        return _leftMemberIDs;
     }
 }

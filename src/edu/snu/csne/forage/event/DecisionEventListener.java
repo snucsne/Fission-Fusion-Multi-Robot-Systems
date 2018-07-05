@@ -63,6 +63,9 @@ public class DecisionEventListener extends AbstractSimulationEventListener
     /** A list of all the decisions made by agents */
     private List<DecisionEvent> _decisionHistory =
             new LinkedList<DecisionEvent>();
+    
+    /** The current state of the simulation */
+    private SimulationState _simState = null;
 
     
     /**
@@ -78,6 +81,7 @@ public class DecisionEventListener extends AbstractSimulationEventListener
 
         // Call the superclass implementation
         super.initialize( simState );
+        _simState = simState;
         
         // Grab the properties
         Properties props = simState.getProps();
@@ -166,10 +170,9 @@ public class DecisionEventListener extends AbstractSimulationEventListener
             DecisionEvent currentEvent = decisionIter.next();
             Decision currentDecision = currentEvent.getDecision();
             
-            _writer.printf( "%010d   %10s  %10s  %10s\n",
+            _writer.printf( "%010d   %10s  %10s\n",
                     currentEvent.getTimestep(),
                     currentEvent.getAgent().getID(),
-                    currentDecision.getTeam().getID(),
                     currentDecision.getType() );
         }
         

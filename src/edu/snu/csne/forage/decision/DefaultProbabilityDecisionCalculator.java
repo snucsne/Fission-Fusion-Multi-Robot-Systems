@@ -442,7 +442,7 @@ public class DefaultProbabilityDecisionCalculator
     @Override
     public float calculateNavigateProbability( Patch patch, Agent agent )
     {
-        // Get the mean resultant vector of the agent w.r.t. sesnsed teammates
+        // Get the mean resultant vector of the agent w.r.t. sensed teammates
         NavigationalVector mrv = agent.getMRVForTeam( agent.getTeam().getID() );
         float mrvComponent = 0.0f;
         float mrvR = mrv.r;
@@ -680,11 +680,11 @@ public class DefaultProbabilityDecisionCalculator
     }
 
     /**
-     * TODO Method description
-     *
-     * @param patch
-     * @param agent
-     * @return
+     * Calculate the probability that a given agent forages in the
+     * current patch
+     * 
+     * @param agent The agent making the decision
+     * @return The probability
      * @see edu.snu.csne.forage.decision.ProbabilityDecisionCalculator#calculateForageProbability(edu.snu.csne.forage.Patch, edu.snu.csne.forage.Agent)
      */
     @Override

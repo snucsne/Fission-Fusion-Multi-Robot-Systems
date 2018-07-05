@@ -19,7 +19,6 @@
  */
 package edu.snu.csne.forage;
 
-import java.util.Collection;
 // Imports
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -181,6 +179,9 @@ public class SimulationState
     /** Number of new teams created */
     private int _newTeamCount = 0;
     
+    /** Decision maker for all agents */
+    private AgentDecisionMaker _decisionMaker = null;
+    
     /** The patch depletion calculator */
     private PatchDepletionCalculator _patchDepletionCalculator =
             new PatchDepletionCalculator();
@@ -191,6 +192,9 @@ public class SimulationState
     
     /** All the teams in the simulation */
     private Map<String,AgentTeam> _teams = new HashMap<String,AgentTeam>();
+    
+    /** Each agent's leader */
+    private Map<Agent,Agent> _following = new HashMap<Agent,Agent>();
     
     /** All the food patches in the simulation */
     private Map<String,Patch> _patches = new HashMap<String,Patch>();
@@ -442,6 +446,78 @@ public class SimulationState
         
         return team;
     }
+
+    public void registerFollower( Agent follower, Agent leader )
+    {
+        Validate.notNull( follower, "Can't register a null follower" );
+        Validate.notNull( leader, "Can't register a follower for a null leader" );
+        Validate.isTrue( !follower.getID().equals( leader.getID() ),
+                "Agent ["
+                + follower.getID()
+                + "] can't follow themself" );
+        
+        Agent currentLeader = _following.get( follower );
+        if( null != currentLeader )
+        {
+            _LOG.error( "Follower ["
+                + follower.getID()
+                + "] can't follow ["
+                + leader.getID()
+                + "] since they are already following ["
+                + currentLeader.getID()
+                + "]" );
+            throw new RuntimeException( "Follower ["
+                + follower.getID()
+                + "] can't follow ["
+                + leader.getID()
+                + "] since they are already following ["
+                + currentLeader.getID()
+                + "]" );
+        }
+        _following.put( follower, leader );
+    }
+    
+    public void deregisterFollower( Agent follower, Agent leader )
+    {
+        Validate.notNull( follower, "Can't deregister a null follower" );
+        Validate.notNull( leader, "Can't deregister a follower for a null leader" );
+        Validate.isTrue( !follower.getID().equals( leader.getID() ),
+                "Agent ["
+                + follower.getID()
+                + "] can't unfollow themself" );
+
+        Agent currentLeader = _following.get( follower );
+        Validate.isTrue( leader.equals( currentLeader),
+                "Follower ["
+                + follower.getID()
+                + "] isn't following ["
+                + leader.getID()
+                + "] (currently following ["
+                + currentLeader
+                + "])" );
+        _following.remove( follower );
+    }
+    
+    public List<Agent> getFollowers( Agent leader )
+    {
+        Validate.notNull( leader, "Can't find followers of null leader" );
+        
+        List<Agent> followers = new LinkedList<Agent>();
+        
+        // Iterate through all the agents to see who they are following
+        Iterator<Agent> followerIter = _following.keySet().iterator();
+        while( followerIter.hasNext() )
+        {
+            Agent currentFollower = followerIter.next();
+            Agent currentLeader = _following.get( currentFollower );
+            if( leader.getID().equals( currentLeader ) )
+            {
+                followers.add( currentFollower );
+            }
+        }
+        
+        return followers;
+    }
     
     /**
      * Returns all the food patches in the simulation
@@ -683,6 +759,11 @@ public class SimulationState
         return _patchDepletionCalculator;
     }
     
+    public AgentDecisionMaker getAgentDecisionMaker()
+    {
+        return _decisionMaker;
+    }
+    
     /**
      * Create all the agents used in the simulation
      */
@@ -767,12 +848,12 @@ public class SimulationState
 
         // Get the decision maker class
         String decisionMakerClassName = _props.getProperty( _DECISION_MAKER_CLASS_KEY );
-        AgentDecisionMaker decisionMaker = (AgentDecisionMaker) MiscUtils.loadAndInstantiate(
+        _decisionMaker = (AgentDecisionMaker) MiscUtils.loadAndInstantiate(
                 decisionMakerClassName,
                 "Agent decision maker class is required - specified class is not valid ["
                 + decisionMakerClassName
                 + "]" );
-        decisionMaker.initialize( this, _props );
+        _decisionMaker.initialize( this, _props );
 
         // Get the agent configuration properties
         String agentPropertiesFile = _props.getProperty( _AGENT_PROPS_FILE_KEY );
@@ -836,7 +917,7 @@ public class SimulationState
                     maxForagingArea,
                     agentSensor,
                     patchSensor,
-                    decisionMaker,
+                    _decisionMaker,
                     _patchDepletionCalculator,
                     this );
             

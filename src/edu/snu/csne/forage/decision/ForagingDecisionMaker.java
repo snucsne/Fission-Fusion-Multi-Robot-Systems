@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
@@ -56,9 +58,7 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
     private DecisionBuilder _decisionBuilder = new DecisionBuilder();
 
     /** The probability decision calculator */
-    private ProbabilityDecisionCalculator _probDecisionCalc =
-            new DefaultProbabilityDecisionCalculator();
-    
+    private ProbabilityDecisionCalculator _probDecisionCalc = null;
     
     
     /**
@@ -83,6 +83,7 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
         _decisionBuilder.initialize( simState, props );
         
         // Initialize the probability decision calculator
+        _probDecisionCalc = new DefaultProbabilityDecisionCalculator();
         _probDecisionCalc.initialize( simState );
 
         _LOG.trace( "Leaving initialize( simState, props )" );
@@ -264,6 +265,11 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
             {
                 continue;
             }
+            if( agent.getID().equals( leader.getID() ) )
+            {
+                _LOG.warn( "Attempted to build a decision where an agent follows itself" );
+                continue;
+            }
             
             // Calculate the probability of following this leader
             float probability = _probDecisionCalc.calculateFollowProbability(
@@ -328,5 +334,13 @@ public class ForagingDecisionMaker extends AbstractAgentDecisionMaker
         }
         
         return forageDecisions;
+    }
+    
+    public void setProbabilityDecisionCalculator(
+            ProbabilityDecisionCalculator probDecisionCalc )
+    {
+        Validate.notNull( probDecisionCalc,
+                "Probability decision calculator may not be null" );
+        _probDecisionCalc = probDecisionCalc;
     }
 }

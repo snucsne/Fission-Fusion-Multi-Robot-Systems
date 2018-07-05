@@ -133,6 +133,11 @@ public class Decision
         }
     }
     
+    public long getTimestep()
+    {
+        return _timestep;
+    }
+    
     /**
      * Returns the type of this decision
      *
@@ -356,7 +361,7 @@ public class Decision
         return new Decision(
                 DecisionType.FOLLOW,
                 timestep,
-                leader.getTeam(),
+                null,
                 leader,
                 null,
                 null,
@@ -418,7 +423,7 @@ public class Decision
                 DecisionType.REST,
                 timestep,
                 agent.getTeam(),
-                agent,
+                null,
                 null,
                 agent.getPosition(),
                 0.0f,

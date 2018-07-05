@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import com.jme3.math.Vector3f;
 import edu.snu.csne.forage.decision.AgentDecisionMaker;
 import edu.snu.csne.forage.decision.Decision;
+import edu.snu.csne.forage.decision.DecisionType;
 import edu.snu.csne.forage.event.DecisionEvent;
 import edu.snu.csne.forage.sensor.AgentSensor;
 import edu.snu.csne.forage.sensor.PatchSensor;
@@ -267,18 +268,60 @@ public class Agent
         _LOG.trace( "Entering plan()" );
 
         // Get the new decision
-        _decision = _decisionMaker.decide( this );
-
-        // Are we switching teams?
-        if( !_decision.getTeam().equals( _team ) )
+        Decision decision = _decisionMaker.decide( this );
+        if( !_decision.equals( decision ) )
         {
-            // Yup, change the team and notify them
-            _team.leave( this );
-            _team = _decision.getTeam();
-            _team.join( this );
+            // Does the new decision have a new leader?
+            Agent oldLeader = _decision.getLeader();
+if( this.equals(oldLeader) )
+{
+    _LOG.warn( "Old leader is same as us: decisionType=["
+            + _decision.getType()
+            + "] time=["
+            + _decision.getTimestep()
+            + "]" );
+}
+            Agent newLeader = decision.getLeader();
+            if( null == oldLeader )
+            {
+                if( null != newLeader )
+                {
+                    _simState.registerFollower( this, newLeader );
+                }
+            }
+            else if( null == newLeader )
+            {
+                _simState.deregisterFollower( this, oldLeader );
+            }
+            else if( !oldLeader.getID().equals( newLeader.getID() ) )
+            {
+                _simState.deregisterFollower( this, oldLeader );
+                _simState.registerFollower( this, newLeader );
+            }
             
-            // Search through the sensed agents for the new teammates
-            findSensedTeammates();
+            // Set our new team?
+            AgentTeam newTeam = decision.getTeam();
+            if( null == newTeam )
+            {
+                if( DecisionType.FOLLOW.equals( decision.getType() ) )
+                {
+                    // Use the team of the decision's leader
+                    newTeam = decision.getLeader().getTeam();
+                }
+                else
+                {
+                    _LOG.error( "Non-follow decision of type ["
+                            + _decision.getType()
+                            + "] has no associated team" );
+                    throw new RuntimeException( "Non-follow decision of type ["
+                            + _decision.getType()
+                            + "] has no associated team" );
+                }
+            }
+            setTeam( newTeam );
+        
+            // Set the new decision
+            _decision = decision;
         }
         
         // Signal this decision
@@ -395,6 +438,63 @@ public class Agent
         return _team;
     }
     
+    public void setTeam( AgentTeam team )
+    {
+        // Is it different?
+        Validate.notNull( team, "New team may not be null" );
+        if( !_team.equals( team ) )
+        {
+            // Yup
+            _team.leave( this );
+            _team = team;
+            _team.join( this );
+            
+            // Notify all the followers
+            Iterator<Agent> iter = _simState.getFollowers( this ).iterator();
+            while( iter.hasNext() )
+            {
+                Agent follower = iter.next();
+                follower.setTeam( team );
+            }
+            
+            // Search through the sensed agents for the new teammates
+            findSensedTeammates();
+        }
+    }
+    
+    public Agent getLeader()
+    {
+        return getLeader( this );
+    }
+    
+    private Agent getLeader( Agent originalAgent )
+    {
+        Agent leader = null;
+
+        // If the decision leader is null, this agent is the leader
+        Agent decisionLeader = _decision.getLeader();
+        if( null == decisionLeader )
+        {
+            // This agent is the leader
+            leader = this;
+        }
+        /* Check to ensure the decision leader isn't the original agent looking
+         * for their leader.  This could happen if A follows B, B follows C,
+         * and C follows A. */
+        else if( originalAgent.getID().equals( decisionLeader ) )
+        {
+            _LOG.warn( "Cycle detected in leadership hierarchy" );
+            leader = null;
+        }
+        else
+        {
+            // Ask the decision leader who their team leader is
+            leader = decisionLeader.getLeader( originalAgent );
+        }
+        
+        return leader;
+    }
+    
     /**
      * Returns this agent's position
      *
@@ -495,6 +595,12 @@ public class Agent
         return _sensedTeammates;
     }
     
+    public List<Agent> getSensedAgentsOnTeam( AgentTeam team )
+    {
+        Validate.notNull( team, "Team may not be null" );
+        return _knownTeamMemberships.get( team.getID() );
+    }
+    
     /**
      * Returns all the non-teammate agents that are sensed by this agent
      *
@@ -531,7 +637,13 @@ public class Agent
         {
             String teamID = teamIDIter.next();
             Agent agent = _knownTeamMemberships.get( teamID ).get( 0 );
-            sensedLeaders.put( teamID, agent );
+            
+            // A leader can't be resting
+            Decision agentDecision = agent.getDecision();
+            if( !DecisionType.REST.equals( agentDecision.getType() ) )
+            {
+                sensedLeaders.put( teamID, agent );
+            }
         }
         
         return sensedLeaders;

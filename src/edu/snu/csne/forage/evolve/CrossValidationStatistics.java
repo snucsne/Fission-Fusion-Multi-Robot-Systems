@@ -58,9 +58,9 @@ public class CrossValidationStatistics extends ParseableStatistics
         _LOG.trace( "Entering buildIndDescription( ind, state, useGen, indPrefix )" );
 
         // Evaluate the individual to get testing and validation fitness
-        if( state.evaluator.p_problem instanceof DefaultForageProblem )
+        if( state.evaluator.p_problem instanceof DefaultGAForageProblem )
         {
-            DefaultForageProblem problem = (DefaultForageProblem) state.evaluator.p_problem;
+            DefaultGAForageProblem problem = (DefaultGAForageProblem) state.evaluator.p_problem;
             problem.evaluate( state, ind, FoldType.TESTING );
             problem.evaluate( state, ind, FoldType.VALIDATION );
         }
