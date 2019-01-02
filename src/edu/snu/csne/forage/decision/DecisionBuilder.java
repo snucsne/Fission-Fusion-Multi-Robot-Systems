@@ -125,7 +125,6 @@ public class DecisionBuilder
         // Build the decision
         Decision decision = Decision.buildNavigateDecision( _simState.getCurrentSimulationStep(),
 //                _simState.createNewTeam(),
-                null,
                 patch,
                 navWeights.get( GroupBehavior.SEPARATION ).floatValue(),
                 navWeights.get( GroupBehavior.COHESION ).floatValue(),
@@ -143,7 +142,7 @@ public class DecisionBuilder
         return decision;
     }
     
-    public Decision buildFollowDecision( Agent agent, Agent leader, float probabiltiy )
+    public Decision buildFollowDecision( Agent agent, Agent leader, Patch patch, float probabiltiy )
     {
         // Get the follow weights
         Map<GroupBehavior, Float> followWeights = _behaviorWeights.get( DecisionType.FOLLOW );
@@ -151,6 +150,7 @@ public class DecisionBuilder
         // Build the decision
         Decision decision = Decision.buildFollowDecision( _simState.getCurrentSimulationStep(),
                 leader,
+                patch,
                 followWeights.get( GroupBehavior.SEPARATION ).floatValue(),
                 followWeights.get( GroupBehavior.COHESION ).floatValue(),
                 followWeights.get( GroupBehavior.ALIGNMENT ).floatValue(),

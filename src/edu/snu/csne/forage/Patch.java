@@ -61,8 +61,8 @@ public class Patch
     /** The minimum number of agents required for foraging to succeed */
     private int _minAgentForageCount = 0;
     
-    /** The agent team for foragers at this patch */
-    private AgentTeam _foragingTeam = null;
+//    /** The agent team for foragers at this patch */
+//    private AgentTeam _foragingTeam = null;
     
     
     /**
@@ -82,28 +82,28 @@ public class Patch
             float predationProbability,
             int minAgentForageCount )
     {
-        this( id, position, radius, initialResources, predationProbability, minAgentForageCount, null );
-    }
-
-    /**
-     * Builds this Patch object
-     *
-     * @param id
-     * @param position
-     * @param radius
-     * @param initialResources
-     * @param predationProbability
-     * @param minAgentForageCount
-     * @param foragingTeam
-     */
-    public Patch( String id,
-            Vector3f position,
-            float radius,
-            float initialResources,
-            float predationProbability,
-            int minAgentForageCount,
-            AgentTeam foragingTeam )
-    {
+//        this( id, position, radius, initialResources, predationProbability, minAgentForageCount, null );
+//    }
+//
+//    /**
+//     * Builds this Patch object
+//     *
+//     * @param id
+//     * @param position
+//     * @param radius
+//     * @param initialResources
+//     * @param predationProbability
+//     * @param minAgentForageCount
+//     * @param foragingTeam
+//     */
+//    public Patch( String id,
+//            Vector3f position,
+//            float radius,
+//            float initialResources,
+//            float predationProbability,
+//            int minAgentForageCount,
+//            AgentTeam foragingTeam )
+//    {
         // Validate and store
         Validate.notEmpty( id, "Patch ID may not be null or empty" );
         Validate.notNull( position, "Patch position may not be null" );
@@ -125,8 +125,8 @@ public class Patch
         _predationProbability = predationProbability;
         _minAgentForageCount = minAgentForageCount;
         
-        // Foraging team is optional
-        _foragingTeam = foragingTeam;
+//        // Foraging team is optional
+//        _foragingTeam = foragingTeam;
     }
 
     /**
@@ -228,10 +228,10 @@ public class Patch
         return _minAgentForageCount;
     }
 
-    public AgentTeam getForagingTeam()
-    {
-        return _foragingTeam;
-    }
+//    public AgentTeam getForagingTeam()
+//    {
+//        return _foragingTeam;
+//    }
     
     /**
      * TODO Method description

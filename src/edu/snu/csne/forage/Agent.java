@@ -81,9 +81,6 @@ public class Agent
     /** This agent's acceleration */
     private Vector3f _acceleration = new Vector3f();
     
-    /** The team of which this agent is a member */
-    private AgentTeam _team = null;
-    
     /** The rate of resources this agent can consume */
     private float _resourceConsumptionRate = 0.0f;
     
@@ -171,7 +168,6 @@ public class Agent
     public Agent( String id,
             Vector3f initialPosition,
             Vector3f initialVelocity,
-            AgentTeam team,
             float resourceConsumptionRate,
             float resourceConsumptionMax,
             float maxSpeed,
@@ -190,7 +186,6 @@ public class Agent
         Validate.notBlank( id, "ID may not be null" );
         Validate.notNull( initialPosition, "Initial position may not be null" );
         Validate.notNull( initialVelocity, "Initial velocity may not be null" );
-        Validate.notNull( team, "Team may not be null" );
         Validate.isTrue( 0.0f < resourceConsumptionRate,
                 "Resource consumption rate must be positive" );
         Validate.isTrue( 0.0f < maxSpeed, "Max speed must be positive" );
@@ -208,7 +203,6 @@ public class Agent
         _id = id;
         _position = initialPosition.clone();
         _velocity = initialVelocity.clone();
-        _team = team;
         _resourceConsumptionRate = resourceConsumptionRate;
         _maxSpeed = maxSpeed;
         _maxForce = maxForce;
@@ -299,27 +293,6 @@ if( this.equals(oldLeader) )
                 _simState.registerFollower( this, newLeader );
             }
             
-            // Set our new team?
-            AgentTeam newTeam = decision.getTeam();
-            if( null == newTeam )
-            {
-                if( DecisionType.FOLLOW.equals( decision.getType() ) )
-                {
-                    // Use the team of the decision's leader
-                    newTeam = decision.getLeader().getTeam();
-                }
-                else
-                {
-                    _LOG.error( "Non-follow decision of type ["
-                            + _decision.getType()
-                            + "] has no associated team" );
-                    throw new RuntimeException( "Non-follow decision of type ["
-                            + _decision.getType()
-                            + "] has no associated team" );
-                }
-            }
-            setTeam( newTeam );
-        
             // Set the new decision
             _decision = decision;
         }
@@ -411,9 +384,6 @@ if( this.equals(oldLeader) )
      */
     public void terminate()
     {
-        // Notify the team the agent isn't a member anymore
-        _team.leave( this );
-        
         // Set the agent to inactive
         _active = false;
     }
@@ -426,40 +396,6 @@ if( this.equals(oldLeader) )
     public String getID()
     {
         return _id;
-    }
-    
-    /**
-     * Returns the team of which this agent is a member
-     *
-     * @return The agent's team
-     */
-    public AgentTeam getTeam()
-    {
-        return _team;
-    }
-    
-    public void setTeam( AgentTeam team )
-    {
-        // Is it different?
-        Validate.notNull( team, "New team may not be null" );
-        if( !_team.equals( team ) )
-        {
-            // Yup
-            _team.leave( this );
-            _team = team;
-            _team.join( this );
-            
-            // Notify all the followers
-            Iterator<Agent> iter = _simState.getFollowers( this ).iterator();
-            while( iter.hasNext() )
-            {
-                Agent follower = iter.next();
-                follower.setTeam( team );
-            }
-            
-            // Search through the sensed agents for the new teammates
-            findSensedTeammates();
-        }
     }
     
     public Agent getLeader()

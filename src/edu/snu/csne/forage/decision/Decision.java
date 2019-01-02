@@ -23,11 +23,8 @@ package edu.snu.csne.forage.decision;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.jme3.math.Vector3f;
-
 import edu.snu.csne.forage.Agent;
-import edu.snu.csne.forage.AgentTeam;
 import edu.snu.csne.forage.Patch;
 import edu.snu.csne.forage.SimulationState;
 
@@ -48,9 +45,6 @@ public class Decision
 
     /** The time of this decision */
     private long _timestep = 0l;
-    
-    /** The team associated with this decision */
-    private AgentTeam _team = null;
     
     /** The leader (if any) associated with this decision */
     private Agent _leader = null;
@@ -79,7 +73,6 @@ public class Decision
     
     private Decision( DecisionType type,
             long timestep,
-            AgentTeam team,
             Agent leader,
             Patch patch,
             Vector3f destination,
@@ -94,8 +87,6 @@ public class Decision
         _type = type;
         Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
         _timestep = timestep;
-//        Validate.notNull( type, "Agent team may not be null" );
-        _team = team;
         
         // Optional parameters
         _leader = leader;
@@ -125,12 +116,7 @@ public class Decision
      */
     public void choose( SimulationState simState )
     {
-        // Create a team for the agent if there is no team associated with it
-        if( null == _team )
-        {
-            _team = simState.createNewTeam();
-            _LOG.debug( "Creating new team" );
-        }
+        // Do nothing now
     }
     
     public long getTimestep()
@@ -156,16 +142,6 @@ public class Decision
     public float getProbability()
     {
         return _probability;
-    }
-    
-    /**
-     * Returns the team associated with this decision
-     *
-     * @return The team
-     */
-    public AgentTeam getTeam()   
-    {
-        return _team;
     }
     
     /**
@@ -270,7 +246,6 @@ public class Decision
     
     public static Decision buildNavigateDecision(
             long timestep,
-            AgentTeam team,
             Patch patch,
             float separationWeight,
             float cohesionWeight,
@@ -292,7 +267,6 @@ public class Decision
         return new Decision(
                 DecisionType.NAVIGATE,
                 timestep,
-                team,
                 null,
                 patch,
                 null,
@@ -305,7 +279,6 @@ public class Decision
     
     public static Decision buildExploreDecision(
             long timestep,
-            AgentTeam team,
             Vector3f destination,
             float separationWeight,
             float cohesionWeight,
@@ -315,7 +288,6 @@ public class Decision
     {
         // Validate the parameters
         Validate.isTrue( 0 <= timestep, "Timestep must be non-negative" );
-        Validate.notNull( team, "Agent team may not be null" );
         Validate.notNull( destination, "Destination may not be null" );
         Validate.inclusiveBetween( 0.0f,
                 1.0f,
@@ -328,7 +300,6 @@ public class Decision
         return new Decision(
                 DecisionType.EXPLORE,
                 timestep,
-                team,
                 null,
                 null,
                 destination,
@@ -342,6 +313,7 @@ public class Decision
     public static Decision buildFollowDecision(
             long timestep,
             Agent leader,
+            Patch patch,
             float separationWeight,
             float cohesionWeight,
             float alignmentWeight,
@@ -361,9 +333,8 @@ public class Decision
         return new Decision(
                 DecisionType.FOLLOW,
                 timestep,
-                null,
                 leader,
-                null,
+                patch,
                 null,
                 separationWeight,
                 cohesionWeight,
@@ -374,7 +345,6 @@ public class Decision
     
     public static Decision buildForageDecision(
             long timestep,
-            AgentTeam team,
             Agent leader,
             Patch patch,
             float separationWeight,
@@ -392,15 +362,10 @@ public class Decision
                         + probability
                         + "]" );
 
-        // Leader or team is required
-        Validate.isTrue( (null != team) || (null != leader),
-                "Leader or team is required" );
-        
         // Create the decision
         return new Decision(
                 DecisionType.FORAGE,
                 timestep,
-                team,
                 leader,
                 patch,
                 patch.getPosition(),
@@ -422,7 +387,6 @@ public class Decision
         return new Decision(
                 DecisionType.REST,
                 timestep,
-                agent.getTeam(),
                 null,
                 null,
                 agent.getPosition(),

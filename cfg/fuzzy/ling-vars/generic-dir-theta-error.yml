@@ -1,0 +1,18 @@
+name : DirThetaError
+uod : "[-1,1]"
+values :
+  - name : negative-large
+    membership : (-1,1) (-0.55,1) (-0.3,0)
+  - name : negative
+    membership : (-0.55,0) (-0.3,1) (-0.05,0)
+  - name : negative-small
+    membership : (-0.3,0) (-0.05,1) (0,0)
+  - name : zero
+    membership : (-0.05,0) (0,1) (0.05,0)
+  - name : positive-small
+    membership : (0,0) (0.05,1) (0.3,0)
+  - name : positive
+    membership : (0.05,0) (0.3,1) (0.55,0)
+  - name : positive-large
+    membership : (0.3,0) (0.55,1) (1,1)
+

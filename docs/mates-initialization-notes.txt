@@ -1,0 +1,29 @@
+Engine initialization
+- Initialize fuzzy system
+- Turn off JME logging
+- Load app settings in simple app
+  settings.load("edu.snu.csne.mates.Simulator")
+
+SimpleApplication simpleInitApp
+- Create BulletAppState
+- Create sim display environment app state
+- Create sim execution app state
+
+Build sim display environment app state (if not headless)
+- Set background
+- Add grid
+- Add lights
+- Set up chase camera
+
+Build sim execution app state
+- Load environment
+  - Iterate through world objects
+    - Create the agent
+      - Get fuzzy variables
+      - Get float variables
+      - Get modules
+    - Create the spatial/geometry
+      - Some can be non-physical (e.g., patches)
+    - Create control constraints?
+- Load listeners
+

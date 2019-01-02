@@ -1,0 +1,35 @@
+name : Cohesion behavior
+rules :
+  # Rule 1
+  - rule :
+    antecedent :
+      and :
+        - input-value           : cohesion-dir-theta
+          linguistic-variable   : DirTheta back-left
+        - input-value           : cohesion-arrival-time
+          linguistic-variable   : ArrivalTime now
+    consequent :
+      and :
+        - output-value          : steer-yaw-output
+          linguistic-variable   : SteerYaw left
+        - output-value          : steer-speed-relative-output
+          linguistic-variable   : SteerSpeedRelative same
+
+  # Rule 2
+  - rule :
+    antecedent :
+      and :
+        - input-value           : cohesion-dir-theta
+          linguistic-variable   : DirTheta back-left
+        - input-value           : cohesion-arrival-time
+          hedge :
+            type                : not
+            linguistic-variable  : ArrivalTime now
+    consequent :
+      and :
+        - output-value          : steer-yaw-output
+          linguistic-variable   : SteerYaw left
+        - output-value          : steer-speed-relative-output
+          linguistic-variable   : SteerSpeedRelative same
+
+

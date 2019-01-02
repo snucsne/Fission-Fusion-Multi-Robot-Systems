@@ -1,0 +1,13 @@
+name : SteerYaw
+uod : "[-1,1]"
+values :
+  - name : left
+    membership : (-1,1) (-0.1,1) (-0.05,0)
+  - name : small-left
+    membership : (-0.1,0) (-0.05,1) (0,0)
+  - name : center
+    membership : (-0.05,0) (0,1) (0.05,0)
+  - name : small-right
+    membership : (0,0) (0.05,1) (0.1,0)
+  - name : right
+    membership : (0.05,0) (0.1,1) (1,1)

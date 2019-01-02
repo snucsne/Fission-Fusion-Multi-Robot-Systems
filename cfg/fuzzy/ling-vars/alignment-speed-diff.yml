@@ -1,0 +1,13 @@
+name : AlignmentSpeedDiff
+uod : "[-1,1]"
+values :
+  - name : much-slower
+    membership : (-1,1) (-0.3,1) (-0.15,0)
+  - name : slower
+    membership : (-0.3,0) (-0.15,1) (0,0)
+  - name : same
+    membership : (-0.15,0) (0,1) (0.15,0)
+  - name : faster
+    membership : (0,0) (0.15,1) (0.3,0)
+  - name : much-faster
+    membership : (0.15,0) (0.3,1) (1,1)

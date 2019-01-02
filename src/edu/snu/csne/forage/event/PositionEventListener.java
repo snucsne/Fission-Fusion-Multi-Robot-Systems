@@ -68,19 +68,16 @@ public class PositionEventListener extends AbstractSimulationEventListener
         public final Vector3f position;
         public final long timestep;
         public final String agentID;
-        public final AgentTeam team;
         public final boolean active;
         
         public PositionUpdate( Vector3f position,
                 long timestep,
                 String agentID,
-                AgentTeam team,
                 boolean active)
         {
             this.position = new Vector3f( position );
             this.timestep = timestep;
             this.agentID = agentID;
-            this.team = team;
             this.active = active;
         }
     }
@@ -184,7 +181,6 @@ public class PositionEventListener extends AbstractSimulationEventListener
                     current.getPosition(),
                     timestep.longValue(),
                     current.getID(),
-                    current.getTeam(),
                     current.isActive() ) );
         }
     }
@@ -221,7 +217,6 @@ public class PositionEventListener extends AbstractSimulationEventListener
                     current.getPosition(),
                     timestep.longValue(),
                     current.getID(),
-                    current.getTeam(),
                     current.isActive() ) );
         }
     }
@@ -252,7 +247,6 @@ public class PositionEventListener extends AbstractSimulationEventListener
                 _writer.printf( "%06d  %s  %-20s  %+09.3f  %+09.3f  %+09.3f  %1d\n",
                         update.timestep,
                         update.agentID,
-                        update.team.getID(),
                         update.position.x,
                         update.position.y,
                         update.position.z,

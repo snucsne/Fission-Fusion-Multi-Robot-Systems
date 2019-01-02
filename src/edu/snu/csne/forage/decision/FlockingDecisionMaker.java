@@ -71,13 +71,8 @@ public class FlockingDecisionMaker extends AbstractAgentDecisionMaker
     {
 //        _LOG.trace( "Entering decide( agent )" );
 
-        // There should be only one team
-        Map<String,AgentTeam> allTeams = _simState.getAllTeams();
-        AgentTeam team = allTeams.values().iterator().next();
-        
         // Always do the same thing and simply flock
         Decision decision = Decision.buildExploreDecision( 0,
-                team,
                 Vector3f.ZERO,
                 1.5f,
                 1.0f,

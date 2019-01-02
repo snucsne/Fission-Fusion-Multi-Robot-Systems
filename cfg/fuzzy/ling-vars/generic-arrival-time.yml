@@ -1,0 +1,13 @@
+name : ArrivalTime
+uod : "[0,1]"
+values :
+  - name : now
+    membership : (0,1) (0.03,1) (0.06,0)
+  - name : real-soon
+    membership : (0.03,0) (0.06,1) (0.15,1) (0.2,0)
+  - name : soon
+    membership : (0.15,0) (0.2,1) (0.4,1) (0.5,0)
+  - name : long-time
+    membership : (0.4,0) (0.5,1) (0.75,1) (0.85,0)
+  - name : distant
+    membership : (0.75,0) (0.85,1) (1,1)

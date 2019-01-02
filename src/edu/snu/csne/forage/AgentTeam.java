@@ -37,6 +37,7 @@ import edu.snu.csne.forage.decision.DecisionType;
  *
  * @author Brent Eskridge
  */
+@Deprecated
 public class AgentTeam
 {
     /** Our logger */

@@ -1,0 +1,13 @@
+# =========================================================
+# generated on: Wed Mar 21 17:18:24 CDT 2018
+# position count [1]
+# minimum neighbor separation [0.0]
+# maximum position radius [0.0]
+# maximum velocity [0.0]
+# random seed [30]
+# =========================================================
+
+agent-count = 1
+agent.000.position = +00.000,+00.000,+00.000
+agent.000.velocity = -00.000,-00.000,+00.000
+agent.000.team = Team000

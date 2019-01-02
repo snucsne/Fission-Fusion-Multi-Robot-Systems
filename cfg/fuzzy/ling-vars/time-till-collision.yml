@@ -1,0 +1,13 @@
+name : TimeTillCollision
+uod : "[0,1]"
+values :
+  - name : now
+    membership : (0,1) (0.08,1) (0.12,0)
+  - name : real-soon
+    membership : (0.08,0) (0.12,1) (0.2,1) (0.25,0)
+  - name : soon
+    membership : (0.2,0) (0.25,1) (0.4,1) (0.5,0)
+  - name : long-time
+    membership : (0.4,0) (0.5,1) (0.75,1) (0.85,0)
+  - name : distant
+    membership : (0.75,0) (0.85,1) (1,1)

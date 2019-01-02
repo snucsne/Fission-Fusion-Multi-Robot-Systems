@@ -1,0 +1,11 @@
+name : DirThetaDelta
+uod : "[0,1]"
+values :
+  - name : zero
+    membership : (0,1) (0.05,0)
+  - name : small
+    membership : (0.0,0) (0.05,1) (0.1,0)
+  - name : medium
+    membership : (0.05,0) (0.1,1) (0.45,1) (0.55,0)
+  - name : large
+    membership : (0.45,0) (0.55,1) (1,1)

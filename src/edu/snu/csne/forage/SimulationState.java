@@ -190,9 +190,6 @@ public class SimulationState
     /** All the agents in the simulation */
     private Map<String,Agent> _agents = new HashMap<String,Agent>();
     
-    /** All the teams in the simulation */
-    private Map<String,AgentTeam> _teams = new HashMap<String,AgentTeam>();
-    
     /** Each agent's leader */
     private Map<Agent,Agent> _following = new HashMap<Agent,Agent>();
     
@@ -357,96 +354,6 @@ public class SimulationState
         return agent;
     }
     
-    /**
-     * Returns all the teams in the simulation
-     * 
-     * @return All the teams
-     */
-    public Map<String,AgentTeam> getAllTeams()
-    {
-        return new HashMap<String,AgentTeam>( _teams );
-    }
-    
-    /**
-     * Returns all the active teams in the simulation
-     *
-     * @return All the active teams
-     */
-    public Map<String,AgentTeam> getAllActiveTeams()
-    {
-        Map<String,AgentTeam> activeTeams = new HashMap<String,AgentTeam>(); 
-        Iterator<AgentTeam> teamIter = getAllTeams().values().iterator();
-        while( teamIter.hasNext() )
-        {
-            AgentTeam current = teamIter.next();
-            if( current.isActive() )
-            {
-                activeTeams.put( current.getID(), current );
-            }
-        }
-        
-        return activeTeams;
-    }
-    
-    /**
-     * Returns the team specified by the ID.  If the team does not exist,
-     * it can create it.
-     *
-     * @param id The unique id
-     * @param Flag indiicating whether or not to create the team if it
-     * doesn't exist
-     * @return The team
-     */
-    public AgentTeam getTeam( String id, boolean createIfNotExist )
-    {
-        // Try to get the team
-        AgentTeam team = _teams.get( id );
-        
-        // Does it exist?
-        if( null == team )
-        {
-            // Nope.  DO we create it?
-            if( createIfNotExist )
-            {
-                team = new AgentTeam( id );
-                _teams.put( id, team );
-                _LOG.debug( "Created team with ID ["
-                        + id
-                        + "]" );
-            }
-            else
-            {
-                // Nope
-                throw new IllegalArgumentException( "No team with id=["
-                        + id
-                        + "] was found" );
-            }
-        }
-        
-        return team;
-    }
-    
-    /**
-     * Creates a new team
-     *
-     * @return The newly created team
-     */
-    public AgentTeam createNewTeam()
-    {
-        // Generate an ID
-        String id = "GenTeam" + String.format( "%05d", ++_newTeamCount );
-        
-        // Build the team
-        AgentTeam team = new AgentTeam( id );
-        _teams.put( id, team );
-        
-        _LOG.debug( "Created new team with ID=["
-                + id
-                + "]" );
-        
-        return team;
-    }
-
     public void registerFollower( Agent follower, Agent leader )
     {
         Validate.notNull( follower, "Can't register a null follower" );
@@ -613,21 +520,6 @@ public class SimulationState
         {
             // Send the signal
             iter.next().simStepTearDown();
-        }
-        
-        // Remove any inactive and removable teams
-        List<AgentTeam> teams = new LinkedList<AgentTeam>( _teams.values() );
-        Iterator<AgentTeam> teamIter = teams.iterator();
-        while( teamIter.hasNext() )
-        {
-            AgentTeam team = teamIter.next();
-            if( !team.isActive() && team.isRemoveable() )
-            {
-                _teams.remove( team.getID() );
-//                _LOG.debug( "Cleaned up empty team ["
-//                        + team.getID()
-//                        + "]" );
-            }
         }
     }
 
@@ -895,18 +787,10 @@ public class SimulationState
                     "Agent [" + formattedIdx + "] velocity " );
             }
 
-            // Get the team
-            String teamID = agentProps.getProperty( prefix + _TEAM_KEY );
-            Validate.notEmpty( teamID, "Team id may not be null or empty" );
-            
-            // Get the team from the library
-            AgentTeam team = getTeam( teamID, true );
-            
             // Create the agent
             Agent agent = new Agent( id,
                     position,
                     velocity,
-                    team,
                     resourceConsumptionRate,
                     resourceConsumptionMax,
                     maxSpeed,
@@ -923,9 +807,6 @@ public class SimulationState
             
             // Add it to the map
             _agents.put( id, agent );
-            
-            // Add it to its team
-            team.join( agent );
         }
         
         _LOG.trace( "Leaving createAgents()" );
@@ -994,19 +875,13 @@ public class SimulationState
                     prefix + _MIN_AGENT_FORAGE_COUNT_KEY,
                     "Patch [" + formattedIdx + "] min agent forage count " );
 
-            // Create the team for foraging in the patch
-            AgentTeam foragingTeam = new AgentTeam( "Foraging" + formattedIdx, false );
-            _teams.put( foragingTeam.getID(), foragingTeam );
-            _LOG.debug( "Created foraging team [" + foragingTeam.getID() + "]" );
-            
             // Create the patch and store it
             Patch patch = new Patch( id,
                     position,
                     radius,
                     resources,
                     predationProbability,
-                    minAgentForageCount,
-                    foragingTeam );
+                    minAgentForageCount );
             _patches.put( id, patch );
             
             _LOG.debug( "Created patch [" + id + "]" );

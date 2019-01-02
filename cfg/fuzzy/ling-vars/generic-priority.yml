@@ -1,0 +1,13 @@
+name : Priority
+uod : "[0,1]"
+values :
+  - name : zero
+    membership : (0,1) (0.08,1) (0.1,0)
+  - name : low
+    membership : (0.08,0) (0.1,1) (0.3,1) (0.4,0)
+  - name : medium
+    membership : (0.3,0) (0.4,1) (0.65,1) (0.75,0)
+  - name : high
+    membership : (0.65,0) (0.75,1) (0.95,1) (0.975,0)
+  - name : full
+    membership : (0.95,0) (0.975,1) (1,1)

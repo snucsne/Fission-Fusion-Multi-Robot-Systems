@@ -1,0 +1,433 @@
+name : Flocking behavior
+rules :
+  # Rule 1
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority full
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA zero
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA zero
+
+  # Rule 2
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority high
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA zero
+
+  # Rule 3
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority high
+        - input-value           : separation-priority
+          linguistic-variable   : Priority full
+    consequent :
+      and :
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA medium
+
+  # Rule 4
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority high
+        - input-value           : separation-priority
+          linguistic-variable   : Priority high
+    consequent :
+      and :
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA low
+
+  # Rule 5
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority high
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+    consequent :
+      and :
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA zero
+
+
+  # Rule 6
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority medium
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA medium
+
+  # Rule 7
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority low
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA low
+
+  # Rule 8
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          linguistic-variable   : Priority full
+    consequent :
+      and :
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA zero
+
+  # Rule 9
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          linguistic-variable   : Priority high
+    consequent :
+      and :
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA zero
+
+  # Rule 10
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : cohesion-priority
+          linguistic-variable   : Priority full
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA low
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA low
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA full
+
+  # Rule 11
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : cohesion-priority
+          linguistic-variable   : Priority high
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA low
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA low
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA full
+
+  # Rule 11
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA low
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA low
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA full
+
+  # Rule 12
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA medium
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA low
+
+  # Rule 13
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+        - input-value           : cohesion-priority
+          linguistic-variable   : Priority zero
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA medium
+
+  # Rule 14
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority zero
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : separation-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+    consequent :
+      and :
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA medium
+
+  # Rule 15
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : alignment-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+        - input-value           : separation-priority
+          linguistic-variable   : Priority zero
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority full
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority high
+        - input-value           : cohesion-priority
+          hedge :
+            type                : not
+            linguistic-variable : Priority zero
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA full
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA low
+
+  # Rule 16
+  - rule :
+    antecedent :
+      and :
+        - input-value           : cohesion-priority
+          linguistic-variable   : Priority medium
+    consequent :
+      and :
+        - output-value          : cohesion-doa
+          linguistic-variable   : BehaviorDOA medium
+
+  # Rule 17
+  - rule :
+    antecedent :
+      and :
+        - input-value           : alignment-priority
+          linguistic-variable   : Priority medium
+    consequent :
+      and :
+        - output-value          : alignment-doa
+          linguistic-variable   : BehaviorDOA medium
+
+  # Rule 18
+  - rule :
+    antecedent :
+      and :
+        - input-value           : separation-priority
+          linguistic-variable   : Priority medium
+    consequent :
+      and :
+        - output-value          : separation-doa
+          linguistic-variable   : BehaviorDOA medium
+
+

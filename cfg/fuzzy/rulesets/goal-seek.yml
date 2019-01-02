@@ -6,7 +6,7 @@ rules :
     antecedent :
       and :
         - input-value           : goal-dir-theta
-          linguistic-variable   : GoalSeekDirTheta back-left
+          linguistic-variable   : DirTheta back-left
         - input-value           : goal-arrival-time
           linguistic-variable   : ArrivalTime now
     consequent :
@@ -17,10 +17,12 @@ rules :
           linguistic-variable   : SteerSpeedRelative same
 
   - rule :
+    # IF (goal-dir-theta IS back-left) AND (goal-arrival-time IS NOT now)
+    # THEN (steery-yaw-output IS left) AND (steer-speed-relative-output IS faster)
     antecedent :
       and :
         - input-value           : goal-dir-theta
-          linguistic-variable   : GoalSeekDirTheta back-left
+          linguistic-variable   : DirTheta back-left
         - input-value           : goal-arrival-time
           hedge :
             type                : not
@@ -33,10 +35,12 @@ rules :
           linguistic-variable   : SteerSpeedRelative faster
 
   - rule :
+    # IF (goal-dir-theta IS back-right) AND (goal-arrival-time IS now)
+    # THEN (steer-yaw-output IS right) AND (steer-speed-relative-output IS same)
     antecedent :
       and :
         - input-value           : goal-dir-theta
-          linguistic-variable   : GoalSeekDirTheta back-right
+          linguistic-variable   : DirTheta back-right
         - input-value           : goal-arrival-time
           linguistic-variable   : ArrivalTime now
     consequent :
@@ -50,7 +54,7 @@ rules :
     antecedent :
       and :
         - input-value           : goal-dir-theta
-          linguistic-variable   : GoalSeekDirTheta back-right
+          linguistic-variable   : DirTheta back-right
         - input-value           : goal-arrival-time
           hedge :
             type                : not
@@ -68,11 +72,11 @@ rules :
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-left
+            linguistic-variable : DirTheta back-left
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-right
+            linguistic-variable : DirTheta back-right
         - input-value           : goal-arrival-time
           linguistic-variable   : ArrivalTime distant
     consequent :
@@ -85,11 +89,11 @@ rules :
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-left
+            linguistic-variable : DirTheta back-left
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-right
+            linguistic-variable : DirTheta back-right
         - input-value           : goal-arrival-time
           linguistic-variable   : ArrivalTime long-time
     consequent :
@@ -102,11 +106,11 @@ rules :
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-left
+            linguistic-variable : DirTheta back-left
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-right
+            linguistic-variable : DirTheta back-right
         - input-value           : goal-arrival-time
           linguistic-variable   : ArrivalTime soon
     consequent :
@@ -119,11 +123,11 @@ rules :
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-left
+            linguistic-variable : DirTheta back-left
         - input-value           : goal-dir-theta
           hedge :
             type                : not
-            linguistic-variable : GoalSeekDirTheta back-right
+            linguistic-variable : DirTheta back-right
         - input-value           : goal-arrival-time
           linguistic-variable   : ArrivalTime real-soon
     consequent :
@@ -141,7 +145,7 @@ rules :
   - rule :
     antecedent :
       input-value           : goal-dir-theta
-      linguistic-variable   : GoalSeekDirTheta left
+      linguistic-variable   : DirTheta left
     consequent :
       output-value          : steer-yaw-output
       linguistic-variable   : SteerYaw left
@@ -149,7 +153,7 @@ rules :
   - rule :
     antecedent :
       input-value           : goal-dir-theta
-      linguistic-variable   : GoalSeekDirTheta small-left
+      linguistic-variable   : DirTheta small-left
     consequent :
       output-value          : steer-yaw-output
       linguistic-variable   : SteerYaw small-left
@@ -157,7 +161,7 @@ rules :
   - rule :
     antecedent :
       input-value           : goal-dir-theta
-      linguistic-variable   : GoalSeekDirTheta center
+      linguistic-variable   : DirTheta center
     consequent :
       output-value          : steer-yaw-output
       linguistic-variable   : SteerYaw center
@@ -165,7 +169,7 @@ rules :
   - rule :
     antecedent :
       input-value           : goal-dir-theta
-      linguistic-variable   : GoalSeekDirTheta small-right
+      linguistic-variable   : DirTheta small-right
     consequent :
       output-value          : steer-yaw-output
       linguistic-variable   : SteerYaw small-right
@@ -173,7 +177,7 @@ rules :
   - rule :
     antecedent :
       input-value           : goal-dir-theta
-      linguistic-variable   : GoalSeekDirTheta right
+      linguistic-variable   : DirTheta right
     consequent :
       output-value          : steer-yaw-output
       linguistic-variable   : SteerYaw right
